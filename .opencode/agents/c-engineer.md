@@ -20,6 +20,9 @@ permissions:
     resource: "modern-c-mastery"
     effect: allow
   - action: skill
+    resource: "reverse-engineer-anything"
+    effect: allow
+  - action: skill
     resource: "cpp20-win32-re"
     effect: allow
   - action: skill

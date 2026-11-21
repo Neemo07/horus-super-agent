@@ -1,10 +1,10 @@
 # Horus Super Agent
 
-**A DAG-Wave orchestrator harness for [OpenCode](https://opencode.ai): 1 primary agent, 5 specialist subagents, 8 expert skills, and a mechanical evidence gate that refuses to call work "done" without proof on disk.**
+**A DAG-Wave orchestrator harness for [OpenCode](https://opencode.ai): 1 primary agent, 5 specialist subagents, 9 expert skills, and a mechanical evidence gate that refuses to call work "done" without proof on disk.**
 
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%2B%20V2-00d4aa?style=flat-square)](https://opencode.ai)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](#license)
-[![Skills](https://img.shields.io/badge/skills-8-a855f7?style=flat-square)](#whats-inside)
+[![Skills](https://img.shields.io/badge/skills-9-a855f7?style=flat-square)](#whats-inside)
 [![Agents](https://img.shields.io/badge/agents-6-f59e0b?style=flat-square)](#agents)
 
 ---
@@ -43,11 +43,12 @@ horus-super-agent/
     │   ├── ui-gui-engineer.md
     │   ├── re-analyst.md
     │   └── reviewer.md
-    └── skills/                # 8 skills, each a SKILL.md (+ scripts/)
+    └── skills/                # 9 skills, each a SKILL.md (+ scripts/)
         ├── planning-with-evidence/     # scripts/plan.py — the evidence gate
         ├── subagent-driven-dev/        # DAG waves, dispatch envelopes, review gates
         ├── anti-hallucination-harness/ # dsh-superagent discipline
         ├── graphify-memory/            # AST graph as long-context memory
+        ├── reverse-engineer-anything/  # REA tool routing, evidence IDs, static≠runtime
         ├── modern-c-mastery/           # C11/C17/C23, UB elimination, hardening
         ├── cpp20-win32-re/             # PE32/PE32+ → clean C++20 reconstruction
         ├── native-gui-architecture/    # Win32+D2D, ImGui, GTK4, SDL3
@@ -111,7 +112,7 @@ First prompt triggers the **kickoff gate**: Horus asks whether to enable subagen
 | `architect` | subagent | Read-only systems architect. Maps codebases via Graphify, emits DAG task plans with disjoint file-ownership locks. |
 | `c-engineer` | subagent | C17/C23 + C++20/Win32 engineer. Zero-UB hardened code, respects write-locks, returns compact Result Envelopes. |
 | `ui-gui-engineer` | subagent | Native desktop GUI (Win32/Direct2D, ImGui, GTK4, SDL3, Clay) and modern web UI/UX. Accessible, zero-slop interfaces. |
-| `re-analyst` | subagent | Read-only reverse engineer. REA + Ghidra/IDA evidence for structs, vtables, Win32 API contracts. Never edits source. |
+| `re-analyst` | subagent | Read-only reverse engineer. Loads `reverse-engineer-anything` for REA routing + `cpp20-win32-re` for MSVC ABI. Evidence for structs, vtables, Win32 contracts. Never edits source. |
 | `reviewer` | subagent | Strictly read-only. Spec, security, memory-safety, ABI, file-lock and evidence audit. Emits `PASS`/`FAIL` with `file:line`. |
 
 Subagents are isolated: they receive a **compact Dispatch Packet** (task id, goal, owned files, graphify slice, invariants, acceptance criteria, verify command), never your conversation history.
@@ -202,6 +203,7 @@ Tasks run in dependency waves, not sequentially:
 | `subagent-driven-dev` | Parallel delegation with file locks and review gates |
 | `anti-hallucination-harness` | Enforcing evidence-backed claims and surgical refactors |
 | `graphify-memory` | Architecture mapping, dependency tracing, blast-radius checks |
+| `reverse-engineer-anything` | REA tool routing for PE/ELF/Mach-O, Electron/ASAR, archives, hardening audits |
 | `modern-c-mastery` | Writing/auditing C11/C17/C23 |
 | `cpp20-win32-re` | Reconstructing legacy Win32 C++ from PE32/PE32+ binaries |
 | `native-gui-architecture` | Desktop GUI: DPI scaling, 60/120fps, threading, dark mode |
