@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Primary DAG-Wave Orchestrator built on DeepSeek dsh-superagent + Graphify + REA + Planning-with-Evidence
+  "default_agent": "horus",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "permissions": [
+    { "action": "read", "resource": "*", "effect": "allow" },
+    { "action": "glob", "resource": "*", "effect": "allow" },
+    { "action": "grep", "resource": "*", "effect": "allow" },
+    { "action": "skill", "resource": "*", "effect": "allow" },
+    { "action": "edit", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "git push *", "effect": "ask" },
+    { "action": "shell", "resource": "rm -rf *", "effect": "ask" },
+    { "action": "subagent", "resource": "*", "effect": "allow" }
+  ],
+  // Optional MCP servers: uncomment once installed
+  // "mcp": {
+  //   "graphify": {
+  //     "type": "local",
+  //     "command": ["graphify", "--mcp"],
+  //     "enabled": true
+  //   },
+  //   "rea": {
+  //     "type": "local",
+  //     "command": ["npx", "-y", "rea-agents@latest", "mcp"],
+  //     "enabled": true
+  //   }
+  // }
+}

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Planning / runtime artifacts produced by plan.py
+task_plan.md
+findings.md
+progress.md
+HANDOFF.md
+evidence/
+.horus/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
