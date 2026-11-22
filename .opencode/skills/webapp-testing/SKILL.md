@@ -1,86 +1,96 @@
 ---
 name: webapp-testing
 description: Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.
-license: MIT
-compatibility: opencode
-metadata:
-  source: anthropics/skills (skills/webapp-testing)
-  edition: condensed-offline
+license: Complete terms in LICENSE.txt
 ---
-# Web Application Testing
 
-> Provenance: offline edition re-authored from the upstream `anthropics/skills` `webapp-testing` skill; `scripts/with_server.py` and `examples/` are independent implementations with the same CLI contract. Run `python scripts/sync_upstream.py --only webapp-testing` from the project root to replace this folder with the verbatim upstream skill.
+# Web Application Testing
 
 To test local web applications, write native Python Playwright scripts.
 
-**Helper scripts**
-- `scripts/with_server.py` - starts one or more servers, waits for their ports, runs your command, then stops the servers (Windows and POSIX).
+**Helper Scripts Available**:
+- `scripts/with_server.py` - Manages server lifecycle (supports multiple servers)
 
-Always run `python scripts/with_server.py --help` first. Treat helper scripts as black boxes: call them, do not read their source into context unless a customised solution is unavoidable.
+**Always run scripts with `--help` first** to see usage. DO NOT read the source until you try running the script first and find that a customized solution is abslutely necessary. These scripts can be very large and thus pollute your context window. They exist to be called directly as black-box scripts rather than ingested into your context window.
 
-## Decision tree
+## Decision Tree: Choosing Your Approach
+
 ```
-Task -> static HTML?
-  yes -> read the HTML, pick selectors, write a Playwright script (file:// URL)
-         fails/incomplete -> treat as dynamic
-  no  -> server already running?
-         no  -> python scripts/with_server.py --help, then wrap your script with it
-         yes -> reconnaissance-then-action:
-                1. navigate, wait for networkidle
-                2. screenshot or inspect the DOM
-                3. identify selectors from what is rendered
-                4. act with those selectors
+User task → Is it static HTML?
+    ├─ Yes → Read HTML file directly to identify selectors
+    │         ├─ Success → Write Playwright script using selectors
+    │         └─ Fails/Incomplete → Treat as dynamic (below)
+    │
+    └─ No (dynamic webapp) → Is the server already running?
+        ├─ No → Run: python scripts/with_server.py --help
+        │        Then use the helper + write simplified Playwright script
+        │
+        └─ Yes → Reconnaissance-then-action:
+            1. Navigate and wait for networkidle
+            2. Take screenshot or inspect DOM
+            3. Identify selectors from rendered state
+            4. Execute actions with discovered selectors
 ```
 
-## Run with a managed server
+## Example: Using with_server.py
+
+To start a server, run `--help` first, then use the helper:
+
+**Single server:**
 ```bash
-# one server
 python scripts/with_server.py --server "npm run dev" --port 5173 -- python your_automation.py
+```
 
-# backend + frontend
+**Multiple servers (e.g., backend + frontend):**
+```bash
 python scripts/with_server.py \
   --server "cd backend && python server.py" --port 3000 \
   --server "cd frontend && npm run dev" --port 5173 \
   -- python your_automation.py
 ```
-Your automation script contains only Playwright logic; servers are managed for you.
 
+To create an automation script, include only Playwright logic (servers are managed automatically):
 ```python
 from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)   # always headless
+    browser = p.chromium.launch(headless=True) # Always launch chromium in headless mode
     page = browser.new_page()
-    page.goto("http://localhost:5173")
-    page.wait_for_load_state("networkidle")      # CRITICAL on dynamic apps
-    # ... automation logic
+    page.goto('http://localhost:5173') # Server already running and ready
+    page.wait_for_load_state('networkidle') # CRITICAL: Wait for JS to execute
+    # ... your automation logic
     browser.close()
 ```
 
-## Reconnaissance-then-action
-1. Inspect the rendered DOM: `page.screenshot(path="/tmp/inspect.png", full_page=True)`, `page.content()`, `page.locator("button").all()`.
-2. Identify selectors from the inspection result.
-3. Execute actions with those selectors.
+## Reconnaissance-Then-Action Pattern
 
-**Pitfall:** never inspect the DOM of a dynamic app before `networkidle`. Wait first.
+1. **Inspect rendered DOM**:
+   ```python
+   page.screenshot(path='/tmp/inspect.png', full_page=True)
+   content = page.content()
+   page.locator('button').all()
+   ```
 
-## Best practices
-- Use `sync_playwright()` for synchronous scripts and always close the browser.
-- Prefer descriptive selectors: `role=`, `text=`, `data-testid`, ids; avoid brittle CSS chains.
-- Add explicit waits: `page.wait_for_selector(...)`; use `wait_for_timeout` only as a last resort.
-- Capture `page.on("console", ...)` and `page.on("pageerror", ...)` during runs; a green flow with console errors is not green.
-- Assert on visible outcomes (text, URL, element state), not on "no exception".
+2. **Identify selectors** from inspection results
 
-## Evidence (Horus)
-Use the final command as the task's proof: `plan.py done <id> --run "python scripts/with_server.py --server \"npm run dev\" --port 5173 -- python e2e/check_login.py"`. The script must exit non-zero on any failed assertion.
+3. **Execute actions** using discovered selectors
 
-## Setup (once)
-```bash
-pip install playwright
-python -m playwright install chromium
-```
+## Common Pitfall
 
-## Reference files
-- `examples/element_discovery.py` - list buttons, links and inputs on a page
-- `examples/static_html_automation.py` - drive a local HTML file via `file://`
-- `examples/console_logging.py` - capture console output and page errors during automation
+❌ **Don't** inspect the DOM before waiting for `networkidle` on dynamic apps
+✅ **Do** wait for `page.wait_for_load_state('networkidle')` before inspection
+
+## Best Practices
+
+- **Use bundled scripts as black boxes** - To accomplish a task, consider whether one of the scripts available in `scripts/` can help. These scripts handle common, complex workflows reliably without cluttering the context window. Use `--help` to see usage, then invoke directly. 
+- Use `sync_playwright()` for synchronous scripts
+- Always close the browser when done
+- Use descriptive selectors: `text=`, `role=`, CSS selectors, or IDs
+- Add appropriate waits: `page.wait_for_selector()` or `page.wait_for_timeout()`
+
+## Reference Files
+
+- **examples/** - Examples showing common patterns:
+  - `element_discovery.py` - Discovering buttons, links, and inputs on a page
+  - `static_html_automation.py` - Using file:// URLs for local HTML
+  - `console_logging.py` - Capturing console logs during automation

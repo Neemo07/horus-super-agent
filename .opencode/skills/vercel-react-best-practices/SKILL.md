@@ -1,90 +1,149 @@
 ---
 name: vercel-react-best-practices
-description: React and Next.js performance optimization guidelines from Vercel Engineering. Use when writing, reviewing, or refactoring React or Next.js code - components, pages, data fetching, bundle size, re-renders, hydration, or any performance work. Rules are prioritized by impact (waterfalls and bundle size first).
+description: React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
 license: MIT
-compatibility: opencode
 metadata:
-  source: vercel-labs/agent-skills (skills/react-best-practices)
-  edition: condensed-offline
+  author: vercel
+  version: "1.0.0"
 ---
+
 # Vercel React Best Practices
 
-> Provenance: offline condensed edition covering the 8 upstream categories. Rule IDs follow the upstream prefixes (`async-`, `bundle-`, `server-`, `client-`, `rerender-`, `rendering-`, `js-`, `advanced-`) but wording is re-authored. For the complete rule set with incorrect/correct code, run `python scripts/sync_upstream.py --only vercel-react-best-practices`, or fetch the guide (about 80 KB, 57 rules):
-> `https://raw.githubusercontent.com/vercel-labs/agent-skills/main/skills/react-best-practices/AGENTS.md`
-> single rule: `https://raw.githubusercontent.com/vercel-labs/agent-skills/main/skills/react-best-practices/rules/{rule-id}.md`
+Comprehensive performance optimization guide for React and Next.js applications, maintained by Vercel. Contains 70 rules across 8 categories, prioritized by impact to guide automated refactoring and code generation.
 
-## How to use
-1. Fix in priority order. CRITICAL categories move the needle most; do not micro-optimise (`js-`) while a waterfall (`async-`) exists.
-2. Measure first when possible (Network tab waterfall, bundle analyzer, React Profiler). Cite `file:line` for each finding.
-3. Keep behaviour identical. Optimisations must not change data, ordering or permissions.
-4. In review mode, output: `# | Category | Rule ID | file:line | Impact | Fix`.
+## When to Apply
 
-## Priority and rules
-### 1. Eliminating waterfalls - CRITICAL (`async-`)
-- `async-parallel`: independent awaits run with `Promise.all`, never sequentially.
-- `async-defer-await`: move `await` into the branch that actually uses the value.
-- `async-dependencies`: for partial dependencies start promises early, await late.
-- `async-api-routes`: start independent work at the top of route handlers, await at the end.
-- `async-suspense-boundaries`: stream slow sections behind `<Suspense>` instead of blocking the page.
+Reference these guidelines when:
+- Writing new React components or Next.js pages
+- Implementing data fetching (client or server-side)
+- Reviewing code for performance issues
+- Refactoring existing React/Next.js code
+- Optimizing bundle size or load times
 
-### 2. Bundle size - CRITICAL (`bundle-`)
-- `bundle-barrel-imports`: import from the concrete module, not a barrel `index` (or use `optimizePackageImports`).
-- `bundle-dynamic-imports`: `next/dynamic` / `lazy` for heavy, below-the-fold or interaction-only components.
-- `bundle-defer-third-party`: load analytics, chat, tag managers after hydration.
-- `bundle-conditional`: load code only when the feature flag/route is active.
-- `bundle-preload`: preload on hover/focus intent for likely next navigations.
+## Rule Categories by Priority
 
-### 3. Server-side performance - HIGH (`server-`)
-- `server-auth-actions`: authenticate and authorise inside every Server Action like an API route.
-- `server-cache-react`: `React.cache()` for per-request dedup of DB/fetch calls.
-- `server-cache-lru`: cross-request LRU cache for hot, non-user-specific data.
-- `server-dedup-props`: do not pass the same large data as props and again via fetch.
-- `server-serialization`: pass only needed fields across the server/client boundary.
-- `server-parallel-fetching`: restructure components so sibling fetches run in parallel.
-- `server-after-nonblocking`: logging/analytics via `after()` so they do not block the response.
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Eliminating Waterfalls | CRITICAL | `async-` |
+| 2 | Bundle Size Optimization | CRITICAL | `bundle-` |
+| 3 | Server-Side Performance | HIGH | `server-` |
+| 4 | Client-Side Data Fetching | MEDIUM-HIGH | `client-` |
+| 5 | Re-render Optimization | MEDIUM | `rerender-` |
+| 6 | Rendering Performance | MEDIUM | `rendering-` |
+| 7 | JavaScript Performance | LOW-MEDIUM | `js-` |
+| 8 | Advanced Patterns | LOW | `advanced-` |
 
-### 4. Client-side data fetching - MEDIUM-HIGH (`client-`)
-- `client-swr-dedup`: use SWR/TanStack Query for request dedup, caching and revalidation.
-- `client-event-listeners`: one shared global listener instead of one per component instance.
-- `client-passive-event-listeners`: `{ passive: true }` for scroll/touch listeners.
-- `client-localstorage-schema`: version and validate localStorage payloads; guard reads with try/catch.
+## Quick Reference
 
-### 5. Re-render optimization - MEDIUM (`rerender-`)
-- `rerender-defer-reads`: do not subscribe to state (e.g. search params) only used in callbacks.
-- `rerender-memo`: extract expensive subtrees into `memo` components.
-- `rerender-dependencies`: use primitive dependencies in effects/memos.
-- `rerender-derived-state` / `rerender-derived-state-no-effect`: compute during render, not in `useEffect` + `setState`.
-- `rerender-functional-setstate`: `setX(prev => ...)` for stable callbacks.
-- `rerender-lazy-state-init`: `useState(() => expensive())`.
-- `rerender-move-effect-to-event`: side effects belong in event handlers when triggered by user action.
-- `rerender-transitions`: `startTransition` for non-urgent updates.
-- `rerender-use-ref-transient-values`: `useRef` for frequently changing values that do not affect rendering.
+### 1. Eliminating Waterfalls (CRITICAL)
 
-### 6. Rendering performance - MEDIUM (`rendering-`)
-- `rendering-content-visibility`: `content-visibility: auto` for long off-screen lists.
-- `rendering-hoist-jsx`: hoist static JSX out of components.
-- `rendering-hydration-no-flicker`: inline script for client-only values (theme) to avoid flash.
-- `rendering-hydration-suppress-warning`: `suppressHydrationWarning` only for known benign mismatches.
-- `rendering-conditional-render`: use ternaries, not `&&`, when the left side can be `0`/`NaN`.
-- `rendering-animate-svg-wrapper`: animate a wrapper `<div>`, not the SVG element.
-- `rendering-svg-precision`: reduce SVG coordinate precision.
-- `rendering-activity`: `<Activity>` to preserve state of hidden UI.
-- `rendering-usetransition-loading`: `useTransition` instead of manual loading flags.
+- `async-cheap-condition-before-await` - Check cheap sync conditions before awaiting flags or remote values
+- `async-defer-await` - Move await into branches where actually used
+- `async-parallel` - Use Promise.all() for independent operations
+- `async-dependencies` - Use better-all for partial dependencies
+- `async-api-routes` - Start promises early, await late in API routes
+- `async-suspense-boundaries` - Use Suspense to stream content
 
-### 7. JavaScript micro-optimisations - LOW-MEDIUM (`js-`)
-- `js-index-maps` / `js-set-map-lookups`: build `Map`/`Set` for repeated lookups instead of `find`/`includes` in loops.
-- `js-combine-iterations`: one pass instead of chained `filter().map().filter()`.
-- `js-early-exit`: return early; `js-length-check-first`: compare lengths before deep array compare.
-- `js-hoist-regexp`: create RegExp once, outside loops/renders.
-- `js-cache-function-results` / `js-cache-property-access` / `js-cache-storage`: memoise repeated work; read `localStorage`/cookies once.
-- `js-batch-dom-css`: batch style/layout reads and writes (no layout thrashing).
-- `js-tosorted-immutable`: `toSorted()` instead of mutating `sort()`; `js-min-max-loop`: loop for min/max, not sort.
+### 2. Bundle Size Optimization (CRITICAL)
 
-### 8. Advanced patterns - LOW (`advanced-`)
-- `advanced-event-handler-refs`: store handlers in refs for stable subscriptions.
-- `advanced-init-once`: app-wide init once per load, not once per mount.
-- `advanced-use-latest`: `useLatest` ref pattern for latest callback without re-subscribing.
+- `bundle-barrel-imports` - Import directly, avoid barrel files
+- `bundle-analyzable-paths` - Prefer statically analyzable import and file-system paths to avoid broad bundles and traces
+- `bundle-dynamic-imports` - Use next/dynamic for heavy components
+- `bundle-defer-third-party` - Load analytics/logging after hydration
+- `bundle-conditional` - Load modules only when feature is activated
+- `bundle-preload` - Preload on hover/focus for perceived speed
 
-## Pairing
-- Data/DB and caching concerns: `speed-engineer`. Supabase queries: `supabase-postgres-best-practices`.
-- Visual quality: `frontend-design`, `ui-ux-design-systems`. E2E verification: `webapp-testing`.
+### 3. Server-Side Performance (HIGH)
+
+- `server-auth-actions` - Authenticate server actions like API routes
+- `server-cache-react` - Use React.cache() for per-request deduplication
+- `server-cache-lru` - Use LRU cache for cross-request caching
+- `server-dedup-props` - Avoid duplicate serialization in RSC props
+- `server-hoist-static-io` - Hoist static I/O (fonts, logos) to module level
+- `server-no-shared-module-state` - Avoid module-level mutable request state in RSC/SSR
+- `server-serialization` - Minimize data passed to client components
+- `server-parallel-fetching` - Restructure components to parallelize fetches
+- `server-parallel-nested-fetching` - Chain nested fetches per item in Promise.all
+- `server-after-nonblocking` - Use after() for non-blocking operations
+
+### 4. Client-Side Data Fetching (MEDIUM-HIGH)
+
+- `client-swr-dedup` - Use SWR for automatic request deduplication
+- `client-event-listeners` - Deduplicate global event listeners
+- `client-passive-event-listeners` - Use passive listeners for scroll
+- `client-localstorage-schema` - Version and minimize localStorage data
+
+### 5. Re-render Optimization (MEDIUM)
+
+- `rerender-defer-reads` - Don't subscribe to state only used in callbacks
+- `rerender-memo` - Extract expensive work into memoized components
+- `rerender-memo-with-default-value` - Hoist default non-primitive props
+- `rerender-dependencies` - Use primitive dependencies in effects
+- `rerender-derived-state` - Subscribe to derived booleans, not raw values
+- `rerender-derived-state-no-effect` - Derive state during render, not effects
+- `rerender-functional-setstate` - Use functional setState for stable callbacks
+- `rerender-lazy-state-init` - Pass function to useState for expensive values
+- `rerender-simple-expression-in-memo` - Avoid memo for simple primitives
+- `rerender-split-combined-hooks` - Split hooks with independent dependencies
+- `rerender-move-effect-to-event` - Put interaction logic in event handlers
+- `rerender-transitions` - Use startTransition for non-urgent updates
+- `rerender-use-deferred-value` - Defer expensive renders to keep input responsive
+- `rerender-use-ref-transient-values` - Use refs for transient frequent values
+- `rerender-no-inline-components` - Don't define components inside components
+
+### 6. Rendering Performance (MEDIUM)
+
+- `rendering-animate-svg-wrapper` - Animate div wrapper, not SVG element
+- `rendering-content-visibility` - Use content-visibility for long lists
+- `rendering-hoist-jsx` - Extract static JSX outside components
+- `rendering-svg-precision` - Reduce SVG coordinate precision
+- `rendering-hydration-no-flicker` - Use inline script for client-only data
+- `rendering-hydration-suppress-warning` - Suppress expected mismatches
+- `rendering-activity` - Use Activity component for show/hide
+- `rendering-conditional-render` - Use ternary, not && for conditionals
+- `rendering-usetransition-loading` - Prefer useTransition for loading state
+- `rendering-resource-hints` - Use React DOM resource hints for preloading
+- `rendering-script-defer-async` - Use defer or async on script tags
+
+### 7. JavaScript Performance (LOW-MEDIUM)
+
+- `js-batch-dom-css` - Group CSS changes via classes or cssText
+- `js-index-maps` - Build Map for repeated lookups
+- `js-cache-property-access` - Cache object properties in loops
+- `js-cache-function-results` - Cache function results in module-level Map
+- `js-cache-storage` - Cache localStorage/sessionStorage reads
+- `js-combine-iterations` - Combine multiple filter/map into one loop
+- `js-length-check-first` - Check array length before expensive comparison
+- `js-early-exit` - Return early from functions
+- `js-hoist-regexp` - Hoist RegExp creation outside loops
+- `js-min-max-loop` - Use loop for min/max instead of sort
+- `js-set-map-lookups` - Use Set/Map for O(1) lookups
+- `js-tosorted-immutable` - Use toSorted() for immutability
+- `js-flatmap-filter` - Use flatMap to map and filter in one pass
+- `js-request-idle-callback` - Defer non-critical work to browser idle time
+
+### 8. Advanced Patterns (LOW)
+
+- `advanced-effect-event-deps` - Don't put `useEffectEvent` results in effect deps
+- `advanced-event-handler-refs` - Store event handlers in refs
+- `advanced-init-once` - Initialize app once per app load
+- `advanced-use-latest` - useLatest for stable callback refs
+
+## How to Use
+
+Read individual rule files for detailed explanations and code examples:
+
+```
+rules/async-parallel.md
+rules/bundle-barrel-imports.md
+```
+
+Each rule file contains:
+- Brief explanation of why it matters
+- Incorrect code example with explanation
+- Correct code example with explanation
+- Additional context and references
+
+## Full Compiled Document
+
+For the complete guide with all rules expanded: `AGENTS.md`

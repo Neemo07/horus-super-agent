@@ -5,14 +5,17 @@ Needs: git, network access. Python 3.8+ standard library only.
 
   python scripts/sync_upstream.py --list
   python scripts/sync_upstream.py --dry-run
-  python scripts/sync_upstream.py                          # sync everything
+  python scripts/sync_upstream.py                          # sync uncustomized skills
+  python scripts/sync_upstream.py --force-customized       # also overwrite Horus-poll upgrades
   python scripts/sync_upstream.py --only superpowers,vibe  # by group
   python scripts/sync_upstream.py --only webapp-testing    # by skill name
   python scripts/sync_upstream.py --dest ~/.config/opencode/skills
 
 Skills are located by SKILL.md frontmatter name (or directory-name alias), not by
-hard-coded paths. Replaced folders are backed up to <dest>/../.skills-sync-backup/<ts>/
-and the commits used are recorded in <dest>/../SOURCES.lock.json.
+hard-coded paths. Horus-customized skills (native OpenCode `question` poll upgrades)
+are skipped by default unless `--force-customized` is passed. Replaced folders are
+backed up to <dest>/../.skills-sync-backup/<ts>/ and the commits used are recorded
+in <dest>/../SOURCES.lock.json.
 """
 import argparse
 import json
@@ -35,7 +38,10 @@ GROUPS = {
     },
     "anthropic": {
         "repo": "https://github.com/anthropics/skills.git",
-        "skills": {"frontend-design": [], "webapp-testing": []},
+        "skills": {n: [] for n in (
+            "frontend-design", "webapp-testing", "mcp-builder",
+            "pdf", "docx", "xlsx", "pptx",
+        )},
     },
     "vercel": {
         "repo": "https://github.com/vercel-labs/agent-skills.git",
@@ -49,9 +55,33 @@ GROUPS = {
         "marketplace": "https://github.com/obra/superpowers-marketplace.git",
         "plugin": "superpowers",
         "default_repo": "https://github.com/obra/superpowers.git",
-        "skills": "*",  # every skill folder of the superpowers plugin, and nothing else
+        # Only sync the 6 non-overlapping Superpowers skills (Horus/Vibe supersede the rest)
+        "skills": {n: [] for n in (
+            "brainstorming",
+            "test-driven-development",
+            "systematic-debugging",
+            "using-git-worktrees",
+            "finishing-a-development-branch",
+            "writing-skills",
+        )},
     },
 }
+# Skills and commands customized by Horus with native OpenCode `question` poll integration.
+# Skipped by default so syncing upstream does not silently strip Horus poll guardrails.
+PROTECTED_CUSTOMIZED_SKILLS = {
+    "vibe",
+    "vibe-grill",
+    "vibe-spec-plan",
+    "vibe-scoped-build",
+    "vibe-critique",
+    "vibe-test-gate",
+    "brainstorming",
+    "systematic-debugging",
+    "using-git-worktrees",
+    "finishing-a-development-branch",
+    "writing-skills",
+}
+PROTECTED_CUSTOMIZED_COMMANDS = {"vibe.md"}
 SKIP_DIRS = {".git", "node_modules", ".backup", "__pycache__"}
 
 
@@ -145,6 +175,8 @@ def main():
     ap.add_argument("--only", default="", help="comma list of group or skill names")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--force-customized", action="store_true",
+                    help="also overwrite Horus-customized skills/commands (vibe*, brainstorming, vibe.md)")
     ap.add_argument("--override", action="append", default=[], metavar="GROUP=URL_OR_PATH",
                     help="use another repo/path for a group (testing, forks)")
     a = ap.parse_args()
@@ -154,6 +186,7 @@ def main():
         for g, c in GROUPS.items():
             names = "(all skills of the plugin)" if c["skills"] == "*" else ", ".join(c["skills"])
             print(f"{g:12} {names}")
+        print(f"\nProtected (pass --force-customized to overwrite): {', '.join(sorted(PROTECTED_CUSTOMIZED_SKILLS))}")
         return 0
     if shutil.which("git") is None:
         print("git not found on PATH", file=sys.stderr)
@@ -196,12 +229,18 @@ def main():
                 for name, d in found.items():
                     if only and g not in only and name not in only:
                         continue
+                    if not a.force_customized and name in PROTECTED_CUSTOMIZED_SKILLS and (dest / name).exists():
+                        print(f"  skip    {name}  (Horus-customized; pass --force-customized to overwrite)")
+                        continue
                     install_dir(d, dest / name, name, backup_root, a.dry_run)
                     lock[name] = {"repo": repo, "commit": sha, "path": d.relative_to(root).as_posix(), "synced": stamp}
                 for fname, rel in cfg.get("commands", {}).items():
                     src = root / rel
                     if src.is_file() and (not only or g in only):
                         cmd_dir = dest.parent / "commands"
+                        if not a.force_customized and fname in PROTECTED_CUSTOMIZED_COMMANDS and (cmd_dir / fname).exists():
+                            print(f"  skip    command {fname}  (Horus-customized; pass --force-customized to overwrite)")
+                            continue
                         print(f"  command {fname}")
                         if not a.dry_run:
                             cmd_dir.mkdir(exist_ok=True)

@@ -21,7 +21,7 @@
   // "mcp": {
   //   "graphify": {
   //     "type": "local",
-  //     "command": ["graphify", "--mcp"],
+  //     "command": ["graphify-mcp", "graphify-out/graph.json"],
   //     "enabled": true
   //   },
   //   "rea": {

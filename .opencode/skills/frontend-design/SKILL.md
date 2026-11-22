@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
+description: "Web aesthetic direction, typography, composition, and visual polish when building or reshaping web interfaces so they avoid templated AI defaults (pair with ui-ux-design-systems for tokens and accessibility)."
 license: Complete terms in LICENSE.txt
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: vibe-critique
-description: Adversarial anti-sycophancy review skill — disables polite agreement, audits code/plans against PRD specs with file:line evidence, confidence scores, and production failure scenarios.
+description: Adversarial anti-sycophancy code review & feedback-evaluation skill — audits code/plans against PRD specs with file:line evidence, and evaluates incoming review comments technically without performative agreement.
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:
@@ -40,3 +40,12 @@ Reference catalog of all 26 Vibe anti-patterns: `.opencode/skills/vibe/reference
    - Any newly introduced packages, external CDN links, or IAM/role changes.
 4. **Hard Rejection Verdict:**
    - `APPROVE`, `APPROVE WITH MANDATORY FIXES`, or `REJECT` (under Horus `reviewer`, map `APPROVE` → `VERDICT: PASS` and anything else → `VERDICT: FAIL`) — stating the exact blocking conditions.
+
+---
+
+## Receiving Code Review Feedback (Anti-Sycophancy Mode)
+
+When evaluating external PR or human review comments:
+1. **Read & clarify first:** restate the requirement; if any item is unclear, ask before editing.
+2. **Verify against the codebase:** check whether the suggestion is technically valid here, breaks invariants, or violates YAGNI (grep for real usage).
+3. **Push back with evidence:** never reply with *"You're absolutely right!"* or gratitude theater—state the concrete fix or technical objection with `file:line` proof, and implement verified items one at a time (blockers first).

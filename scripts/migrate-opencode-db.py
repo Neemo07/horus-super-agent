@@ -21,8 +21,8 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
-import time
 
+# Preferred column order; intersected dynamically with actual source & target schemas.
 SESS_COLS = [
     "id", "project_id", "workspace_id", "parent_id", "slug", "directory", "path",
     "title", "version", "share_url", "summary_additions", "summary_deletions",
@@ -42,19 +42,42 @@ def log(msg: str) -> None:
 
 
 def is_locked(path: str) -> bool:
-    """True when another process holds an exclusive handle on the file."""
+    """True when another process holds the DB file open/locked."""
     if not os.path.exists(path):
         return False
-    try:
-        with open(path, "rb+"):
-            return False
-    except OSError:
-        return True
+    if os.name == "nt":
+        try:
+            with open(path, "rb+"):
+                return False
+        except OSError:
+            return True
+    # On POSIX, open("rb+") does not detect SQLite advisory locks.
+    # Probe via `fuser` or `lsof` when available without mutating the DB.
+    if shutil.which("fuser"):
+        r = subprocess.run(["fuser", path], capture_output=True)
+        return r.returncode == 0
+    if shutil.which("lsof"):
+        r = subprocess.run(["lsof", "-t", path], capture_output=True, text=True)
+        return bool(r.stdout.strip())
+    return False
 
 
 def table_names(con: sqlite3.Connection) -> set[str]:
     return {r[0] for r in con.execute(
         "SELECT name FROM sqlite_master WHERE type='table'")}
+
+
+def table_columns(con: sqlite3.Connection, table: str) -> set[str]:
+    return {r[1] for r in con.execute(f"PRAGMA table_info({table})")}
+
+
+def common_columns(old_con: sqlite3.Connection, old_table: str,
+                   new_con: sqlite3.Connection, new_table: str,
+                   preferred: list[str]) -> list[str]:
+    shared = table_columns(old_con, old_table) & table_columns(new_con, new_table)
+    ordered = [c for c in preferred if c in shared]
+    extras = sorted(shared - set(ordered))
+    return ordered + extras
 
 
 def backup(src: str, stamp: str) -> str:
@@ -115,29 +138,34 @@ def create_fresh(db_path: str) -> None:
 
 
 def restore(old_db: str, new_db: str) -> dict[str, int]:
-    """Copy content old-schema -> new-schema."""
+    """Copy content old-schema -> new-schema using dynamic column intersection."""
     o = sqlite3.connect(f"file:{old_db}?mode=ro", uri=True)
     n = sqlite3.connect(new_db)
     n.execute("PRAGMA foreign_keys=OFF")
     stats = {"project": 0, "session": 0, "message": 0, "part": 0, "skipped": 0}
     try:
-        rows = o.execute(f"SELECT {','.join(PROJ_COLS)} FROM project").fetchall()
-        n.executemany(
-            f"INSERT OR REPLACE INTO project ({','.join(PROJ_COLS)}) "
-            f"VALUES ({','.join('?' * len(PROJ_COLS))})", rows)
-        stats["project"] = len(rows)
+        proj_cols = common_columns(o, "project", n, "project", PROJ_COLS)
+        if proj_cols:
+            rows = o.execute(f"SELECT {','.join(proj_cols)} FROM project").fetchall()
+            n.executemany(
+                f"INSERT OR REPLACE INTO project ({','.join(proj_cols)}) "
+                f"VALUES ({','.join('?' * len(proj_cols))})", rows)
+            stats["project"] = len(rows)
 
-        rows = o.execute(f"SELECT {','.join(SESS_COLS)} FROM session_v2").fetchall()
-        fixed = []
-        for r in rows:
-            r = list(r)
-            if r[7] is None:  # title is NOT NULL in the new schema
-                r[7] = ""
-            fixed.append(r)
-        n.executemany(
-            f"INSERT OR REPLACE INTO session ({','.join(SESS_COLS)}) "
-            f"VALUES ({','.join('?' * len(SESS_COLS))})", fixed)
-        stats["session"] = len(fixed)
+        sess_cols = common_columns(o, "session_v2", n, "session", SESS_COLS)
+        title_idx = sess_cols.index("title") if "title" in sess_cols else -1
+        if sess_cols:
+            rows = o.execute(f"SELECT {','.join(sess_cols)} FROM session_v2").fetchall()
+            fixed = []
+            for r in rows:
+                r = list(r)
+                if title_idx >= 0 and r[title_idx] is None:  # title is NOT NULL in the new schema
+                    r[title_idx] = ""
+                fixed.append(r)
+            n.executemany(
+                f"INSERT OR REPLACE INTO session ({','.join(sess_cols)}) "
+                f"VALUES ({','.join('?' * len(sess_cols))})", fixed)
+            stats["session"] = len(fixed)
 
         valid = {r[0] for r in n.execute("SELECT id FROM session")}
         mrows = o.execute(
@@ -186,7 +214,7 @@ def restore(old_db: str, new_db: str) -> dict[str, int]:
                 stats["part"] += 1
         n.commit()
         fk = n.execute("PRAGMA foreign_key_check").fetchall()
-        stats["fk_violations"] = len(fk)  # type: ignore[assignment]
+        stats["fk_violations"] = len(fk)
         return stats
     finally:
         n.close()

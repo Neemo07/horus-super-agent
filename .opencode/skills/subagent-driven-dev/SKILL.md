@@ -17,7 +17,7 @@ Before starting a project or multi-task feature, invoke OpenCode's built-in **`q
 If `Custom per subagent` is chosen:
 1. Run `opencode models` to list valid `provider/model` IDs.
 2. Call `question` again (one tab per active subagent: `architect`, `c-engineer`, `ui-gui-engineer`, `web-engineer`, `re-analyst`, `reviewer`) with top available options + `Inherit session` (user can always click `"Type your own answer"` for any exact `provider/model` ID).
-3. Patch `model:` in `.opencode/agents/<name>.md` for custom assignments (omit `model:` for `inherit` — never hardcode defaults).
+3. Save the custom model map in `.horus/STATE.md` (gitignored) and only patch `model:` in `.opencode/agents/<name>.md` for the active session when required (omit `model:` for `inherit`; never commit local `model:` overrides).
 4. Run `plan.py init` to scaffold `task_plan.md`, `findings.md`, `progress.md`, and `evidence/`, and create `.horus/STATE.md`.
 
 ## 2. Unified Workspace State
@@ -76,7 +76,7 @@ When a worker returns its **Result Envelope**:
     - **Retry 3 (Circuit Breaker):** Run `plan.py block <id> "<exact failure>"`, stop spinning, and invoke the **`question` tool** (`header: "Blocked"`, 2–3 concrete recovery options + built-in custom answer).
 
 ## 6. Wave-End Integration Gate & Cold-Start Handoff
-1. After every task in the wave is proven `[x]`, run the integrated workspace build/test/sanitizer suite and `graphify . --update`.
+1. After every task in the wave is proven `[x]`, run the integrated workspace build/test/sanitizer suite and `graphify update .`.
 2. Before claiming the project finished, run `plan.py verify` (or `verify --rerun`).
 3. Before pausing, compacting, or ending a session, run `plan.py handoff --note "<active wave & next step>"`.
 4. On resume: read `HANDOFF.md`, `task_plan.md`, tail of `findings.md`, `progress.md`, and `.horus/STATE.md` → run `plan.py verify` + `git status --short` → redo anything `UNPROVEN` → run `plan.py next`.

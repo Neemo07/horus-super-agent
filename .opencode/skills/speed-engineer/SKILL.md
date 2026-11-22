@@ -1,6 +1,6 @@
 ---
 name: speed-engineer
-description: Keeps apps built with AI fast under real users. Covers the 5 things AI usually forgets — database indexes and N+1 queries, pagination, image optimization, caching, and skeleton loading — sized to how big the project really is. Use whenever you create or change anything that touches the database (tables, migrations, queries, Supabase, Postgres, Prisma, Drizzle), a list/feed/table of records, data fetching or API routes, image upload or display, or loading states. Also use when the user says the app or a page is slow, laggy, hangs, or "takes time to load", asks to optimize performance, or asks to review/audit the project before launch. Triggers include "speed", "performance", "slow", "بطيء", "تقيل", "بيهنج", "سرّع".
+description: "Right-sized web performance engineering (S/M/L project tiers): DB indexes, N+1 queries, pagination, image optimization, caching, and skeleton states. Triggers on DB/list/upload work or slow/laggy reports (بطيء, تقيل, بيهنج, سرّع)."
 ---
 
 # Speed Engineer: build apps that stay fast with real users

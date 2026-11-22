@@ -20,6 +20,9 @@ permissions:
     resource: "*"
     effect: deny
   - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
     resource: "git diff*"
     effect: allow
   - action: shell
@@ -42,6 +45,24 @@ permissions:
     effect: allow
   - action: shell
     resource: "ctest *"
+    effect: allow
+  - action: shell
+    resource: "pytest *"
+    effect: allow
+  - action: shell
+    resource: "npm test*"
+    effect: allow
+  - action: shell
+    resource: "pnpm test*"
+    effect: allow
+  - action: shell
+    resource: "npx vitest run*"
+    effect: allow
+  - action: shell
+    resource: "npx tsc --noEmit*"
+    effect: allow
+  - action: shell
+    resource: "npx playwright test*"
     effect: allow
   - action: question
     resource: "*"

@@ -23,7 +23,7 @@ permissions:
     resource: "ui-ux-design-systems"
     effect: allow
   - action: skill
-    resource: "graphify-memory"
+    resource: "graphify"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"
@@ -38,7 +38,7 @@ permissions:
     resource: "webapp-testing"
     effect: allow
   - action: skill
-    resource: "verification-before-completion"
+    resource: "vibe-scoped-build"
     effect: allow
   - action: shell
     resource: "*"

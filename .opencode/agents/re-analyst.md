@@ -20,12 +20,15 @@ permissions:
     resource: "cpp20-win32-re"
     effect: allow
   - action: skill
-    resource: "graphify-memory"
+    resource: "graphify"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"
     effect: allow
   - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
     resource: "*"
     effect: deny
   - action: shell

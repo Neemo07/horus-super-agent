@@ -1,5 +1,5 @@
 ---
-description: "Read-only systems architect for modern C17/C23, C++20/Win32, native GUI, and UI/UX design. Maps codebases via Graphify AST graphs and produces evidence-gated DAG task plans with disjoint file-ownership locks."
+description: "Read-only systems architect for modern C17/C23, C++20/Win32, native GUI, Web/Next.js/Supabase, and UI/UX design. Maps codebases via Graphify AST graphs and produces evidence-gated DAG task plans with disjoint file-ownership locks."
 mode: subagent
 steps: 15
 color: "#5b8def"
@@ -17,6 +17,9 @@ permissions:
     resource: "*"
     effect: allow
   - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
     resource: "*"
     effect: deny
   - action: shell

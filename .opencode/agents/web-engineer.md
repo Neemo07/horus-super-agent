@@ -2,7 +2,7 @@
 description: "Full-stack web engineer for React/Next.js, Supabase/Postgres, performance, and browser-verified delivery. Respects orchestrator file-ownership locks and returns compact verified Result Envelopes."
 mode: subagent
 steps: 30
-color: "#f59e0b"
+color: "#10b981"
 permissions:
   - action: read
     resource: "*"
@@ -35,6 +35,9 @@ permissions:
     resource: "webapp-testing"
     effect: allow
   - action: skill
+    resource: "mcp-builder"
+    effect: allow
+  - action: skill
     resource: "vibe-scoped-build"
     effect: allow
   - action: skill
@@ -44,10 +47,7 @@ permissions:
     resource: "systematic-debugging"
     effect: allow
   - action: skill
-    resource: "verification-before-completion"
-    effect: allow
-  - action: skill
-    resource: "graphify-memory"
+    resource: "graphify"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"

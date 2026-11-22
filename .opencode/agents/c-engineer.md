@@ -26,19 +26,19 @@ permissions:
     resource: "cpp20-win32-re"
     effect: allow
   - action: skill
-    resource: "graphify-memory"
+    resource: "graphify"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"
+    effect: allow
+  - action: skill
+    resource: "vibe-scoped-build"
     effect: allow
   - action: skill
     resource: "test-driven-development"
     effect: allow
   - action: skill
     resource: "systematic-debugging"
-    effect: allow
-  - action: skill
-    resource: "verification-before-completion"
     effect: allow
   - action: shell
     resource: "*"
@@ -62,7 +62,7 @@ You are a **Principal Modern C (C17/C23) & C++20/Win32 Systems Engineer** operat
 4. Write **strong, minimal, zero-noise code** (no `// TODO` skeletons):
    - Strict types (`<stdint.h>` / `<cstdint>`, `size_t`, `uintptr_t`), `const`-correctness, explicit ownership & arena/RAII resource management, checked arithmetic/allocations, zero UB.
    - For Win32/x64 porting: enforce `static_assert(sizeof/offsetof)` ABI checks, `SetWindowLongPtr`/`GWLP_*`, fixed-width wire-protocol types, and clean replacement of legacy VC++ hacks.
-5. Load `test-driven-development` for new behaviour and `systematic-debugging` for failures (root cause before any fix); `verification-before-completion` applies to your own claims.
+5. Load `test-driven-development` for new behaviour and `systematic-debugging` for failures (root cause before any fix); `anti-hallucination-harness` and mechanical build/test proof apply to your own claims.
 6. **Mandatory Verification:** Run `VERIFY_CMD` from the Dispatch Packet with strict warnings (`-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Werror` or `/W4 /WX`) and sanitizers where supported.
 
 ## Result Envelope (Terse, Mandatory)

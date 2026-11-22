@@ -2,14 +2,14 @@
 
 # Horus Super Agent
 
-**A DAG-wave orchestrator and 34-skill harness for [OpenCode](https://opencode.ai).**
+**A DAG-wave orchestrator and 31-skill harness for [OpenCode](https://opencode.ai).**
 
 Specs before code, file-locked parallel subagents, and proof-gated task closure —
 with every decision surfaced as a native clickable poll instead of a wall of chat questions.
 
-[![Version](https://img.shields.io/badge/version-0.3-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.3.7-00d4aa?style=flat-square)](CHANGELOG.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%7C%20V2-6e56cf?style=flat-square)](https://opencode.ai)
-[![Skills](https://img.shields.io/badge/skills-34-3b82f6?style=flat-square)](SKILLS.md)
+[![Skills](https://img.shields.io/badge/skills-31-3b82f6?style=flat-square)](SKILLS.md)
 [![Subagents](https://img.shields.io/badge/subagents-6-8b5cf6?style=flat-square)](#the-subagents)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#quick-start)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
@@ -136,7 +136,7 @@ python scripts/validate_horus.py
 ```
 
 ```
-HORUS VALIDATION PASSED: 7 agents, 34 skills, 5 commands, 4 Vibe templates, 8 bilingual Vibe handbooks.
+HORUS VALIDATION PASSED (project): 7 agents, 31 skills, 6 commands, 4 Vibe templates, 8 bilingual Vibe handbooks, 8 Graphify references.
 ```
 
 The validator checks config parsing, `question` permissions on the primary agent,
@@ -146,7 +146,7 @@ skill frontmatter, required commands, merged Vibe assets, and Python syntax.
 ### Optional companions
 
 ```bash
-uv tool install --upgrade graphifyy     # local AST knowledge graph, 0 LLM tokens
+uv tool install --upgrade "graphifyy[mcp]"  # local AST knowledge graph + graphify-mcp server
 npx -y rea-agents@latest setup          # REA binary / PE analysis toolkit
 pip install playwright && python -m playwright install chromium   # webapp-testing
 ```
@@ -165,8 +165,8 @@ horus-super-agent/
 ├─ install.ps1 / install.sh   # project-local and global installers
 ├─ .opencode/
 │  ├─ agents/                 # horus + 6 subagents
-│  ├─ commands/               # 5 slash commands
-│  └─ skills/                 # 34 skills
+│  ├─ commands/               # 6 slash commands
+│  └─ skills/                 # 31 skills
 │     └─ vibe/                # 4 templates + 8 EN/AR handbooks
 └─ scripts/
    ├─ validate_horus.py       # integrity validator
@@ -203,6 +203,7 @@ Only `horus` may call the `question` tool. Workers that need a decision return
 | `/horus-resume` | Cold-start or post-compaction recovery from `HANDOFF.md` and `task_plan.md` |
 | `/horus-review` | Adversarial read-only review plus anti-test-theater audit on the current diff |
 | `/vibe` | Enter the 7-stage Vibe Engineering workflow |
+| `/graphify` | Official Graphify v0.9.115 knowledge graph build, query, path, explain, update, wiki & MCP |
 
 ### Evidence gates (`plan.py`)
 
@@ -225,7 +226,7 @@ editing a checkbox by hand useless.
 
 ## The skills
 
-34 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
+31 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
 
 <details>
 <summary><b>Orchestration & evidence (9 Horus originals)</b></summary>
@@ -235,7 +236,7 @@ editing a checkbox by hand useless.
 | `subagent-driven-dev` | DAG waves, file locks, Dispatch/Result envelopes, smart retries |
 | `planning-with-evidence` | `plan.py` progress, proof records, `HANDOFF.md` |
 | `anti-hallucination-harness` | Evidence-backed claims, minimal output, honest blockers |
-| `graphify-memory` | AST architecture maps and blast-radius queries |
+| `graphify` | Official Graphify v0.9.115 OpenCode skill + 8 references (AST graph, query/path/explain/section, wiki, MCP) |
 | `reverse-engineer-anything` | Binary, bundle, and archive inspection via REA |
 | `cpp20-win32-re` | PE32/PE32+ analysis into clean C++20 `_WIN64` |
 | `modern-c-mastery` | C11/17/23 UB elimination, arenas, sanitizers |
@@ -262,26 +263,25 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 </details>
 
 <details>
-<summary><b>Web, data, and design (5 skills)</b></summary>
+<summary><b>Web, data, MCP, design & documents (10 skills)</b></summary>
 
 | Skill | Use it for |
 | :--- | :--- |
 | `speed-engineer` | Indexes, N+1, pagination, caching, skeleton states |
-| `vercel-react-best-practices` | React/Next.js waterfalls and bundle size |
-| `supabase-postgres-best-practices` | Schema, RLS, indexing, connection management |
-| `frontend-design` | Distinctive visual direction |
+| `vercel-react-best-practices` | React/Next.js waterfalls and bundle size (70 rules) |
+| `supabase-postgres-best-practices` | Schema, RLS, indexing, connection management (31 rules) |
+| `frontend-design` | Distinctive web visual direction & typography |
 | `webapp-testing` | Playwright verification, screenshots, console logs |
+| `mcp-builder` | Building high-quality TypeScript & Python MCP servers |
+| `pdf` / `docx` / `xlsx` / `pptx` | Full document, spreadsheet, presentation & PDF engineering |
 
 </details>
 
 <details>
-<summary><b>Engineering discipline (14 Superpowers skills)</b></summary>
+<summary><b>Engineering discipline (6 full Superpowers v7.0.2 skills + references/scripts)</b></summary>
 
-`using-superpowers`, `brainstorming`, `writing-plans`, `executing-plans`,
-`subagent-driven-development`, `dispatching-parallel-agents`, `test-driven-development`,
-`systematic-debugging`, `verification-before-completion`, `requesting-code-review`,
-`receiving-code-review`, `using-git-worktrees`, `finishing-a-development-branch`,
-`writing-skills`
+`brainstorming`, `test-driven-development`, `systematic-debugging`,
+`using-git-worktrees`, `finishing-a-development-branch`, `writing-skills`
 
 </details>
 

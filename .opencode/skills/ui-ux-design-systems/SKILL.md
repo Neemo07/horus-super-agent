@@ -1,6 +1,6 @@
 ---
 name: ui-ux-design-systems
-description: "High-craft UI/UX design system engineering for desktop and web apps: visual hierarchy, 4/8px spatial grids, OKLCH semantic tokens, WCAG/APCA contrast, micro-interactions, and anti-AI-slop standards."
+description: "Design system architecture for desktop and web apps: OKLCH semantic color tokens, 4/8px spatial grids, visual hierarchy, WCAG/APCA contrast, and component state ergonomics."
 license: MIT
 compatibility: opencode
 ---

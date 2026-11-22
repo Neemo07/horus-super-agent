@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 """
-Integrity & configuration validator for Horus Super Agent (OpenCode v0.3+).
+Integrity & configuration validator for Horus Super Agent (OpenCode v0.3.1+).
 
 Checks:
-1. opencode.jsonc (V2) and opencode.v1.json (V1) parse cleanly and allow the built-in `question` tool.
+1. opencode.jsonc (V2) / opencode.json (global or V1) and opencode.v1.json parse cleanly and allow `question`.
 2. Primary agent `horus.md` explicitly allows `question`; all subagents explicitly deny `question` and `subagent`.
-3. Zero hardcoded `model:` fields in any agent frontmatter (enforces interactive in-session model selection).
-4. Every skill under .opencode/skills/*/SKILL.md has valid YAML frontmatter matching its directory name.
-5. Every slash command under .opencode/commands/*.md has valid frontmatter and non-empty body.
-6. All merged Vibe Engineering Playbook templates (4) and bilingual EN/AR reference handbooks (8) exist.
-7. Bundled Python scripts (plan.py, with_server.py, sync_upstream.py) compile cleanly.
+3. Read-only subagents (`edit: deny`) explicitly deny `shell: "*"` before narrow command allowlists.
+4. Zero hardcoded `model:` fields in clean repo templates (auto-relaxed when `.horus/STATE.md` exists or `--allow-session-models` is passed).
+5. Every skill under .opencode/skills/*/SKILL.md has valid YAML frontmatter matching its directory name.
+6. Every slash command under .opencode/commands/*.md has valid frontmatter and non-empty body.
+7. All merged Vibe Engineering Playbook templates (4) and bilingual EN/AR reference handbooks (8) exist.
+8. Bundled Python scripts (plan.py, with_server.py, sync_upstream.py, validate_horus.py, migrate-opencode-db.py) parse cleanly in memory (no __pycache__ pollution).
 """
 from __future__ import annotations
 
+import argparse
+import ast
 import json
-import py_compile
 import re
 import sys
 from pathlib import Path
@@ -72,10 +74,22 @@ REQUIRED_VIBE_REFS = [
 
 REQUIRED_COMMANDS = [
     "vibe.md",
+    "graphify.md",
     "horus-init.md",
     "horus-status.md",
     "horus-resume.md",
     "horus-review.md",
+]
+
+REQUIRED_GRAPHIFY_REFS = [
+    "add-watch.md",
+    "exports.md",
+    "extraction-spec.md",
+    "github-and-merge.md",
+    "hooks.md",
+    "query.md",
+    "transcribe.md",
+    "update.md",
 ]
 
 
@@ -96,7 +110,16 @@ def split_frontmatter(text: str) -> tuple[str, str]:
     return parts[0], parts[1].strip()
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Validate Horus Super Agent installation and integrity.")
+    ap.add_argument(
+        "--allow-session-models",
+        action="store_true",
+        help="Allow local `model:` overrides in agent frontmatter (also auto-enabled when .horus/STATE.md exists).",
+    )
+    args = ap.parse_args(argv)
+    allow_models = args.allow_session_models or (ROOT / ".horus" / "STATE.md").exists()
+
     errors: list[str] = []
 
     def fail(msg: str) -> None:
@@ -108,7 +131,12 @@ def main() -> int:
         fail(f"Missing opencode.jsonc or opencode.json in {ROOT}")
     else:
         try:
-            cfg = json.loads(strip_jsonc_comments(jsonc_path.read_text(encoding="utf-8-sig")))
+            raw = jsonc_path.read_text(encoding="utf-8-sig")
+            # Strict JSON check when file extension is .json (no // comments allowed)
+            if jsonc_path.suffix == ".json":
+                cfg = json.loads(raw)
+            else:
+                cfg = json.loads(strip_jsonc_comments(raw))
             perms = v2_permissions(cfg)
             has_q = any(
                 p.get("action") == "question" and p.get("effect") == "allow"
@@ -135,7 +163,7 @@ def main() -> int:
     agents_dir = BASE / "agents"
     agent_files = sorted(agents_dir.glob("*.md"))
     if not agent_files:
-        fail("No agent files found in .opencode/agents/")
+        fail("No agent files found in agents/")
     for af in agent_files:
         try:
             fm, body = split_frontmatter(af.read_text(encoding="utf-8"))
@@ -144,7 +172,7 @@ def main() -> int:
             continue
         if not body:
             fail(f"{af.name}: empty prompt body")
-        if re.search(r"^model:\s*\S+", fm, re.M):
+        if not allow_models and re.search(r"^model:\s*\S+", fm, re.M):
             fail(f"{af.name}: hardcoded model: found in frontmatter (must be selected in session)")
         if af.name == "horus.md":
             if not re.search(r"action:\s*question\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*allow", fm):
@@ -154,12 +182,16 @@ def main() -> int:
                 fail(f"{af.name}: subagent must explicitly deny `question` tool")
             if not re.search(r"action:\s*subagent\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
                 fail(f"{af.name}: subagent must explicitly deny `subagent` tool")
+            # Read-only subagents (edit: deny) must also explicitly deny shell: "*"
+            if re.search(r"action:\s*edit\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                if not re.search(r"action:\s*shell\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                    fail(f"{af.name}: read-only subagent must explicitly deny `shell: \"*\"` baseline")
 
     # 4. Validate skills
     skills_dir = BASE / "skills"
     skill_dirs = sorted(p for p in skills_dir.iterdir() if p.is_dir())
     if not skill_dirs:
-        fail("No skills found in .opencode/skills/")
+        fail("No skills found in skills/")
     for sd in skill_dirs:
         sm = sd / "SKILL.md"
         if not sm.exists():
@@ -185,7 +217,7 @@ def main() -> int:
     for cmd in REQUIRED_COMMANDS:
         cp = cmds_dir / cmd
         if not cp.exists():
-            fail(f"Missing required command .opencode/commands/{cmd}")
+            fail(f"Missing required command commands/{cmd}")
             continue
         try:
             fm, body = split_frontmatter(cp.read_text(encoding="utf-8"))
@@ -200,18 +232,25 @@ def main() -> int:
     vibe_dir = skills_dir / "vibe"
     for tpl in REQUIRED_VIBE_TEMPLATES:
         if not (vibe_dir / "templates" / tpl).exists():
-            fail(f"Missing merged Vibe template: .opencode/skills/vibe/templates/{tpl}")
+            fail(f"Missing merged Vibe template: skills/vibe/templates/{tpl}")
     for ref in REQUIRED_VIBE_REFS:
         if not (vibe_dir / "references" / ref).exists():
-            fail(f"Missing merged Vibe reference: .opencode/skills/vibe/references/{ref}")
+            fail(f"Missing merged Vibe reference: skills/vibe/references/{ref}")
 
-    # 7. Compile-check bundled Python scripts
+    # 6b. Validate official Graphify v0.9.115 OpenCode references
+    graphify_dir = skills_dir / "graphify"
+    for ref in REQUIRED_GRAPHIFY_REFS:
+        if not (graphify_dir / "references" / ref).exists():
+            fail(f"Missing official Graphify reference: skills/graphify/references/{ref}")
+
+    # 7. Syntax-check bundled Python scripts in memory (zero __pycache__ pollution)
     scripts_dir = ROOT / "scripts"
     if not (scripts_dir / "validate_horus.py").exists():
         scripts_dir = BASE / "scripts"
     py_scripts = [
         scripts_dir / "sync_upstream.py",
         scripts_dir / "validate_horus.py",
+        scripts_dir / "migrate-opencode-db.py",
         skills_dir / "planning-with-evidence" / "scripts" / "plan.py",
         skills_dir / "webapp-testing" / "scripts" / "with_server.py",
     ]
@@ -220,7 +259,7 @@ def main() -> int:
             fail(f"Missing script: {ps}")
             continue
         try:
-            py_compile.compile(str(ps), doraise=True)
+            ast.parse(ps.read_text(encoding="utf-8"), filename=str(ps))
         except Exception as exc:
             fail(f"Syntax error in {ps}: {exc}")
 
@@ -235,7 +274,8 @@ def main() -> int:
         f"{len(agent_files)} agents, {len(skill_dirs)} skills, "
         f"{len(REQUIRED_COMMANDS)} commands, "
         f"{len(REQUIRED_VIBE_TEMPLATES)} Vibe templates, "
-        f"{len(REQUIRED_VIBE_REFS)} bilingual Vibe handbooks."
+        f"{len(REQUIRED_VIBE_REFS)} bilingual Vibe handbooks, "
+        f"{len(REQUIRED_GRAPHIFY_REFS)} Graphify references."
     )
     return 0
 
