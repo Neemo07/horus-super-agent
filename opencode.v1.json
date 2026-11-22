@@ -5,6 +5,7 @@
     "AGENTS.md"
   ],
   "permission": {
+    "question": "allow",
     "skill": {
       "*": "allow"
     },

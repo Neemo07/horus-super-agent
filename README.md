@@ -1,11 +1,24 @@
 # Horus Super Agent
 
-**A DAG-Wave orchestrator harness for [OpenCode](https://opencode.ai): 1 primary agent, 5 specialist subagents, 9 expert skills, and a mechanical evidence gate that refuses to call work "done" without proof on disk.**
+**A DAG-Wave orchestrator harness for [OpenCode](https://opencode.ai): 1 primary agent, 6 specialist subagents, 21 expert skills, 1 slash command, and a mechanical evidence gate that refuses to call work "done" without proof on disk.**
 
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%2B%20V2-00d4aa?style=flat-square)](https://opencode.ai)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](#license)
-[![Skills](https://img.shields.io/badge/skills-9-a855f7?style=flat-square)](#whats-inside)
-[![Agents](https://img.shields.io/badge/agents-6-f59e0b?style=flat-square)](#agents)
+[![Skills](https://img.shields.io/badge/skills-21-a855f7?style=flat-square)](#whats-inside)
+[![Agents](https://img.shields.io/badge/agents-7-f59e0b?style=flat-square)](#agents)
+
+---
+
+## What's New in v0.2.1
+
+v0.2.1 is a full-stack + systems expansion of the v0.2 harness. Everything is additive: existing `plan.py`, DAG waves, and write-locks are unchanged.
+
+- **Native OpenCode Interactive Polls (`question` tool).** Enabled in `opencode.jsonc`, `opencode.v1.json`, and `horus.md`. Kickoff choices, `vibe-grill` Socratic discovery, `vibe-spec-plan` approvals, `speed-engineer` scale tiers, branch-finish options, and circuit-breaker escalations now open in OpenCode's native poll UI (pick an option or type your own answer) instead of plain chat text.
+- **Full 7-Stage Vibe Engineering Playbook.** New `/vibe` slash command (`.opencode/commands/vibe.md`) plus all six composable skills (`vibe`, `vibe-grill`, `vibe-spec-plan`, `vibe-scoped-build`, `vibe-critique`, `vibe-test-gate`) and the `PRD.template.md` / `IMPLEMENTATION_PLAN.template.md` templates.
+- **Superpowers Core** (`obra/superpowers` v7.0.2, core only): brainstorming before code, RED-GREEN-REFACTOR TDD, 4-phase systematic debugging, fresh verification before completion, and git branch finishing mapped to OpenCode V2.
+- **New `fullstack-engineer` subagent** for React/Next.js, Supabase/Postgres, performance, and Playwright E2E work.
+- **Six new web skills:** `frontend-design`, `superpowers`, `vercel-react-best-practices`, `supabase-postgres-best-practices`, `webapp-testing`, `speed-engineer`.
+- **Upstream sync tooling:** `scripts/sync-skills.ps1` / `scripts/sync-skills.sh` (`-SyncUpstream` / `--sync`) pull the latest upstream rule trees and references.
 
 ---
 
@@ -35,15 +48,21 @@ horus-super-agent/
 ├── opencode.v1.json           # OpenCode V1 config (permission map)
 ├── install.ps1                # Windows installer (project | global)
 ├── install.sh                 # Linux / macOS installer (project | global)
+├── scripts/
+│   ├── sync-skills.ps1        # Pull latest upstream skill trees (Windows)
+│   └── sync-skills.sh         # Pull latest upstream skill trees (Linux / macOS)
 └── .opencode/
-    ├── agents/                # 1 primary orchestrator + 5 subagents
+    ├── agents/                # 1 primary orchestrator + 6 subagents
     │   ├── horus.md
     │   ├── architect.md
+    │   ├── fullstack-engineer.md
     │   ├── c-engineer.md
     │   ├── ui-gui-engineer.md
     │   ├── re-analyst.md
     │   └── reviewer.md
-    └── skills/                # 9 skills, each a SKILL.md (+ scripts/)
+    ├── commands/
+    │   └── vibe.md            # /vibe — 7-stage Vibe Engineering entry point
+    └── skills/                # 21 skills, each a SKILL.md (+ scripts/)
         ├── planning-with-evidence/     # scripts/plan.py — the evidence gate
         ├── subagent-driven-dev/        # DAG waves, dispatch envelopes, review gates
         ├── anti-hallucination-harness/ # dsh-superagent discipline
@@ -52,10 +71,22 @@ horus-super-agent/
         ├── modern-c-mastery/           # C11/C17/C23, UB elimination, hardening
         ├── cpp20-win32-re/             # PE32/PE32+ → clean C++20 reconstruction
         ├── native-gui-architecture/    # Win32+D2D, ImGui, GTK4, SDL3
-        └── ui-ux-design-systems/       # OKLCH tokens, spatial grids, WCAG/APCA
+        ├── ui-ux-design-systems/       # OKLCH tokens, spatial grids, WCAG/APCA
+        ├── vibe/                       # 7-stage orchestrator + PRD/plan templates
+        ├── vibe-grill/                 # Socratic discovery → PRD.md
+        ├── vibe-spec-plan/             # PRD → IMPLEMENTATION_PLAN.md
+        ├── vibe-scoped-build/          # Scoped increments, root-cause fixes
+        ├── vibe-critique/              # Anti-sycophancy adversarial review
+        ├── vibe-test-gate/             # Anti-test-theater + 16-point launch gate
+        ├── superpowers/                # Brainstorm, TDD, debugging, verification
+        ├── frontend-design/            # Distinctive, subject-grounded visual design
+        ├── vercel-react-best-practices/# React & Next.js performance rules
+        ├── supabase-postgres-best-practices/ # Postgres/RLS/schema rules
+        ├── speed-engineer/             # Right-sized performance engineering
+        └── webapp-testing/             # Playwright E2E + with_server.py
 ```
 
-Built by fusing four upstream philosophies: **DeepSeek `dsh-superagent`** (router/worker separation, honest reporting), **`planning-with-files`** (3-file pattern, extended with proof), **[Graphify](https://github.com/Graphify-Labs/graphify)** (deterministic AST graph), and **[REA](https://github.com/morluto/rea)** (evidence-first binary analysis).
+Built by fusing upstream philosophies: **DeepSeek `dsh-superagent`** (router/worker separation, honest reporting), **`planning-with-files`** (3-file pattern, extended with proof), **[Graphify](https://github.com/Graphify-Labs/graphify)** (deterministic AST graph), **[REA](https://github.com/morluto/rea)** (evidence-first binary analysis), **[Superpowers](https://github.com/obra/superpowers)** (core methodology), and the **[Vibe Engineering Playbook](https://github.com/abduallahJamal/vibe-engineering-playbook)**.
 
 ---
 
@@ -73,7 +104,13 @@ Built by fusing four upstream philosophies: **DeepSeek `dsh-superagent`** (route
 bash install.sh project /path/to/your/repo
 ```
 
-This copies `.opencode/agents/`, `.opencode/skills/`, `AGENTS.md`, and `opencode.jsonc` into the target. **Existing `AGENTS.md` / `opencode.jsonc` are never overwritten.**
+This copies `.opencode/agents/`, `.opencode/commands/`, `.opencode/skills/`, `AGENTS.md`, and `opencode.jsonc` into the target. **Existing `AGENTS.md` / `opencode.jsonc` are never overwritten** unless you pass `-Force` / `--force`.
+
+| Flag | Effect |
+|---|---|
+| `-Force` / `--force` | Back up existing `AGENTS.md` / `opencode.jsonc` to `.bak` and update them to v0.2.1 (enables the `question` permission) |
+| `-V1` / `--v1` | Install `opencode.v1.json` as `opencode.json` for OpenCode V1 |
+| `-SyncUpstream` / `--sync` | Re-pull the latest upstream skill trees and references via `scripts/sync-skills.*` |
 
 ### 2. Or install globally (every OpenCode project)
 
@@ -108,8 +145,9 @@ First prompt triggers the **kickoff gate**: Horus asks whether to enable subagen
 
 | Agent | Mode | Role |
 |---|---|---|
-| **`horus`** | primary | DAG-Wave orchestrator. Evidence-gated planning, graphify-first navigation, file-locked parallel dispatch, two-stage review, model selection gate. |
-| `architect` | subagent | Read-only systems architect. Maps codebases via Graphify, emits DAG task plans with disjoint file-ownership locks. |
+| **`horus`** | primary | DAG-Wave orchestrator. Evidence-gated planning, graphify-first navigation, file-locked parallel dispatch, two-stage review, native `question` polls, model selection gate. |
+| `architect` | subagent | Read-only systems & full-stack architect. Maps codebases via Graphify, emits DAG task plans with disjoint file-ownership locks. |
+| `fullstack-engineer` | subagent | React/Next.js, Supabase/Postgres, performance, and Playwright E2E engineer. Vercel React + Supabase RLS rules, Speed Engineer tiers, scoped builds. |
 | `c-engineer` | subagent | C17/C23 + C++20/Win32 engineer. Zero-UB hardened code, respects write-locks, returns compact Result Envelopes. |
 | `ui-gui-engineer` | subagent | Native desktop GUI (Win32/Direct2D, ImGui, GTK4, SDL3, Clay) and modern web UI/UX. Accessible, zero-slop interfaces. |
 | `re-analyst` | subagent | Read-only reverse engineer. Loads `reverse-engineer-anything` for REA routing + `cpp20-win32-re` for MSVC ABI. Evidence for structs, vtables, Win32 contracts. Never edits source. |
@@ -208,8 +246,28 @@ Tasks run in dependency waves, not sequentially:
 | `cpp20-win32-re` | Reconstructing legacy Win32 C++ from PE32/PE32+ binaries |
 | `native-gui-architecture` | Desktop GUI: DPI scaling, 60/120fps, threading, dark mode |
 | `ui-ux-design-systems` | Visual hierarchy, 4/8px grids, OKLCH tokens, WCAG/APCA |
+| `vibe` | Orchestrating the 7-stage Vibe Engineering workflow end to end |
+| `vibe-grill` | Pre-code Socratic requirements discovery → `PRD.md` |
+| `vibe-spec-plan` | Turning `PRD.md` into an approved `IMPLEMENTATION_PLAN.md` |
+| `vibe-scoped-build` | Single-task diffs, root-cause fixes, checkpoint hygiene |
+| `vibe-critique` | Adversarial anti-sycophancy review with `file:line` evidence |
+| `vibe-test-gate` | Anti-test-theater audit + 16-point pre-launch gate |
+| `superpowers` | Brainstorming, TDD, systematic debugging, verification, branch finish |
+| `frontend-design` | Distinctive visual direction instead of templated defaults |
+| `vercel-react-best-practices` | React / Next.js performance and bundle optimization |
+| `supabase-postgres-best-practices` | Postgres schema, RLS, indexes, migrations, slow-query diagnosis |
+| `speed-engineer` | Indexes/N+1, pagination, images, caching, skeletons — sized S/M/L |
+| `webapp-testing` | Playwright E2E against local web apps |
 
 All skills are plain `SKILL.md` files: portable, diffable, no build step.
+
+---
+
+## Slash Commands
+
+| Command | What it does |
+|---|---|
+| `/vibe` | Launches the 7-stage Vibe Engineering workflow (`.opencode/commands/vibe.md`): classify PoC vs production, inspect `PRD.md` / `IMPLEMENTATION_PLAN.md`, route to the right stage skill, and pause at human review gates. |
 
 ---
 
@@ -254,4 +312,4 @@ Before pausing: `plan.py handoff --note "<active wave & next step>"`.
 
 ## License
 
-MIT. Upstream inspirations retain their own licenses: `dsh-superagent-prototype` (DeepSeek), `planning-with-files` (OthmanAdi), `graphify` (Apache-2.0, Graphify-Labs), `rea` (morluto).
+MIT. Upstream inspirations retain their own licenses: `dsh-superagent-prototype` (DeepSeek), `planning-with-files` (OthmanAdi), `graphify` (Apache-2.0, Graphify-Labs), `rea` (morluto), `superpowers` (obra), `vibe-engineering-playbook` (abduallahJamal), `frontend-design` / `webapp-testing` (Anthropic skills), `vercel-react-best-practices` (Vercel Labs), `supabase-postgres-best-practices` (Supabase).

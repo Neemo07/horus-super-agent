@@ -1,6 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Primary DAG-Wave Orchestrator built on DeepSeek dsh-superagent + Graphify + REA + Planning-with-Evidence
+  // Horus Super Agent v0.2 — Primary DAG-Wave Orchestrator for OpenCode V2
+  // Combines DeepSeek dsh-superagent, Planning-with-Evidence (plan.py), Graphify AST, REA,
+  // Superpowers Core, Vibe Engineering Playbook, Speed Engineer, Frontend Design,
+  // Vercel React, Supabase Postgres, and Playwright Webapp Testing.
   "default_agent": "horus",
   "instructions": [
     "AGENTS.md"
@@ -9,6 +12,7 @@
     { "action": "read", "resource": "*", "effect": "allow" },
     { "action": "glob", "resource": "*", "effect": "allow" },
     { "action": "grep", "resource": "*", "effect": "allow" },
+    { "action": "question", "resource": "*", "effect": "allow" },
     { "action": "skill", "resource": "*", "effect": "allow" },
     { "action": "edit", "resource": "*", "effect": "allow" },
     { "action": "shell", "resource": "*", "effect": "allow" },

@@ -13,11 +13,17 @@ permissions:
   - action: grep
     resource: "*"
     effect: allow
+  - action: question
+    resource: "*"
+    effect: deny
   - action: skill
     resource: "reverse-engineer-anything"
     effect: allow
   - action: skill
     resource: "cpp20-win32-re"
+    effect: allow
+  - action: skill
+    resource: "superpowers"
     effect: allow
   - action: skill
     resource: "graphify-memory"
@@ -61,5 +67,6 @@ STATUS: DONE | BLOCKED | NEEDS_DECISION
 EVIDENCE_REFS: <binary SHA-256 / VAs / RVAs / REA evidence IDs>
 SPEC: <types + static_assert layouts, calling conventions, behavioral invariants>
 TEST_VECTORS: <golden input/output vectors from binary>
+DECISION_OPTIONS: <structured poll options if NEEDS_DECISION, or none>
 UNKNOWNS: <explicit gaps or AMBIGUOUS items, or none>
 ```
