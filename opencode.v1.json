@@ -1,0 +1,19 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "horus",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "permission": {
+    "question": "allow",
+    "skill": {
+      "*": "allow"
+    },
+    "edit": "allow",
+    "bash": {
+      "*": "allow",
+      "git push *": "ask",
+      "rm -rf *": "ask"
+    }
+  }
+}

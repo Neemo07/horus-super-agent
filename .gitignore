@@ -1,0 +1,28 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Installer backups
+*.bak
+
+# Harness runtime artifacts (per-project, not part of the harness)
+task_plan.md
+findings.md
+progress.md
+HANDOFF.md
+evidence/
+.horus/
+graphify-out/
+
+# Upstream sync artifacts
+.opencode/SOURCES.lock.json
+.opencode/.skills-sync-backup/
