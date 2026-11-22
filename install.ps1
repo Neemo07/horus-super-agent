@@ -23,6 +23,19 @@ foreach ($d in "agents", "skills", "commands") {
 
 foreach ($f in "AGENTS.md", "opencode.jsonc") {
   $destFile = Join-Path $Cfg $f
+
+  # Global installs usually already have an opencode.json holding providers/MCP.
+  # Dropping a competing opencode.jsonc beside it risks shadowing that config,
+  # so never introduce a second config file in global mode.
+  if ($f -eq "opencode.jsonc" -and $Mode -eq "global") {
+    $existingJson = Join-Path $Cfg "opencode.json"
+    if (Test-Path $existingJson) {
+      Write-Host "Skipped $destFile (opencode.json already exists; add permissions manually)"
+      continue
+    }
+    $destFile = $existingJson
+  }
+
   if (Test-Path $destFile) {
     if ($ForceConfig) {
       Copy-Item -Force $destFile "$destFile.bak"
@@ -37,13 +50,10 @@ foreach ($f in "AGENTS.md", "opencode.jsonc") {
 }
 
 New-Item -ItemType Directory -Force -Path (Join-Path $Cfg "scripts") | Out-Null
-Copy-Item -Force (Join-Path $ScriptDir "scripts/sync_upstream.py") (Join-Path $Cfg "scripts/sync_upstream.py")
-Copy-Item -Force (Join-Path $ScriptDir "scripts/validate_horus.py") (Join-Path $Cfg "scripts/validate_horus.py")
-Write-Host "Installed Horus v0.3 ($Mode) to $Base"
-
-if ($Mode -eq "project" -and (Get-Command python -ErrorAction SilentlyContinue)) {
-  python (Join-Path $Cfg "scripts/validate_horus.py")
+foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py") {
+  Copy-Item -Force (Join-Path $ScriptDir "scripts/$s") (Join-Path $Cfg "scripts/$s")
 }
+Write-Host "Installed Horus v0.3 ($Mode) to $Base"
 
 if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
   Write-Host "Note: Graphify CLI not found (AST knowledge graphs):  uv tool install --upgrade graphifyy"
@@ -51,8 +61,17 @@ if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
 if (-not (Get-Command rea -ErrorAction SilentlyContinue)) {
   Write-Host "Note: REA CLI not found (binary reverse engineering, optional):  npx -y rea-agents@latest setup"
 }
-python -c "import playwright" 2>$null
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "Note: 'webapp-testing' needs Playwright:  pip install playwright; python -m playwright install chromium"
+
+if (Get-Command python -ErrorAction SilentlyContinue) {
+  if ($Mode -eq "project") {
+    python (Join-Path $Cfg "scripts/validate_horus.py")
+  }
+  # Quietly probe Playwright. `cmd /c` fully isolates the child's streams:
+  # under $ErrorActionPreference = "Stop", PowerShell 5.1 otherwise converts
+  # a native ImportError traceback on stderr into a terminating error.
+  cmd /c "python -c ""import playwright"" >nul 2>&1"
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "Note: 'webapp-testing' needs Playwright:  pip install playwright; python -m playwright install chromium"
+  }
 }
 Write-Host "Optional: sync other upstream skills:  python $(Join-Path $Cfg 'scripts/sync_upstream.py') --dest $(Join-Path $Base 'skills')"

@@ -30,21 +30,35 @@ cp -r "$SCRIPT_DIR/.opencode/skills/." "$BASE/skills/"
 cp -r "$SCRIPT_DIR/.opencode/commands/." "$BASE/commands/"
 
 for f in AGENTS.md opencode.jsonc; do
-  if [[ -f "$CFG/$f" ]]; then
+  dest="$CFG/$f"
+
+  # Global installs usually already have an opencode.json holding providers/MCP.
+  # Dropping a competing opencode.jsonc beside it risks shadowing that config,
+  # so never introduce a second config file in global mode.
+  if [[ "$f" == "opencode.jsonc" && "$MODE" == "global" ]]; then
+    if [[ -f "$CFG/opencode.json" ]]; then
+      echo "Skipped $dest (opencode.json already exists; add permissions manually)"
+      continue
+    fi
+    dest="$CFG/opencode.json"
+  fi
+
+  if [[ -f "$dest" ]]; then
     if [[ "$FORCE_CONFIG" -eq 1 ]]; then
-      cp "$CFG/$f" "$CFG/$f.bak"
-      cp "$SCRIPT_DIR/$f" "$CFG/$f"
-      echo "Updated $CFG/$f (backup saved to $CFG/$f.bak)"
+      cp "$dest" "$dest.bak"
+      cp "$SCRIPT_DIR/$f" "$dest"
+      echo "Updated $dest (backup saved to $dest.bak)"
     else
-      echo "Kept existing $CFG/$f (pass --force-config to upgrade with .bak backup)"
+      echo "Kept existing $dest (pass --force-config to upgrade with .bak backup)"
     fi
   else
-    cp "$SCRIPT_DIR/$f" "$CFG/$f"
+    cp "$SCRIPT_DIR/$f" "$dest"
   fi
 done
 
-cp "$SCRIPT_DIR/scripts/sync_upstream.py" "$CFG/scripts/sync_upstream.py"
-cp "$SCRIPT_DIR/scripts/validate_horus.py" "$CFG/scripts/validate_horus.py"
+for s in sync_upstream.py validate_horus.py migrate-opencode-db.py; do
+  cp "$SCRIPT_DIR/scripts/$s" "$CFG/scripts/$s"
+done
 echo "Installed Horus v0.3 ($MODE) to $BASE"
 
 if command -v python3 >/dev/null 2>&1 && [[ "$MODE" == "project" ]]; then

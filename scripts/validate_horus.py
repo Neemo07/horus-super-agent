@@ -21,6 +21,37 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Support both layouts:
+#   project install: <root>/.opencode/{agents,skills,commands} + <root>/opencode.jsonc
+#   global install:  <config>/{agents,skills,commands}        + <config>/opencode.json
+NESTED = ROOT / ".opencode"
+BASE = NESTED if NESTED.is_dir() else ROOT
+LAYOUT = "project" if NESTED.is_dir() else "global"
+
+
+def find_config() -> Path | None:
+    for name in ("opencode.jsonc", "opencode.json"):
+        p = ROOT / name
+        if p.exists():
+            return p
+    return None
+
+
+def v2_permissions(cfg: dict) -> list[dict]:
+    """V2 uses a `permissions` array; V1 uses a `permission` map."""
+    perms = cfg.get("permissions")
+    if isinstance(perms, list):
+        return [p for p in perms if isinstance(p, dict)]
+    legacy = cfg.get("permission")
+    if isinstance(legacy, dict):
+        return [
+            {"action": k, "resource": "*", "effect": v}
+            for k, v in legacy.items()
+            if isinstance(v, str)
+        ]
+    return []
+
+
 REQUIRED_VIBE_TEMPLATES = [
     "AGENTS.template.md",
     "AGENTS.template.ar.md",
@@ -71,38 +102,37 @@ def main() -> int:
     def fail(msg: str) -> None:
         errors.append(msg)
 
-    # 1. Validate opencode.jsonc (V2)
-    jsonc_path = ROOT / "opencode.jsonc"
-    if not jsonc_path.exists():
-        fail("Missing opencode.jsonc")
+    # 1. Validate the active config (V2 `permissions` array or V1 `permission` map)
+    jsonc_path = find_config()
+    if jsonc_path is None:
+        fail(f"Missing opencode.jsonc or opencode.json in {ROOT}")
     else:
         try:
-            cfg = json.loads(strip_jsonc_comments(jsonc_path.read_text(encoding="utf-8")))
-            perms = cfg.get("permissions", [])
+            cfg = json.loads(strip_jsonc_comments(jsonc_path.read_text(encoding="utf-8-sig")))
+            perms = v2_permissions(cfg)
             has_q = any(
                 p.get("action") == "question" and p.get("effect") == "allow"
                 for p in perms
-                if isinstance(p, dict)
             )
             if not has_q:
-                fail("opencode.jsonc missing { action: 'question', resource: '*', effect: 'allow' }")
+                fail(f"{jsonc_path.name} missing question -> allow permission")
             if cfg.get("default_agent") != "horus":
-                fail(f"opencode.jsonc default_agent expected 'horus', got {cfg.get('default_agent')!r}")
+                fail(f"{jsonc_path.name} default_agent expected 'horus', got {cfg.get('default_agent')!r}")
         except Exception as exc:
-            fail(f"opencode.jsonc parse error: {exc}")
+            fail(f"{jsonc_path.name} parse error: {exc}")
 
-    # 2. Validate opencode.v1.json (V1)
+    # 2. Validate opencode.v1.json (V1 reference config), if shipped
     v1_path = ROOT / "opencode.v1.json"
     if v1_path.exists():
         try:
-            v1 = json.loads(v1_path.read_text(encoding="utf-8"))
+            v1 = json.loads(v1_path.read_text(encoding="utf-8-sig"))
             if v1.get("permission", {}).get("question") != "allow":
                 fail("opencode.v1.json missing permission.question = 'allow'")
         except Exception as exc:
             fail(f"opencode.v1.json parse error: {exc}")
 
     # 3. Validate agents
-    agents_dir = ROOT / ".opencode" / "agents"
+    agents_dir = BASE / "agents"
     agent_files = sorted(agents_dir.glob("*.md"))
     if not agent_files:
         fail("No agent files found in .opencode/agents/")
@@ -126,7 +156,7 @@ def main() -> int:
                 fail(f"{af.name}: subagent must explicitly deny `subagent` tool")
 
     # 4. Validate skills
-    skills_dir = ROOT / ".opencode" / "skills"
+    skills_dir = BASE / "skills"
     skill_dirs = sorted(p for p in skills_dir.iterdir() if p.is_dir())
     if not skill_dirs:
         fail("No skills found in .opencode/skills/")
@@ -151,7 +181,7 @@ def main() -> int:
             fail(f"skills/{sd.name}/SKILL.md empty body")
 
     # 5. Validate commands
-    cmds_dir = ROOT / ".opencode" / "commands"
+    cmds_dir = BASE / "commands"
     for cmd in REQUIRED_COMMANDS:
         cp = cmds_dir / cmd
         if not cp.exists():
@@ -176,20 +206,23 @@ def main() -> int:
             fail(f"Missing merged Vibe reference: .opencode/skills/vibe/references/{ref}")
 
     # 7. Compile-check bundled Python scripts
+    scripts_dir = ROOT / "scripts"
+    if not (scripts_dir / "validate_horus.py").exists():
+        scripts_dir = BASE / "scripts"
     py_scripts = [
-        ROOT / "scripts" / "sync_upstream.py",
-        ROOT / "scripts" / "validate_horus.py",
+        scripts_dir / "sync_upstream.py",
+        scripts_dir / "validate_horus.py",
         skills_dir / "planning-with-evidence" / "scripts" / "plan.py",
         skills_dir / "webapp-testing" / "scripts" / "with_server.py",
     ]
     for ps in py_scripts:
         if not ps.exists():
-            fail(f"Missing script: {ps.relative_to(ROOT)}")
+            fail(f"Missing script: {ps}")
             continue
         try:
             py_compile.compile(str(ps), doraise=True)
         except Exception as exc:
-            fail(f"Syntax error in {ps.relative_to(ROOT)}: {exc}")
+            fail(f"Syntax error in {ps}: {exc}")
 
     if errors:
         print(f"HORUS VALIDATION FAILED ({len(errors)} issue(s)):")
@@ -198,7 +231,7 @@ def main() -> int:
         return 1
 
     print(
-        f"HORUS VALIDATION PASSED: "
+        f"HORUS VALIDATION PASSED ({LAYOUT}): "
         f"{len(agent_files)} agents, {len(skill_dirs)} skills, "
         f"{len(REQUIRED_COMMANDS)} commands, "
         f"{len(REQUIRED_VIBE_TEMPLATES)} Vibe templates, "
