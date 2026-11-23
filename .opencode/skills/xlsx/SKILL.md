@@ -1,6 +1,6 @@
 ---
 name: xlsx
-description: "Create, read, analyze, and edit Excel (.xlsx/.xlsm/.csv/.tsv) spreadsheets with formulas, formatting, charts, and LibreOffice recalculation verification."
+description: "Create, read, analyze, and edit Excel (.xlsx/.xlsm/.csv) spreadsheets with formulas, charts, and LibreOffice recalculation."
 license: Complete terms in LICENSE.txt
 ---
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Horus Super Agent v0.3 — DAG-Wave Orchestrator + Full Vibe Engineering Playbook + Native OpenCode Poll UI
+  // Horus Super Agent v0.5.0 — DAG-Wave Orchestrator + Vibe Playbook + Graphify + Horus Context Mode + Native OpenCode Poll UI
   "default_agent": "horus",
   "instructions": [
     "AGENTS.md"
@@ -17,17 +17,24 @@
     { "action": "shell", "resource": "rm -rf *", "effect": "ask" },
     { "action": "subagent", "resource": "*", "effect": "allow" }
   ],
-  // Optional MCP servers: uncomment once installed
-  // "mcp": {
-  //   "graphify": {
-  //     "type": "local",
-  //     "command": ["graphify-mcp", "graphify-out/graph.json"],
-  //     "enabled": true
-  //   },
-  //   "rea": {
-  //     "type": "local",
-  //     "command": ["npx", "-y", "rea-agents@latest", "mcp"],
-  //     "enabled": true
-  //   }
-  // }
+  "mcp": {
+    // Horus Context Mode (SQLite FTS5 + sandboxed ctx_execute; requires Node.js >= 22.5.0)
+    "horus-context-mode": {
+      "type": "local",
+      "command": ["node", ".opencode/context-mode/server.js"],
+      "enabled": true
+    }
+    // Optional MCP servers: uncomment once installed
+    // ,
+    // "graphify": {
+    //   "type": "local",
+    //   "command": ["graphify-mcp", "graphify-out/graph.json"],
+    //   "enabled": true
+    // },
+    // "rea": {
+    //   "type": "local",
+    //   "command": ["npx", "-y", "rea-agents@latest", "mcp"],
+    //   "enabled": true
+    // }
+  }
 }

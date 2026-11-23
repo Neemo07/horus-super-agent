@@ -32,6 +32,9 @@ permissions:
     resource: "ui-ux-design-systems"
     effect: allow
   - action: skill
+    resource: "design-engineering"
+    effect: allow
+  - action: skill
     resource: "webapp-testing"
     effect: allow
   - action: skill
@@ -47,7 +50,16 @@ permissions:
     resource: "systematic-debugging"
     effect: allow
   - action: skill
+    resource: "engineering-craft"
+    effect: allow
+  - action: skill
+    resource: "security-audit"
+    effect: allow
+  - action: skill
     resource: "graphify"
+    effect: allow
+  - action: skill
+    resource: "horus-context-mode"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"

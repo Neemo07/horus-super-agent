@@ -11,10 +11,15 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 function Copy-JsoncAsStrictJson {
   param(
     [string]$SourcePath,
-    [string]$DestPath
+    [string]$DestPath,
+    [string]$ContextModeServerPath = ""
   )
   $lines = Get-Content -Path $SourcePath -Encoding UTF8 | Where-Object { $_ -notmatch '^\s*//' }
   $cleaned = ($lines -join "`n") -replace ',(\s*[}\]])', '$1'
+  if ($ContextModeServerPath) {
+    $escaped = $ContextModeServerPath.Replace('\', '/')
+    $cleaned = $cleaned.Replace('.opencode/context-mode/server.js', $escaped)
+  }
   # Validate JSON before writing
   $null = $cleaned | ConvertFrom-Json
   [System.IO.File]::WriteAllText($DestPath, $cleaned + "`n", [System.Text.UTF8Encoding]::new($false))
@@ -28,7 +33,7 @@ if ($Mode -eq "global") {
   $Cfg  = $TargetDir
 }
 
-foreach ($d in "agents", "skills", "commands") {
+foreach ($d in "agents", "skills", "commands", "context-mode") {
   New-Item -ItemType Directory -Force -Path (Join-Path $Base $d) | Out-Null
   Copy-Item -Recurse -Force (Join-Path $ScriptDir ".opencode/$d/*") (Join-Path $Base $d)
 }
@@ -56,7 +61,7 @@ foreach ($f in "AGENTS.md", "opencode.jsonc") {
     if ($ForceConfig) {
       Copy-Item -Force $destFile "$destFile.bak"
       if ($writeStrictJson) {
-        Copy-JsoncAsStrictJson -SourcePath $srcFile -DestPath $destFile
+        Copy-JsoncAsStrictJson -SourcePath $srcFile -DestPath $destFile -ContextModeServerPath (Join-Path $Base "context-mode/server.js")
       } else {
         Copy-Item -Force $srcFile $destFile
       }
@@ -66,7 +71,7 @@ foreach ($f in "AGENTS.md", "opencode.jsonc") {
     }
   } else {
     if ($writeStrictJson) {
-      Copy-JsoncAsStrictJson -SourcePath $srcFile -DestPath $destFile
+      Copy-JsoncAsStrictJson -SourcePath $srcFile -DestPath $destFile -ContextModeServerPath (Join-Path $Base "context-mode/server.js")
     } else {
       Copy-Item $srcFile $destFile
     }
@@ -74,11 +79,20 @@ foreach ($f in "AGENTS.md", "opencode.jsonc") {
 }
 
 New-Item -ItemType Directory -Force -Path (Join-Path $Cfg "scripts") | Out-Null
-foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py") {
+foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py", "horus_foundry.py", "horus_todo.py") {
   Copy-Item -Force (Join-Path $ScriptDir "scripts/$s") (Join-Path $Cfg "scripts/$s")
 }
-Write-Host "Installed Horus v0.3.7 ($Mode) to $Base"
+Write-Host "Installed Horus v0.5.0 ($Mode) to $Base"
 
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+  Write-Host "Note: Horus Context Mode MCP requires Node.js >= 22.5.0 (built-in node:sqlite)."
+} else {
+  $nodeVer = (node -v 2>$null) -replace '^v', ''
+  $parts = $nodeVer.Split('.')
+  if ($parts.Length -ge 2 -and (([int]$parts[0] -lt 22) -or ([int]$parts[0] -eq 22 -and [int]$parts[1] -lt 5))) {
+    Write-Host "Note: Horus Context Mode MCP requires Node.js >= 22.5.0 (found v$nodeVer)."
+  }
+}
 if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
   Write-Host "Note: Graphify CLI not found (AST knowledge graphs):  uv tool install --upgrade "graphifyy[mcp]""
 }

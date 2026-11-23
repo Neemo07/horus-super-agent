@@ -23,7 +23,13 @@ permissions:
     resource: "ui-ux-design-systems"
     effect: allow
   - action: skill
+    resource: "design-engineering"
+    effect: allow
+  - action: skill
     resource: "graphify"
+    effect: allow
+  - action: skill
+    resource: "horus-context-mode"
     effect: allow
   - action: skill
     resource: "anti-hallucination-harness"

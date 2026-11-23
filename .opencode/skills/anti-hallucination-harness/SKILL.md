@@ -1,6 +1,6 @@
 ---
 name: anti-hallucination-harness
-description: "DeepSeek dsh-superagent harness discipline paired with mechanical plan.py evidence gates: zero hallucination, evidence-backed claims, minimal token output, surgical refactoring of noisy/weak code, and honest blocker reporting."
+description: "Signal-only output, evidence-backed claims, zero noisy code, and honest blocker reporting paired with plan.py."
 license: MIT
 compatibility: opencode
 metadata:

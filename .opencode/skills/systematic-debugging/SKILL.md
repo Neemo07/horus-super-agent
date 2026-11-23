@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: "Root-cause-first debugging protocol for bugs and test failures before proposing or applying any fix."
 ---
 
 # Systematic Debugging

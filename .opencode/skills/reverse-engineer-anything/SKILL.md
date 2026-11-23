@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer-anything
-description: "Dedicated REA (morluto/rea) skill for evidence-backed inspection of native binaries (PE/ELF/Mach-O), Electron/JS bundles, archives, binary hardening, and release exposure via REA MCP tools or CLI."
+description: "Inspect PE/ELF/Mach-O binaries, Electron/JS bundles, archives, and binary hardening via REA MCP or CLI."
 license: MIT
 compatibility: opencode
 metadata:

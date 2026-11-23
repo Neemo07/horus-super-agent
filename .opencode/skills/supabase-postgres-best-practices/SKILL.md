@@ -1,6 +1,6 @@
 ---
 name: supabase-postgres-best-practices
-description: "Postgres & Supabase best practices (v1.1.1). Load before writing or changing tables, columns, migrations, RLS policies, indexes, triggers, SQL functions, pg_cron/pgmq/pgvector, or diagnosing slow queries, EXPLAIN plans, pooling, locks, and bloat."
+description: "31 Postgres & Supabase SQL rules: schemas, migrations, RLS policies, indexes, EXPLAIN plans, pooling, locks, and pgvector."
 license: MIT
 metadata:
   author: supabase

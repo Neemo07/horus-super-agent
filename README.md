@@ -2,14 +2,14 @@
 
 # Horus Super Agent
 
-**A DAG-wave orchestrator and 31-skill harness for [OpenCode](https://opencode.ai).**
+**A DAG-wave orchestrator and 39-skill harness for [OpenCode](https://opencode.ai).**
 
 Specs before code, file-locked parallel subagents, and proof-gated task closure —
 with every decision surfaced as a native clickable poll instead of a wall of chat questions.
 
-[![Version](https://img.shields.io/badge/version-0.3.7-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.5.0-00d4aa?style=flat-square)](CHANGELOG.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%7C%20V2-6e56cf?style=flat-square)](https://opencode.ai)
-[![Skills](https://img.shields.io/badge/skills-31-3b82f6?style=flat-square)](SKILLS.md)
+[![Skills](https://img.shields.io/badge/skills-39-3b82f6?style=flat-square)](SKILLS.md)
 [![Subagents](https://img.shields.io/badge/subagents-6-8b5cf6?style=flat-square)](#the-subagents)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#quick-start)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
@@ -136,7 +136,7 @@ python scripts/validate_horus.py
 ```
 
 ```
-HORUS VALIDATION PASSED (project): 7 agents, 31 skills, 6 commands, 4 Vibe templates, 8 bilingual Vibe handbooks, 8 Graphify references.
+HORUS VALIDATION PASSED (project): 7 agents, 39 skills, 12 commands, 4 Vibe templates, 8 bilingual Vibe handbooks, 8 Graphify references.
 ```
 
 The validator checks config parsing, `question` permissions on the primary agent,
@@ -165,13 +165,16 @@ horus-super-agent/
 ├─ install.ps1 / install.sh   # project-local and global installers
 ├─ .opencode/
 │  ├─ agents/                 # horus + 6 subagents
-│  ├─ commands/               # 6 slash commands
-│  └─ skills/                 # 31 skills
+│  ├─ commands/               # 12 slash commands
+│  ├─ context-mode/           # Horus Context Mode MCP server + dashboard
+│  └─ skills/                 # 39 skills
 │     └─ vibe/                # 4 templates + 8 EN/AR handbooks
 └─ scripts/
    ├─ validate_horus.py       # integrity validator
    ├─ sync_upstream.py        # replace offline editions with verbatim upstream
-   └─ migrate-opencode-db.py  # repair a V2→V1 opencode.db schema mismatch
+   ├─ migrate-opencode-db.py  # repair a V2→V1 opencode.db schema mismatch
+   ├─ horus_foundry.py        # Linear-orchestrated parallel background OpenCode pods
+   └─ horus_todo.py           # git-tracked .todo.md checklist, AI analysis & live sidebar
 ```
 
 > **Troubleshooting OpenCode itself?** `scripts/migrate-opencode-db.py` (driven by
@@ -204,6 +207,12 @@ Only `horus` may call the `question` tool. Workers that need a decision return
 | `/horus-review` | Adversarial read-only review plus anti-test-theater audit on the current diff |
 | `/vibe` | Enter the 7-stage Vibe Engineering workflow |
 | `/graphify` | Official Graphify v0.9.115 knowledge graph build, query, path, explain, update, wiki & MCP |
+| `/horus-context` | Horus Context Mode token-savings report (`ctx_stats`), `ctx_doctor`, JIT FTS5 search, or dashboard |
+| `/horus-foundry` | Launch, dry-run, or check Linear-orchestrated parallel background OpenCode pods |
+| `/horus-todo` | Git-tracked `.todo.md` checklist, 1-click AI Requirement Analysis, `plan.py` promote, or live sidebar |
+| `/design` | Design Engineering 20-playbook suite (animations, gestures, `break-ui`, prototyping, `DESIGN.md`, Apple/Swift) |
+| `/craft` | Engineering Craft 18-playbook suite (deep modules, domain modeling, wayfinder, PR/triage/retro, bug diagnosis) |
+| `/security` | Defensive AppSec, C/C++ memory/mitigations, CI/CD & supply-chain hardening audit |
 
 ### Evidence gates (`plan.py`)
 
@@ -226,7 +235,7 @@ editing a checkbox by hand useless.
 
 ## The skills
 
-31 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
+39 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
 
 <details>
 <summary><b>Orchestration & evidence (9 Horus originals)</b></summary>
@@ -237,11 +246,17 @@ editing a checkbox by hand useless.
 | `planning-with-evidence` | `plan.py` progress, proof records, `HANDOFF.md` |
 | `anti-hallucination-harness` | Evidence-backed claims, minimal output, honest blockers |
 | `graphify` | Official Graphify v0.9.115 OpenCode skill + 8 references (AST graph, query/path/explain/section, wiki, MCP) |
+| `horus-context-mode` | SQLite FTS5 (BM25 + Trigram RRF) & sandboxed `ctx_execute` MCP server to keep huge logs/outputs out of context |
+| `horus-next-steps` | State-aware 1-click `question` follow-up polls at the end of substantive tasks/waves (primary agent only) |
+| `horus-foundry` | Linear-orchestrated parallel background OpenCode pods with isolated `git worktree` per ticket |
+| `horus-todo` | Git-tracked `.todo.md` checklist with AI Requirement Analysis, `plan.py` promoter & live sidebar UI |
+| `security-audit` | Defensive AppSec, OWASP/API/Auth, C/C++ mitigations & CI/CD hardening audit (CWE-grounded) |
+| `agent-architecture-reference` | 17-chapter bilingual (EN/ZH) coding-agent harness architecture reference (queried via `ctx_search`) |
 | `reverse-engineer-anything` | Binary, bundle, and archive inspection via REA |
 | `cpp20-win32-re` | PE32/PE32+ analysis into clean C++20 `_WIN64` |
 | `modern-c-mastery` | C11/17/23 UB elimination, arenas, sanitizers |
 | `native-gui-architecture` | DPI, 120 fps rendering, threading, dark mode |
-| `ui-ux-design-systems` | Spatial grids, OKLCH tokens, WCAG/APCA contrast |
+| `ui-ux-design-systems` | Spatial grids, OKLCH tokens, WCAG/APCA contrast + Audit, Document & Extend modes |
 
 </details>
 
@@ -263,7 +278,7 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 </details>
 
 <details>
-<summary><b>Web, data, MCP, design & documents (10 skills)</b></summary>
+<summary><b>Web, data, MCP, design & documents (11 skills)</b></summary>
 
 | Skill | Use it for |
 | :--- | :--- |
@@ -271,6 +286,7 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 | `vercel-react-best-practices` | React/Next.js waterfalls and bundle size (70 rules) |
 | `supabase-postgres-best-practices` | Schema, RLS, indexing, connection management (31 rules) |
 | `frontend-design` | Distinctive web visual direction & typography |
+| `design-engineering` | 20 full Design Engineering playbooks + 2 cheatsheets (motion, choreography, gestures, `break-ui`, prototyping, mobile/Swift) |
 | `webapp-testing` | Playwright verification, screenshots, console logs |
 | `mcp-builder` | Building high-quality TypeScript & Python MCP servers |
 | `pdf` / `docx` / `xlsx` / `pptx` | Full document, spreadsheet, presentation & PDF engineering |
@@ -278,7 +294,7 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 </details>
 
 <details>
-<summary><b>Engineering discipline (6 full Superpowers v7.0.2 skills + references/scripts)</b></summary>
+<summary><b>Engineering discipline (6 full Superpowers v7.0.2 skills + 18-playbook `engineering-craft` suite)</b></summary>
 
 `brainstorming`, `test-driven-development`, `systematic-debugging`,
 `using-git-worktrees`, `finishing-a-development-branch`, `writing-skills`

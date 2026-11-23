@@ -29,6 +29,9 @@ permissions:
     resource: "graphify"
     effect: allow
   - action: skill
+    resource: "horus-context-mode"
+    effect: allow
+  - action: skill
     resource: "anti-hallucination-harness"
     effect: allow
   - action: skill
@@ -39,6 +42,12 @@ permissions:
     effect: allow
   - action: skill
     resource: "systematic-debugging"
+    effect: allow
+  - action: skill
+    resource: "engineering-craft"
+    effect: allow
+  - action: skill
+    resource: "security-audit"
     effect: allow
   - action: shell
     resource: "*"

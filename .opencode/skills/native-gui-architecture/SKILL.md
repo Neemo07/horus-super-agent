@@ -1,6 +1,6 @@
 ---
 name: native-gui-architecture
-description: "Production native desktop GUI engineering in C/C++ (Win32 + Direct2D/DirectWrite, Dear ImGui, Nuklear, Clay, GTK4, SDL3). Covers DPI scaling, 60/120fps rendering, threading, dark mode, and crisp desktop UX."
+description: "Native C/C++ desktop GUI engineering (Win32/Direct2D, ImGui, GTK4, SDL3, Clay): DPI scaling, 120fps rendering, threading, dark mode."
 license: MIT
 compatibility: opencode
 ---

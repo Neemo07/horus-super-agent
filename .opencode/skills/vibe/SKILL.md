@@ -1,6 +1,6 @@
 ---
 name: vibe
-description: Master Vibe Engineering orchestrator (/vibe) enforcing specs-before-prompts, scoped increments, adversarial critique, and real test verification across 7 delivery stages — integrated with Horus Super Agent and OpenCode interactive question polls.
+description: "Master 7-stage Vibe Engineering router (/vibe): specs before code, interactive question polls, scoped builds, critique, launch gate."
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:

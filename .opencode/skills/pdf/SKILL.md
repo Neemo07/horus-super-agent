@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: "Create, read, extract text/tables, fill forms, merge, split, watermark, or OCR PDF (.pdf) documents using verified Python/CLI tooling."
+description: "Create, read, extract text/tables, fill forms, merge, split, watermark, or OCR PDF (.pdf) documents."
 license: Complete terms in LICENSE.txt
 ---
 

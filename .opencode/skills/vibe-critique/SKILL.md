@@ -1,6 +1,6 @@
 ---
 name: vibe-critique
-description: Adversarial anti-sycophancy code review & feedback-evaluation skill — audits code/plans against PRD specs with file:line evidence, and evaluates incoming review comments technically without performative agreement.
+description: "Adversarial anti-sycophancy code review & incoming PR feedback audit with file:line evidence and confidence scores."
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:

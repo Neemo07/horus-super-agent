@@ -1,6 +1,6 @@
 ---
 name: pptx
-description: "Create, read, edit, and visually QA PowerPoint (.pptx/.potx) slide decks, layouts, charts, speaker notes, and OOXML templates."
+description: "Create, read, edit, and visually QA PowerPoint (.pptx/.potx) slide decks, layouts, charts, and speaker notes."
 license: Complete terms in LICENSE.txt
 ---
 

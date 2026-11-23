@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: "Strict RED-GREEN-REFACTOR test-driven development before writing feature or bugfix implementation code."
 ---
 
 # Test-Driven Development (TDD)

@@ -18,6 +18,8 @@ PLAN_PY = REPO_ROOT / ".opencode" / "skills" / "planning-with-evidence" / "scrip
 VALIDATE_PY = REPO_ROOT / "scripts" / "validate_horus.py"
 SYNC_PY = REPO_ROOT / "scripts" / "sync_upstream.py"
 MIGRATE_PY = REPO_ROOT / "scripts" / "migrate-opencode-db.py"
+FOUNDRY_PY = REPO_ROOT / "scripts" / "horus_foundry.py"
+TODO_PY = REPO_ROOT / "scripts" / "horus_todo.py"
 INSTALL_SH = REPO_ROOT / "install.sh"
 
 
@@ -126,6 +128,110 @@ class TestValidateHorus(unittest.TestCase):
         for excluded in ("skill-creator", "claude-api", "brand-guidelines", "web-artifacts-builder", "slack-gif-creator"):
             self.assertFalse((skills_dir / excluded).exists(), f"Excluded skill crept in: {excluded}")
 
+    def test_horus_context_mode_integration_and_rebrand(self) -> None:
+        ctx_dir = REPO_ROOT / ".opencode" / "context-mode"
+        for rel in ("package.json", "server.js", "lib/store.js", "lib/chunker.js",
+                    "lib/executor.js", "lib/tools.js", "dashboard/server.mjs", "dashboard/index.html"):
+            p = ctx_dir / rel
+            self.assertTrue(p.exists(), f"Missing Horus Context Mode file: {rel}")
+            if p.suffix in (".js", ".mjs", ".html"):
+                txt = p.read_text(encoding="utf-8")
+                self.assertNotIn('"antigravity-plugin-context-mode"', txt, f"Unrebranded runtime name in {rel}")
+                self.assertNotIn("Antigravity Context Mode", txt, f"Unrebranded UI title in {rel}")
+                self.assertNotIn("C:/Users/domus", txt, f"Hardcoded author path left in {rel}")
+        # Check MCP registration in both V2 and V1 configs
+        v1 = json.loads((REPO_ROOT / "opencode.v1.json").read_text(encoding="utf-8"))
+        self.assertIn("horus-context-mode", v1.get("mcp", {}))
+        self.assertTrue((REPO_ROOT / ".opencode" / "skills" / "horus-context-mode" / "SKILL.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "horus-context.md").exists())
+        if shutil.which("node"):
+            for js in ("server.js", "lib/store.js", "lib/chunker.js", "lib/executor.js", "lib/tools.js", "dashboard/server.mjs"):
+                r = subprocess.run(["node", "--check", str(ctx_dir / js)], capture_output=True, text=True)
+                self.assertEqual(r.returncode, 0, f"node --check failed for {js}: {r.stderr}")
+
+    def test_horus_next_steps_opencode_native_and_primary_only(self) -> None:
+        ns = REPO_ROOT / ".opencode" / "skills" / "horus-next-steps" / "SKILL.md"
+        self.assertTrue(ns.exists(), "Missing horus-next-steps skill")
+        txt = ns.read_text(encoding="utf-8")
+        # Must use OpenCode native `question` tool schema, zero Antigravity schema leftovers
+        self.assertNotIn("ask_question", txt)
+        self.assertNotIn("is_multi_select", txt)
+        self.assertNotIn("send_message", txt)
+        self.assertIn('"header": "Next Step"', txt)
+        # Must NOT be explicitly granted to any worker subagent
+        for worker in ("c-engineer.md", "re-analyst.md", "ui-gui-engineer.md", "web-engineer.md"):
+            wtxt = (REPO_ROOT / ".opencode" / "agents" / worker).read_text(encoding="utf-8")
+            self.assertNotIn("horus-next-steps", wtxt, f"Primary-only skill leaked to worker {worker}")
+
+    def test_design_system_audit_document_extend_merged_cleanly(self) -> None:
+        ds = REPO_ROOT / ".opencode" / "skills" / "ui-ux-design-systems" / "SKILL.md"
+        txt = ds.read_text(encoding="utf-8")
+        for heading in ("### A. Audit Mode", "### B. Documentation Mode", "### C. Extend Mode"):
+            self.assertIn(heading, txt)
+        self.assertNotIn("collectivebrain.de", txt)
+        self.assertNotIn("whitefox-automations.com", txt)
+
+    def test_design_engineering_20_playbooks_progressive_disclosure(self) -> None:
+        de = REPO_ROOT / ".opencode" / "skills" / "design-engineering"
+        refs = de / "references"
+        self.assertTrue((de / "SKILL.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "design.md").exists())
+        self.assertTrue((refs / "ui-cheatsheet.md").exists())
+        self.assertTrue((refs / "performance-cheatsheet.md").exists())
+        playbooks = sorted(p.name for p in refs.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
+        self.assertEqual(len(playbooks), 20, f"Expected 20 design-engineering playbooks, got {len(playbooks)}")
+        lt_txt = (refs / "learn-taste" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertNotIn("~/.claude/projects/", lt_txt)
+
+    def test_engineering_craft_18_playbooks_progressive_disclosure(self) -> None:
+        ec = REPO_ROOT / ".opencode" / "skills" / "engineering-craft"
+        refs = ec / "references"
+        self.assertTrue((ec / "SKILL.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "craft.md").exists())
+        playbooks = sorted(p.name for p in refs.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
+        self.assertEqual(len(playbooks), 18, f"Expected 18 engineering-craft playbooks, got {len(playbooks)}")
+        # Ensure Claude-only tool/path strings were replaced
+        for md in refs.rglob("*.md"):
+            txt = md.read_text(encoding="utf-8", errors="replace")
+            self.assertNotIn("AskUserQuestion", txt, f"Claude AskUserQuestion left in {md}")
+            self.assertNotIn("~/.claude/skills/", txt, f"Claude skills path left in {md}")
+
+    def test_defensive_security_audit_skill_and_command(self) -> None:
+        sa = REPO_ROOT / ".opencode" / "skills" / "security-audit" / "SKILL.md"
+        self.assertTrue(sa.exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "security.md").exists())
+        txt = sa.read_text(encoding="utf-8")
+        self.assertIn("CWE-639", txt)
+        self.assertIn("libFuzzer", txt)
+
+    def test_agent_architecture_reference_bilingual_chapters(self) -> None:
+        ar = REPO_ROOT / ".opencode" / "skills" / "agent-architecture-reference"
+        self.assertTrue((ar / "SKILL.md").exists())
+        en = list((ar / "references" / "en").glob("*.md"))
+        zh = list((ar / "references" / "zh-CN").glob("*.md"))
+        self.assertEqual(len(en), 19, f"Expected 19 EN chapters, got {len(en)}")
+        self.assertEqual(len(zh), 19, f"Expected 19 ZH chapters, got {len(zh)}")
+
+    def test_zero_catalog_bloat_and_zero_playbook_collisions(self) -> None:
+        import re as _re
+        skills_dir = REPO_ROOT / ".opencode" / "skills"
+        total_desc = 0
+        for sd in sorted(p for p in skills_dir.iterdir() if p.is_dir()):
+            txt = (sd / "SKILL.md").read_text(encoding="utf-8")
+            fm = _re.split(r"\r?\n---\r?\n", txt[4:], maxsplit=1)[0]
+            dm = _re.search(r"^description:\s*(.+)$", fm, _re.M)
+            self.assertIsNotNone(dm, f"Missing description in {sd.name}")
+            desc = dm.group(1).strip().strip('"').strip("'")
+            self.assertLessEqual(len(desc), 150, f"Bloated description in {sd.name}: {len(desc)} chars")
+            total_desc += len(desc)
+        self.assertLessEqual(total_desc, 5200, f"Total catalog too large: {total_desc} chars")
+        # Ensure zero duplicate playbook names across all references
+        seen = {}
+        for p in skills_dir.rglob("SKILL.md"):
+            seen.setdefault(p.parent.name, []).append(p.relative_to(skills_dir).as_posix())
+        dups = {k: v for k, v in seen.items() if len(v) > 1}
+        self.assertEqual(dups, {}, f"Duplicate playbook names found: {dups}")
+
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":
             self.skipTest("bash installer test runs on POSIX")
@@ -145,6 +251,8 @@ class TestValidateHorus(unittest.TestCase):
             # Must parse as strict JSON (zero // comments)
             data = json.loads(cfg_file.read_text(encoding="utf-8"))
             self.assertEqual(data.get("default_agent"), "horus")
+            mcp_cmd = data.get("mcp", {}).get("horus-context-mode", {}).get("command", [])
+            self.assertTrue(any(".config/opencode/context-mode/server.js" in c for c in mcp_cmd), f"Global MCP path not rewritten: {mcp_cmd}")
             self.assertIn("HORUS VALIDATION PASSED (global)", r.stdout)
 
 
@@ -263,6 +371,115 @@ class TestMigrateOpenCodeDb(unittest.TestCase):
             title = n.execute("SELECT title FROM session WHERE id='s1'").fetchone()[0]
             self.assertEqual(title, "")
             n.close()
+
+
+class TestHorusFoundry(unittest.TestCase):
+    def test_foundry_mock_linear_status_and_dry_run(self) -> None:
+        from http.server import BaseHTTPRequestHandler, HTTPServer
+        import threading
+
+        class MockLinear(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                pass
+            def do_POST(self):
+                length = int(self.headers.get("Content-Length", "0"))
+                body = json.loads(self.rfile.read(length).decode("utf-8"))
+                q = body.get("query", "")
+                if "teams" in q:
+                    resp = {"data": {"teams": {"nodes": [{"id": "t1", "key": "HRS", "name": "Horus"}]}}}
+                elif "states" in q:
+                    resp = {"data": {"team": {"states": {"nodes": [
+                        {"id": "s1", "name": "∞ Needs Research", "type": "unstarted", "position": 1},
+                        {"id": "s2", "name": "∞ Research In Progress", "type": "started", "position": 2},
+                        {"id": "s3", "name": "∞ Needs Plan", "type": "unstarted", "position": 3},
+                        {"id": "s4", "name": "∞ Needs Implement", "type": "unstarted", "position": 4},
+                        {"id": "s5", "name": "∞ Implement In Progress", "type": "started", "position": 5},
+                        {"id": "s6", "name": "∞ Needs Validate", "type": "unstarted", "position": 6},
+                    ]}}}}
+                elif "issues" in q:
+                    resp = {"data": {"issues": {"nodes": [
+                        {"id": "i2", "identifier": "HRS-2", "title": "Low priority task", "description": "desc2",
+                         "priority": 3, "url": "https://linear.app/hrs/HRS-2",
+                         "state": {"id": "s1", "name": "∞ Needs Research", "type": "unstarted"}, "labels": {"nodes": []}},
+                        {"id": "i1", "identifier": "HRS-1", "title": "Urgent auth fix", "description": "desc1",
+                         "priority": 1, "url": "https://linear.app/hrs/HRS-1",
+                         "state": {"id": "s4", "name": "∞ Needs Implement", "type": "unstarted"}, "labels": {"nodes": []}},
+                    ]}}}
+                else:
+                    resp = {"data": {}}
+                raw = json.dumps(resp).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+
+        srv = HTTPServer(("127.0.0.1", 0), MockLinear)
+        port = srv.server_address[1]
+        t = threading.Thread(target=srv.serve_forever, daemon=True)
+        t.start()
+        try:
+            env = dict(os.environ, LINEAR_API_KEY="lin_test", LINEAR_API_URL=f"http://127.0.0.1:{port}/graphql")
+            r = subprocess.run(
+                [sys.executable, str(FOUNDRY_PY), "run", "--workers", "1", "--once", "--dry-run"],
+                env=env, capture_output=True, text=True,
+            )
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            # Priority 1 (HRS-1) must be picked before Priority 3 (HRS-2)
+            self.assertIn('"issue": "HRS-1"', r.stdout)
+            self.assertIn('"stage": "implement"', r.stdout)
+            self.assertIn('"branch": "horus/hrs-1-urgent-auth-fix"', r.stdout)
+            self.assertIn('"status": "DRY_RUN"', r.stdout)
+        finally:
+            srv.shutdown()
+            srv.server_close()
+
+
+class TestHorusTodo(unittest.TestCase):
+    def test_todo_roundtrip_preserves_notes_git_tracks_analyzes_and_promotes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            subprocess.run(["git", "init", "-q"], cwd=str(work), check=True)
+
+            # Seed .todo.md with custom headings and prose notes
+            todo = work / ".todo.md"
+            todo.write_text("# My Notes\nKeep this note intact.\n\n- [ ] First task\n", encoding="utf-8")
+
+            r = run_py(TODO_PY, "--dir", str(work), "add", "Second task")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            r = run_py(TODO_PY, "--dir", str(work), "toggle", "1")
+            self.assertEqual(r.returncode, 0, r.stderr)
+
+            txt = todo.read_text(encoding="utf-8")
+            self.assertIn("# My Notes", txt)
+            self.assertIn("Keep this note intact.", txt)
+            self.assertIn("- [x] First task", txt)
+            self.assertIn("- [ ] Second task", txt)
+
+            # Verify `git add -- .todo.md` staged it in the git index
+            ls = subprocess.run(["git", "ls-files", ".todo.md"], cwd=str(work), capture_output=True, text=True)
+            self.assertEqual(ls.stdout.strip(), ".todo.md")
+
+            # Verify AI Requirement Analysis prompt includes open & completed tasks
+            r = run_py(TODO_PY, "--dir", str(work), "analyze")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn("Second task", r.stdout)
+            self.assertIn("First task", r.stdout)
+            self.assertIn("Conflicts & Redundancy", r.stdout)
+
+            # Verify promote creates/appends plan.py-compatible task_plan.md
+            r = run_py(TODO_PY, "--dir", str(work), "promote")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            tp = (work / "task_plan.md").read_text(encoding="utf-8")
+            self.assertIn("- [ ] T1.1 Second task | accept:", tp)
+
+    def test_todo_refuses_to_overwrite_unmanaged_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / ".todo.md").write_text("Unrelated prose document with zero checklists.\n", encoding="utf-8")
+            r = run_py(TODO_PY, "--dir", str(work), "--no-git", "add", "Should fail")
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn("unmanaged-file", r.stderr)
 
 
 if __name__ == "__main__":

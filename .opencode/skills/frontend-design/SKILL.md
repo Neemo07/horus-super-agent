@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: "Web aesthetic direction, typography, composition, and visual polish when building or reshaping web interfaces so they avoid templated AI defaults (pair with ui-ux-design-systems for tokens and accessibility)."
+description: "Distinctive web aesthetic direction, typography, and layout polish that avoids templated AI defaults."
 license: Complete terms in LICENSE.txt
 ---
 

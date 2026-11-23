@@ -1,4 +1,4 @@
-# Horus Super Agent Harness Rules (OpenCode — v0.3)
+# Horus Super Agent Harness Rules (OpenCode — v0.5.0)
 
 Adapted from `deepseek-ai/dsh-superagent-prototype` (000-philosophy, 003-execution, 004-prompts), `Graphify-Labs/graphify`, `morluto/rea`, `planning-with-evidence`, and the full `vibe-engineering-playbook` (v1.0.0).
 
@@ -22,6 +22,7 @@ Adapted from `deepseek-ai/dsh-superagent-prototype` (000-philosophy, 003-executi
   - `PRD.md` & `IMPLEMENTATION_PLAN.md` — Vibe Engineering specs/plans for MVP/Production products (templates bundled in `.opencode/skills/vibe/templates/`).
   - `.horus/STATE.md` — orchestrator runtime config (SDD mode, session subagent `provider/model` map, DAG `depends_on` & `owns_files` write-locks).
 - **Cold-start / compaction resume:** Read `HANDOFF.md` → `task_plan.md` → tail of `findings.md` → `progress.md` → `.horus/STATE.md`, run `plan.py verify` and `git status --short`, redo anything `UNPROVEN`, then run `plan.py next`.
+- **Horus Context Mode (Zero-Bloat Logs & Bulk Data):** When the `horus-context-mode` MCP server is active, NEVER dump huge logs, raw API payloads, or unbounded `cat`/`Get-Content`/`git log` output into context. Route large file/log searches through `ctx_search` (use `reverse: true` for logs) and bulk filtering/commands through `ctx_execute` or `ctx_batch`.
 - **Before stopping or switching sessions/agents:** Always run `plan.py handoff --note "<current state>"`.
 
 ## 4. Zero Weak / Noisy Code Standard
@@ -42,6 +43,7 @@ OpenCode's desktop app, TUI, and VS Code extension provide a built-in **`questio
   4. Put your recommended choice **first** and append `(Recommended)` to its label (staying ≤ 30 chars).
   5. Leave free-form custom input enabled (`custom: true` is OpenCode's default — never add a fake `"Other"` option; OpenCode automatically renders `"Type your own answer"`).
   6. Use `multiple: true` when the user can pick several options (e.g. active subagents, target platforms, or feature slices).
+- **Proactive Next-Steps Poll (`horus-next-steps`):** After completing a substantive task or wave (never on trivial lookups, mid-task blockers, or when already polling), `horus` may present 2–4 state-aware continuations (from `plan.py next`, `/horus-review`, `graphify update .`, or `vibe-test-gate`) via the `question` tool (`header: "Next Step"`). Treat Skip/Dismiss as final — never reprompt.
 - **Subagent Isolation:** Only the primary agent (`horus`) calls `question`. Subagents have `question: deny` and escalate via `STATUS: NEEDS_DECISION` + `DECISION_OPTIONS` so `horus` presents a clean poll to the user.
 
 ## 6. Mandatory In-Session Project Kickoff Gate
@@ -62,10 +64,18 @@ Load the skill when its trigger matches. Never narrate "I will use skill X".
 | React / Next.js code | `vercel-react-best-practices` |
 | SQL, schema, RLS, Supabase/Postgres | `supabase-postgres-best-practices` |
 | DB queries, lists, images, caching, loading states, "slow" | `speed-engineer` (size tier S/M/L first) |
-| Visual design / UI polish | `frontend-design`, `ui-ux-design-systems` |
+| Visual design, UI polish, or design-system audit/docs/extend | `frontend-design`, `ui-ux-design-systems` |
+| Animations, gestures, `break-ui` stress-test, prototyping, `/design` | `design-engineering` (20 playbooks + 2 cheatsheets loaded on demand) |
+| Deep-module architecture, domain model, PR/triage/retro, `/craft` | `engineering-craft` (18 senior-engineering playbooks loaded on demand) |
+| Defensive AppSec, OWASP/API/Auth, C++ mitigations, CI/CD, `/security` | `security-audit` (CWE-grounded hardening & remediation audit) |
+| Designing AI coding-agent harnesses, compaction, tools, swarms | `agent-architecture-reference` (17-chapter EN/ZH reference via `ctx_search`) |
 | Verify UI/flows in a real browser | `webapp-testing` |
 | Build an MCP server (TypeScript or Python) | `mcp-builder` |
 | Create, edit, or extract Office/PDF files | `pdf`, `docx`, `xlsx`, `pptx` |
+| Large logs, bulk outputs, huge files, `/horus-context` | `horus-context-mode` (`ctx_search`, `ctx_execute`, `ctx_batch`, `ctx_stats`) |
+| End of substantive task/wave (primary agent only) | `horus-next-steps` (state-aware 1-click `question` continuations) |
+| Parallel background OpenCode pods via Linear, `/horus-foundry` | `horus-foundry` (`scripts/horus_foundry.py` + isolated git worktrees) |
+| Git-tracked `.todo.md` checklist & AI requirement analysis, `/horus-todo` | `horus-todo` (`scripts/horus_todo.py` + `plan.py` promoter + live sidebar) |
 | Multi-agent DAG orchestration & parallel waves | `subagent-driven-dev` (with `OWNED_FILES` write locks) |
 | Review, PR feedback, & before merge | `reviewer` + `vibe-critique` (adversarial audit + receiving review feedback) |
 | Before any "done" claim / launch | `anti-hallucination-harness`, `plan.py done --run`, `vibe-test-gate` (16-point launch gate) |

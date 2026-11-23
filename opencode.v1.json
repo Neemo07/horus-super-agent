@@ -15,5 +15,12 @@
       "git push *": "ask",
       "rm -rf *": "ask"
     }
+  },
+  "mcp": {
+    "horus-context-mode": {
+      "type": "local",
+      "command": ["node", ".opencode/context-mode/server.js"],
+      "enabled": true
+    }
   }
 }

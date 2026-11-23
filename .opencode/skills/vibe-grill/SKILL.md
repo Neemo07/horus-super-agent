@@ -1,6 +1,6 @@
 ---
 name: vibe-grill
-description: Pre-code Socratic requirements interviewer (Grilling) — asks focused questions via OpenCode's native interactive question poll tool with engineering recommendations, then drafts PRD.md and AGENTS.md from bundled templates.
+description: "Pre-code Socratic requirements interview via OpenCode question polls to draft PRD.md and project AGENTS.md."
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:

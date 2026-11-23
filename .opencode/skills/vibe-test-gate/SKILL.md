@@ -1,6 +1,6 @@
 ---
 name: vibe-test-gate
-description: Anti-test-theater auditor and 16-point Pre-Launch Production Gate — detects fake green unit tests, enforces fail-then-pass assertions, unhappy-path testing, and release readiness.
+description: "Anti-test-theater mutation audit and 16-point Pre-Launch Production Gate before shipping MVP/Production builds."
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:

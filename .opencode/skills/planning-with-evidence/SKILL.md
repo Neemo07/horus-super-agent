@@ -1,6 +1,6 @@
 ---
 name: planning-with-evidence
-description: "Persistent file-based project planning for multi-step or long-running agent work, with a computed progress bar, evidence-gated task completion, and a generated HANDOFF.md for session or agent switches. Use for any task with 3+ steps, anything that may outlive one context window, or when work passes between agents. Extends the 3-file pattern from OthmanAdi/planning-with-files."
+description: "Evidence-gated task_plan.md tracking, mechanical plan.py done --run proofs, SHA-256 checks, and HANDOFF.md recovery for 3+ step work."
 license: MIT
 compatibility: opencode
 ---

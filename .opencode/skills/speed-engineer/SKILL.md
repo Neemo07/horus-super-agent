@@ -1,6 +1,6 @@
 ---
 name: speed-engineer
-description: "Right-sized web performance engineering (S/M/L project tiers): DB indexes, N+1 queries, pagination, image optimization, caching, and skeleton states. Triggers on DB/list/upload work or slow/laggy reports (بطيء, تقيل, بيهنج, سرّع)."
+description: "S/M/L web performance sizing & quick audit: indexes, N+1, pagination, caching, skeletons (triggers: slow, بطيء, تقيل, بيهنج, سرّع)."
 ---
 
 # Speed Engineer: build apps that stay fast with real users

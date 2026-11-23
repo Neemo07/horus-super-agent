@@ -1,6 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work
+description: "After tests pass, decide how to integrate a feature branch (merge, PR, keep, or clean up) via OpenCode question polls."
 ---
 
 # Finishing a Development Branch

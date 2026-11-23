@@ -23,6 +23,9 @@ permissions:
     resource: "graphify"
     effect: allow
   - action: skill
+    resource: "horus-context-mode"
+    effect: allow
+  - action: skill
     resource: "anti-hallucination-harness"
     effect: allow
   - action: edit

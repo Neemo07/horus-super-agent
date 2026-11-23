@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Lightweight pre-code feature design on an existing repo when a full vibe-grill PRD is overkill. Explores intent, trade-offs, and architecture via OpenCode interactive question polls before implementation."
+description: "Lightweight pre-code feature design on existing repos via OpenCode question polls (use vibe-grill for greenfield MVPs)."
 ---
 
 # Brainstorming

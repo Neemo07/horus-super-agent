@@ -1,6 +1,6 @@
 ---
 name: cpp20-win32-re
-description: "Reverse engineer Windows PE32/PE32+ binaries and reconstruct/port legacy Win32 C++ (x86/MSVC) to clean modern C++20 (_WIN64) using REA (morluto/rea), Ghidra/IDA, and evidence-backed verification."
+description: "Port legacy Win32/x86 C++ and PE32/PE32+ binaries to clean modern C++20 (_WIN64) using REA/Ghidra evidence."
 license: MIT
 compatibility: opencode
 metadata:

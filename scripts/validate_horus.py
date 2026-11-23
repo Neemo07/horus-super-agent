@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Integrity & configuration validator for Horus Super Agent (OpenCode v0.3.1+).
+Integrity & configuration validator for Horus Super Agent (OpenCode v0.5.0+).
 
 Checks:
 1. opencode.jsonc (V2) / opencode.json (global or V1) and opencode.v1.json parse cleanly and allow `question`.
@@ -75,10 +75,27 @@ REQUIRED_VIBE_REFS = [
 REQUIRED_COMMANDS = [
     "vibe.md",
     "graphify.md",
+    "design.md",
+    "craft.md",
+    "security.md",
+    "horus-context.md",
+    "horus-foundry.md",
+    "horus-todo.md",
     "horus-init.md",
     "horus-status.md",
     "horus-resume.md",
     "horus-review.md",
+]
+
+REQUIRED_CONTEXT_MODE_FILES = [
+    "package.json",
+    "server.js",
+    "lib/store.js",
+    "lib/chunker.js",
+    "lib/executor.js",
+    "lib/tools.js",
+    "dashboard/server.mjs",
+    "dashboard/index.html",
 ]
 
 REQUIRED_GRAPHIFY_REFS = [
@@ -207,10 +224,23 @@ def main(argv: list[str] | None = None) -> int:
             fail(f"skills/{sd.name}/SKILL.md missing 'name:' field")
         elif m.group(1) != sd.name:
             fail(f"skills/{sd.name}/SKILL.md name {m.group(1)!r} != dir name {sd.name!r}")
-        if not re.search(r"^description:\s*\S+", fm, re.M):
+        dm = re.search(r"^description:\s*['\"]?([^\r\n]+?)['\"]?\s*$", fm, re.M)
+        if not dm:
             fail(f"skills/{sd.name}/SKILL.md missing 'description:' field")
+        elif len(dm.group(1).strip().strip('"').strip("'")) > 150:
+            fail(f"skills/{sd.name}/SKILL.md description exceeds 150-char catalog budget ({len(dm.group(1))} chars)")
         if not body:
             fail(f"skills/{sd.name}/SKILL.md empty body")
+
+    # 4b. Verify zero duplicate sub-playbook directory names across progressive-disclosure references
+    seen_playbooks: dict[str, list[str]] = {}
+    for sub in sorted(skills_dir.rglob("SKILL.md")):
+        if sub.parent.parent == skills_dir:
+            continue
+        seen_playbooks.setdefault(sub.parent.name, []).append(sub.relative_to(skills_dir).as_posix())
+    for pname, locs in seen_playbooks.items():
+        if len(locs) > 1:
+            fail(f"Duplicate reference playbook name {pname!r}: {locs}")
 
     # 5. Validate commands
     cmds_dir = BASE / "commands"
@@ -243,6 +273,12 @@ def main(argv: list[str] | None = None) -> int:
         if not (graphify_dir / "references" / ref).exists():
             fail(f"Missing official Graphify reference: skills/graphify/references/{ref}")
 
+    # 6c. Validate Horus Context Mode MCP bundle
+    ctx_dir = BASE / "context-mode"
+    for rel in REQUIRED_CONTEXT_MODE_FILES:
+        if not (ctx_dir / rel).exists():
+            fail(f"Missing Horus Context Mode runtime file: context-mode/{rel}")
+
     # 7. Syntax-check bundled Python scripts in memory (zero __pycache__ pollution)
     scripts_dir = ROOT / "scripts"
     if not (scripts_dir / "validate_horus.py").exists():
@@ -251,6 +287,8 @@ def main(argv: list[str] | None = None) -> int:
         scripts_dir / "sync_upstream.py",
         scripts_dir / "validate_horus.py",
         scripts_dir / "migrate-opencode-db.py",
+        scripts_dir / "horus_foundry.py",
+        scripts_dir / "horus_todo.py",
         skills_dir / "planning-with-evidence" / "scripts" / "plan.py",
         skills_dir / "webapp-testing" / "scripts" / "with_server.py",
     ]

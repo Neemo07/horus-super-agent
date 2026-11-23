@@ -1,12 +1,14 @@
 ---
 name: ui-ux-design-systems
-description: "Design system architecture for desktop and web apps: OKLCH semantic color tokens, 4/8px spatial grids, visual hierarchy, WCAG/APCA contrast, and component state ergonomics."
+description: "Design system tokens (OKLCH, 4/8px grid, WCAG/APCA) plus Audit, Document, and Extend modes for desktop and web UI."
 license: MIT
 compatibility: opencode
+metadata:
+  version: "0.4.4-horus"
 ---
-# High-Craft UI / UX Design Systems
+# High-Craft UI / UX Design Systems (Architecture, Audit, Docs & Extend)
 
-Design interfaces with the precision of top-tier native tools (Linear, Figma, Ableton, Raycast) — never generic boilerplate.
+Design, audit, document, and extend interfaces with the precision of top-tier native tools (Linear, Figma, Ableton, Raycast) — never generic boilerplate.
 
 ## 1. Visual Hierarchy & Layout Discipline
 - **Single Focal Point per View:** Every screen has one primary action and one primary information hierarchy. Demote secondary controls via weight, contrast, or disclosure rather than cluttering toolbars.
@@ -30,3 +32,33 @@ Design interfaces with the precision of top-tier native tools (Linear, Figma, Ab
 - Cards nested inside cards inside cards (use subtle hairlines and whitespace instead).
 - Unaligned icons/text, inconsistent border radii, or placeholder Lorem Ipsum.
 - Dead controls, fake progress bars, or unstyled browser default scrollbars/inputs.
+
+---
+
+## 5. Operational Modes (Audit, Document & Extend)
+
+Pick the mode that matches the task (if unclear and running as primary `horus`, ask via OpenCode's native `question` tool with `header: "DS Mode"`, options: `Audit System (Recommended)`, `Document Component`, `Extend Pattern`).
+
+### A. Audit Mode (Evidence-Backed `file:line` Scan)
+Use `graphify query` (for component usage/blast radius) and `ctx_search` / `grep` to scan for:
+1. **Hardcoded values:** raw `#hex`/`rgb()`/`px` colors, spacing, radii, z-index, or font sizes bypassing semantic tokens.
+2. **Naming drift:** inconsistent token or prop names (e.g. `primary` vs `brand`, `sm` vs `small`, mixed camel/kebab tokens).
+3. **Component duplication:** duplicate or near-duplicate buttons, modals, inputs, badges, or tables across folders.
+4. **Missing states:** interactive controls missing `hover`, `active`, `focus-visible`, `disabled`, `loading`, `error`, or `empty` states.
+5. **A11y gaps:** contrast below WCAG 2.1 AA, missing `aria-label`/roles, broken keyboard focus order/Escape handling, or hit targets `< 36px`.
+
+**Output format:** terse severity-ranked table (`BLOCKER` / `MAJOR` / `MINOR`) with exact `file:line` and concrete token/primitive replacement. If running as `horus`, offer next steps via `question` (`header: "DS Audit"`, options: `Fix Blockers (Recommended)`, `Generate Docs`, `Write Migration Plan`).
+
+### B. Documentation Mode (Component Spec)
+For each documented component, produce:
+- **Props & Variants Table:** prop name, type, default, and visual/behavioral effect.
+- **State Matrix:** exact behavior and token bindings for `default`, `hover`, `active`, `focus-visible`, `disabled`, `error`, and `loading`.
+- **A11y Contract:** semantic HTML element / ARIA `role`, keyboard shortcuts (`Tab`, `Enter`/`Space`, `Escape`, Arrow keys), focus management, and screen-reader announcements.
+- **Do / Don't Examples:** 2–3 concrete code/usage pairs showing intended vs. anti-pattern usage.
+
+### C. Extend Mode (New Pattern Design)
+When designing a new component or pattern:
+1. **Reuse first:** inspect existing tokens and primitives via `graphify query` / `grep` — compose from existing primitives instead of inventing parallel abstractions.
+2. **Token compliance:** bind strictly to existing OKLCH color, 4/8px spacing, radius, and typography tokens (add new tokens only when a genuine semantic gap exists).
+3. **Edge-case coverage:** specify dark/light parity, responsive breakpoints, RTL (`dir="rtl"`) mirroring when applicable, and all 7 interactive states.
+4. **Trade-offs & verification:** record key API trade-offs in `findings.md`, and verify rendered web components in a real browser via `webapp-testing` (Playwright) before marking done.

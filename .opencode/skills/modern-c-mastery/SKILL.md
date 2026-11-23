@@ -1,6 +1,6 @@
 ---
 name: modern-c-mastery
-description: "Expert modern C (C11/C17/C23) engineering rules, memory/arena patterns, UB elimination, concurrency, compiler hardening flags, and sanitizer verification. Load whenever writing, refactoring, or auditing C code."
+description: "Modern C11/C17/C23 engineering: arena allocators, UB elimination, strict compiler hardening flags, and sanitizer verification."
 license: MIT
 compatibility: opencode
 ---

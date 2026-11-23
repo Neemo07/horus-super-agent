@@ -1,6 +1,6 @@
 ---
 name: vibe-spec-plan
-description: System design and Plan Mode skill — converts PRD.md into an approved phased IMPLEMENTATION_PLAN.md (and Horus task_plan.md) with architectural boundaries, security controls, and dependency rules.
+description: "Convert PRD.md into a phased IMPLEMENTATION_PLAN.md and Horus task_plan.md with boundaries, security, and dependency rules."
 license: MIT
 compatibility: opencode, claude-code, codex
 metadata:

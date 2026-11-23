@@ -1,6 +1,6 @@
 ---
 name: writing-skills
-description: Use when creating new skills, editing existing skills, or verifying skills work before deployment
+description: "TDD process for creating, editing, and verifying OpenCode SKILL.md files (pair with writing-for-agents for AGENTS.md)."
 ---
 
 # Writing Skills

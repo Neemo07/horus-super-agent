@@ -1,6 +1,6 @@
 ---
 name: docx
-description: "Create, read, edit, and format Word (.docx) documents, templates, tracked changes, comments, tables, headers/footers, and OOXML structures."
+description: "Create, read, edit, and format Word (.docx) documents, templates, tracked changes, tables, and OOXML structures."
 license: Complete terms in LICENSE.txt
 ---
 

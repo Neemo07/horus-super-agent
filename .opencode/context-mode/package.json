@@ -1,0 +1,15 @@
+{
+  "name": "horus-context-mode",
+  "version": "2.0.0",
+  "description": "Horus Context Mode MCP server for OpenCode: SQLite FTS5 (BM25 + Trigram RRF) indexing and sandboxed code execution to prevent context window bloat. Adapted from antigravity-plugin-context-mode (MIT).",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dashboard": "node dashboard/server.mjs"
+  },
+  "main": "./server.js"
+}

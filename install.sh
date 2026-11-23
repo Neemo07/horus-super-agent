@@ -18,13 +18,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 copy_jsonc_as_strict_json() {
   local src="$1"
   local dst="$2"
+  local ctx_server="${3:-}"
   if command -v python3 >/dev/null 2>&1; then
-    python3 - "$src" "$dst" << 'PYEOF'
+    python3 - "$src" "$dst" "$ctx_server" << 'PYEOF'
 import json, re, sys
 from pathlib import Path
 text = Path(sys.argv[1]).read_text(encoding="utf-8-sig")
 lines = [ln for ln in text.splitlines() if not ln.lstrip().startswith("//")]
 cleaned = re.sub(r",(\s*[}\]])", r"\1", "\n".join(lines))
+if len(sys.argv) > 3 and sys.argv[3]:
+    cleaned = cleaned.replace(".opencode/context-mode/server.js", sys.argv[3])
 data = json.loads(cleaned)
 Path(sys.argv[2]).write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 PYEOF
@@ -42,10 +45,11 @@ else
   CFG="$TARGET_DIR"
 fi
 
-mkdir -p "$BASE/agents" "$BASE/skills" "$BASE/commands" "$CFG/scripts"
+mkdir -p "$BASE/agents" "$BASE/skills" "$BASE/commands" "$BASE/context-mode" "$CFG/scripts"
 cp -r "$SCRIPT_DIR/.opencode/agents/." "$BASE/agents/"
 cp -r "$SCRIPT_DIR/.opencode/skills/." "$BASE/skills/"
 cp -r "$SCRIPT_DIR/.opencode/commands/." "$BASE/commands/"
+cp -r "$SCRIPT_DIR/.opencode/context-mode/." "$BASE/context-mode/"
 
 for f in AGENTS.md opencode.jsonc; do
   dest="$CFG/$f"
@@ -68,7 +72,7 @@ for f in AGENTS.md opencode.jsonc; do
     if [[ "$FORCE_CONFIG" -eq 1 ]]; then
       cp "$dest" "$dest.bak"
       if [[ "$write_strict_json" -eq 1 ]]; then
-        copy_jsonc_as_strict_json "$SCRIPT_DIR/$f" "$dest"
+        copy_jsonc_as_strict_json "$SCRIPT_DIR/$f" "$dest" "$BASE/context-mode/server.js"
       else
         cp "$SCRIPT_DIR/$f" "$dest"
       fi
@@ -78,22 +82,31 @@ for f in AGENTS.md opencode.jsonc; do
     fi
   else
     if [[ "$write_strict_json" -eq 1 ]]; then
-      copy_jsonc_as_strict_json "$SCRIPT_DIR/$f" "$dest"
+      copy_jsonc_as_strict_json "$SCRIPT_DIR/$f" "$dest" "$BASE/context-mode/server.js"
     else
       cp "$SCRIPT_DIR/$f" "$dest"
     fi
   fi
 done
 
-for s in sync_upstream.py validate_horus.py migrate-opencode-db.py; do
+for s in sync_upstream.py validate_horus.py migrate-opencode-db.py horus_foundry.py horus_todo.py; do
   cp "$SCRIPT_DIR/scripts/$s" "$CFG/scripts/$s"
 done
-echo "Installed Horus v0.3.7 ($MODE) to $BASE"
+echo "Installed Horus v0.5.0 ($MODE) to $BASE"
 
 if command -v python3 >/dev/null 2>&1; then
   python3 "$CFG/scripts/validate_horus.py" || true
 fi
 
+if ! command -v node >/dev/null 2>&1; then
+  echo "Note: Horus Context Mode MCP requires Node.js >= 22.5.0 (built-in node:sqlite)."
+else
+  NODE_MAJ="$(node -p "process.versions.node.split('.')[0]" 2>/dev/null || echo 0)"
+  NODE_MIN="$(node -p "process.versions.node.split('.')[1]" 2>/dev/null || echo 0)"
+  if [[ "$NODE_MAJ" -lt 22 || ( "$NODE_MAJ" -eq 22 && "$NODE_MIN" -lt 5 ) ]]; then
+    echo "Note: Horus Context Mode MCP requires Node.js >= 22.5.0 (found $(node -v))."
+  fi
+fi
 command -v graphify >/dev/null 2>&1 || {
   echo "Note: Graphify CLI not found (AST knowledge graphs):  uv tool install --upgrade "graphifyy[mcp]""; }
 command -v rea >/dev/null 2>&1 || {
