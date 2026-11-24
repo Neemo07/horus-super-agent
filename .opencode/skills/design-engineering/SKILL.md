@@ -1,6 +1,6 @@
 ---
 name: design-engineering
-description: "20-playbook motion & interaction suite: web/Expo animations, choreography, 120fps, gestures, break-ui, ui-prototype, mobile, Swift."
+description: "21-playbook motion, UI craft & faux-product-UI suite: animations, choreography, 120fps, gestures, break-ui, stageshow demos, mobile, Swift."
 license: MIT
 compatibility: opencode
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 # Design Engineering Playbook Suite (Progressive Disclosure Router)
 
-All 20 full Design Engineering playbooks and 2 quick-reference cheatsheets live under `.opencode/skills/design-engineering/references/`. **Never load all playbooks at once** — read ONLY the specific playbook(s) matching the user's task, then execute cleanly following Horus `AGENTS.md`.
+All 21 full Design Engineering playbooks (20 Emil Kowalski craft playbooks + Benji Taylor's full Stageshow faux-product-UI kit) and 2 quick-reference cheatsheets live under `.opencode/skills/design-engineering/references/`. **Never load all playbooks at once** — read ONLY the specific playbook(s) matching the user's task, then execute cleanly following Horus `AGENTS.md`.
 
 > **Quick Cheatsheets (always fast to skim first):**
 > - `references/ui-cheatsheet.md` — concise UI craft & polish rules
@@ -37,6 +37,7 @@ All 20 full Design Engineering playbooks and 2 quick-reference cheatsheets live 
 | Core design-engineering craft philosophy & UI polish | `emil-design-eng/SKILL.md` |
 | Stress-test UI with worst-case data (long strings, RTL, overflow, empty) | `break-ui/SKILL.md` (+ `break-ui/CATALOG.md`) |
 | Build multiple genuinely different UI variants behind a switcher | `ui-prototype/SKILL.md` (+ `ui-prototype/PICKER.md`) |
+| Build faux product UI, marketing hero demos, cursor walkthroughs & bento shots (React/CSS) | `stageshow/SKILL.md` (+ `stageshow/kit/`, `examples/`, `references/`, `scripts/film.mjs`) |
 | Turn session design corrections into durable `DESIGN.md` rules | `learn-taste/SKILL.md` |
 | Choose the right frontend primitive/toast/drawer/combobox library | `pick-ui-library/SKILL.md` |
 | Wire up and customize Sonner toasts cleanly | `ask-sonner/SKILL.md` (+ `ask-sonner/API.md`) |

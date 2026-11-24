@@ -179,7 +179,11 @@ class TestValidateHorus(unittest.TestCase):
         self.assertTrue((refs / "ui-cheatsheet.md").exists())
         self.assertTrue((refs / "performance-cheatsheet.md").exists())
         playbooks = sorted(p.name for p in refs.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
-        self.assertEqual(len(playbooks), 20, f"Expected 20 design-engineering playbooks, got {len(playbooks)}")
+        self.assertEqual(len(playbooks), 21, f"Expected 21 design-engineering playbooks, got {len(playbooks)}")
+        self.assertIn("stageshow", playbooks)
+        self.assertTrue((refs / "stageshow" / "kit" / "act.ts").exists())
+        self.assertTrue((refs / "stageshow" / "scripts" / "film.mjs").exists())
+        self.assertGreaterEqual(len(list((refs / "stageshow" / "references").glob("*.md"))), 15)
         lt_txt = (refs / "learn-taste" / "SKILL.md").read_text(encoding="utf-8")
         self.assertNotIn("~/.claude/projects/", lt_txt)
 
@@ -231,6 +235,37 @@ class TestValidateHorus(unittest.TestCase):
             seen.setdefault(p.parent.name, []).append(p.relative_to(skills_dir).as_posix())
         dups = {k: v for k, v in seen.items() if len(v) > 1}
         self.assertEqual(dups, {}, f"Duplicate playbook names found: {dups}")
+
+    def test_horus_memory_ai_memory_integration_zero_bloat(self) -> None:
+        hm = REPO_ROOT / ".opencode" / "skills" / "horus-memory"
+        self.assertTrue((hm / "SKILL.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "horus-memory.md").exists())
+        refs = hm / "references"
+        for h in ("retrieval.md", "durable-pages.md", "handoff.md", "learning-maintenance.md", "messaging.md"):
+            self.assertTrue((refs / h).exists(), f"Missing horus-memory handbook: {h}")
+        self.assertGreaterEqual(len(list((refs / "opencode-hooks").glob("*"))), 10)
+        # Ensure upstream's 7 split ai-memory-* skills did not creep in as top-level skills
+        for bad in ("ai-memory-retrieval", "ai-memory-durable-pages", "ai-memory-handoff", "ai-memory-messaging"):
+            self.assertFalse((REPO_ROOT / ".opencode" / "skills" / bad).exists())
+
+    def test_senior_engineering_partner_integration_zero_bloat_zero_overlap(self) -> None:
+        sp = REPO_ROOT / ".opencode" / "skills" / "senior-engineering-partner"
+        sm = sp / "SKILL.md"
+        self.assertTrue(sm.exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "partner.md").exists())
+        # Must be a lean progressive-disclosure router, NOT the 92 KB monolith
+        self.assertLessEqual(sm.stat().st_size, 10000, "senior-engineering-partner SKILL.md should be lean router")
+        refs = sp / "references"
+        self.assertEqual(len(list(refs.glob("*"))), 39, "Expected 39 unique non-overlapping references")
+        for excluded in (
+            "engineering-workflow.md", "debugging.md", "multi-agent-coordination.md",
+            "ui-design-and-accessibility.md", "databases.md", "local-and-agentic-ai-tools.md",
+            "skill-self-improvement.md", "frontend-web-security.md",
+        ):
+            self.assertFalse((refs / excluded).exists(), f"Overlapping ref should be excluded: {excluded}")
+        scripts_dir = sp / "scripts"
+        for sc in ("audit.sh", "actions-lint.sh", "leakage-guard.sh", "render-diagrams.sh", "self-review.md"):
+            self.assertTrue((scripts_dir / sc).exists(), f"Missing helper script: {sc}")
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

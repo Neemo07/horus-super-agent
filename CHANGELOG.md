@@ -1,4 +1,21 @@
+## [0.5.3] - 2026-11-24
+### Added
+- **`senior-engineering-partner` skill & `/partner` command**: Adapted `bjgreenberg/senior-engineering-partner` v1.32.0 (Apache-2.0) into a lean ~5 KB OpenCode-native progressive-disclosure hub (139-char description; 39 unique Cloud/K8s/Terraform/SRE/DR/BC/compliance/supply-chain/Python/Bash/TS/Swift references + 5 deterministic helper scripts; 8 overlapping references explicitly deferred to Horus's native skills for zero overlap).
+- **Source-verified `ai-memory` + `graphify` coexistence hardening**: Documented and enforced the recommended best-of-both setup (`ai-memory` always-on plugin + MCP with `parentID` subagent isolation; `graphify` CLI-first by default; never run `graphify opencode install` to avoid `graphify.js` shell-command mutation polluting `ai-memory` capture).
+- Added unit test `test_senior_engineering_partner_integration_zero_bloat_zero_overlap` (27/27 tests).
+
 # Changelog
+
+## v0.5.2
+- **Added `horus-memory` + `/horus-memory` (consolidated OpenCode integration of `akitaonrails/ai-memory`, MIT):**
+  - Consolidated `ai-memory`'s 5 operational skill clusters (`retrieval`, `durable-pages`, `handoff`, `learning-maintenance`, `messaging`) + OpenCode lifecycle hook templates (`references/opencode-hooks/`) behind **one** crisp progressive-disclosure skill (143 chars) instead of 7 separate top-level skills (~2,000 chars saved).
+  - Defined an explicit **4-layer Horus memory boundary** (`graphify` for AST structure, `horus-context-mode` for bulk logs/outputs, `plan.py` for local repo proofs & waves, `horus-memory` for cross-session/cross-project/cross-agent Markdown wiki memory & repo-to-repo inbox) so zero overlap occurs.
+  - Wired into `AGENTS.md`, `validate_horus.py`, `SKILLS.md`, `README.md`, installers, and added `test_horus_memory_ai_memory_integration_zero_bloat` in `tests/test_horus.py`.
+
+## v0.5.1
+- **Added full `stageshow` v1.1.1 (Benji Taylor Faux Product UI kit) with zero catalog bloat & zero overlap:**
+  - Bundled the complete `stageshow` package (`SKILL.md`, React/CSS `kit/`, 50+ gold `examples/`, 15 `references/`, `teaching/`, `playground/`, and Playwright `--gate` verification `scripts/`) inside `.opencode/skills/design-engineering/references/stageshow/` (keeping Horus at 39 skills and 4,648 always-on catalog chars, max 140c per skill, 0 playbook collisions).
+  - Wired into `.opencode/skills/design-engineering/SKILL.md`, `/design` slash command (`Faux Product UI (Stageshow)` poll option), `AGENTS.md`, `SKILLS.md`, `README.md`, installers, and `tests/test_horus.py`.
 
 ## v0.5.0
 - **Zero-Catalog-Bloat & Zero-Overlap Optimization Pass:**

@@ -38,6 +38,9 @@ permissions:
     resource: "vibe-scoped-build"
     effect: allow
   - action: skill
+    resource: "senior-engineering-partner"
+    effect: allow
+  - action: skill
     resource: "test-driven-development"
     effect: allow
   - action: skill

@@ -1,5 +1,5 @@
 ---
-description: "Primary Horus Super Agent DAG-Wave Orchestrator (v0.5.0). Enforces native OpenCode interactive question polls, full 7-stage Vibe Engineering Playbook, mechanical plan.py evidence gates, Graphify AST memory, file-locked parallel subagent dispatch, and in-session provider/model selection."
+description: "Primary Horus Super Agent DAG-Wave Orchestrator (v0.5.2). Enforces native OpenCode interactive question polls, full 7-stage Vibe Engineering Playbook, mechanical plan.py evidence gates, Graphify AST memory, file-locked parallel subagent dispatch, and in-session provider/model selection."
 mode: primary
 color: "#00d4aa"
 permissions:

@@ -2,14 +2,14 @@
 
 # Horus Super Agent
 
-**A DAG-wave orchestrator and 39-skill harness for [OpenCode](https://opencode.ai).**
+**A DAG-wave orchestrator and 41-skill harness for [OpenCode](https://opencode.ai).**
 
 Specs before code, file-locked parallel subagents, and proof-gated task closure —
 with every decision surfaced as a native clickable poll instead of a wall of chat questions.
 
-[![Version](https://img.shields.io/badge/version-0.5.0-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.5.3-00d4aa?style=flat-square)](CHANGELOG.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%7C%20V2-6e56cf?style=flat-square)](https://opencode.ai)
-[![Skills](https://img.shields.io/badge/skills-39-3b82f6?style=flat-square)](SKILLS.md)
+[![Skills](https://img.shields.io/badge/skills-41-3b82f6?style=flat-square)](SKILLS.md)
 [![Subagents](https://img.shields.io/badge/subagents-6-8b5cf6?style=flat-square)](#the-subagents)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#quick-start)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
@@ -95,7 +95,7 @@ A failing task gets three escalating attempts, then a circuit breaker:
 ## Quick start
 
 **Requirements:** OpenCode (V1 or V2), Python 3.8+ for the plan/validation scripts,
-and PowerShell 5.1+ or bash.
+Node.js 22.5+ (only if using `horus-context-mode` MCP), and PowerShell 5.1+ or bash.
 
 ### Install into a single repo (recommended)
 
@@ -136,22 +136,99 @@ python scripts/validate_horus.py
 ```
 
 ```
-HORUS VALIDATION PASSED (project): 7 agents, 39 skills, 12 commands, 4 Vibe templates, 8 bilingual Vibe handbooks, 8 Graphify references.
+HORUS VALIDATION PASSED (project): 7 agents, 41 skills, 14 commands, 4 Vibe templates, 8 bilingual Vibe handbooks, 8 Graphify references.
 ```
 
 The validator checks config parsing, `question` permissions on the primary agent,
 `question`/`subagent` denial on every worker, absence of hardcoded `model:` fields,
-skill frontmatter, required commands, merged Vibe assets, and Python syntax.
+skill frontmatter, strict 150-char description caps, zero sub-playbook collisions,
+required commands, merged Vibe assets, and Python syntax.
 
 ### Optional companions
 
 ```bash
-uv tool install --upgrade "graphifyy[mcp]"  # local AST knowledge graph + graphify-mcp server
-npx -y rea-agents@latest setup          # REA binary / PE analysis toolkit
-pip install playwright && python -m playwright install chromium   # webapp-testing
+# Local AST knowledge graph + graphify-mcp server
+uv tool install --upgrade "graphifyy[mcp]"
+
+# Cross-session / cross-project Markdown wiki memory daemon (ai-memory)
+# Linux / macOS:
+curl -fsSL https://github.com/akitaonrails/ai-memory/releases/latest/download/install.sh | sh
+# Windows (PowerShell):
+# irm https://github.com/akitaonrails/ai-memory/releases/latest/download/install.ps1 | iex
+ai-memory setup --yes --agent opencode2   # or --agent opencode for V1
+
+# REA binary / PE analysis toolkit
+npx -y rea-agents@latest setup
+
+# Browser verification for webapp-testing
+pip install playwright && python -m playwright install chromium
 ```
 
-Both MCP servers ship commented out in `opencode.jsonc` — uncomment once installed.
+Graphify and REA MCP servers ship commented out in `opencode.jsonc` — uncomment once installed.
+See [Memory, Context & Knowledge Graph Architecture](#memory-context--knowledge-graph-architecture)
+before running `ai-memory setup` alongside Horus and Graphify.
+
+---
+
+## Memory, Context & Knowledge Graph Architecture
+
+Horus separates context, code topology, execution proofs, and long-term memory into
+**four non-overlapping layers**:
+
+| Layer | Skill / Tool | Primary Job | Storage & Scope |
+| :--- | :--- | :--- | :--- |
+| **Codebase Topology** | `graphify` (`graphifyy[mcp]`) | Static AST knowledge graph: symbols, callers, god nodes, shortest paths, blast radius | `graphify-out/graph.json` (per-repo, derived from source) |
+| **Long-Term Memory** | `horus-memory` (`ai-memory`) | Cross-session, cross-project & cross-agent durable Markdown wiki, decisions, gotchas, handoffs, inbox | `~/.local/share/ai-memory/` (git-backed user/team wiki) |
+| **Session Output Sandbox** | `horus-context-mode` | SQLite FTS5 (BM25 + Trigram RRF) & sandboxed `ctx_execute` to keep huge logs/dumps out of context | `~/.horus-context-mode/context.db` (ephemeral/session FTS5 index) |
+| **Execution State & Proof** | `planning-with-evidence` (`plan.py`) | Current repo DAG wave plan, file locks, proof logs, and local `HANDOFF.md` | `task_plan.md`, `evidence/`, `HANDOFF.md` (per-repo) |
+
+### `horus-memory` (`ai-memory`) vs `graphify`
+
+They solve **complementary problems** and work best together: `graphify` answers
+*"How is this codebase wired right now?"* while `ai-memory` answers *"Why did we decide
+this, what broke last time, and what happened in another session or repo?"*
+
+| Dimension | `horus-memory` (`ai-memory`) | `graphify` (`graphifyy` v0.9.115) |
+| :--- | :--- | :--- |
+| **Core purpose** | Durable cross-session/cross-project/cross-agent memory, wiki pages, handoffs, repo-to-repo inbox | Structural codebase & document knowledge graph (AST calls, imports, communities, god nodes) |
+| **Scope** | Global across all repos, sessions, machines & agents | Per-repository (or monorepo workspace) |
+| **Storage** | `~/.local/share/ai-memory/` (standalone git-backed Markdown wiki) | `<repo>/graphify-out/` (`graph.json`, `GRAPH_REPORT.md`, optional `wiki/`) |
+| **Runtime & Port** | Background Rust daemon + local HTTP hook server on `127.0.0.1:49374` | On-demand CLI (`graphify extract . --code-only`, `graphify update .`) + stdio MCP (`graphify-mcp graphify-out/graph.json`) |
+| **OpenCode Integration** | OpenCode plugin (`~/.config/opencode/plugins/ai-memory.ts`), MCP server, and Horus's `horus-memory` skill (`/horus-memory`) | Optional MCP entry in `opencode.jsonc` and Horus's `graphify` skill (`/graphify`) |
+| **MCP Tool Namespace** | `memory_*` (`memory_query`, `memory_write_page`, `memory_handoff_*`, `memory_message_*`, `memory_lint`, ...) | Graphify query/path/explain/report tools |
+| **LLM Token Cost** | 0 LLM tokens for default capture, search, handoffs, and inbox | 0 LLM tokens for AST extraction (`--code-only`) and incremental updates |
+
+### Future Conflict Check & Coexistence Rules
+
+**Recommended Best-of-the-Best Setup (Source-Verified):** Keep **both** — they solve orthogonal problems and have **zero runtime, storage, port, or MCP namespace overlap**, and `ai-memory`'s OpenCode V2 plugin explicitly skips `parentID` child sessions so Horus's parallel subagents are never polluted:
+- Run **`ai-memory`** as your **always-on OpenCode plugin + MCP** (`ai-memory setup --yes --agent opencode2`, then delete the 7 extra `ai-memory-*` skill folders).
+- Run **`graphify`** in **CLI-first mode** by default (`graphify extract . --code-only`, `graphify query/path/explain`, `graphify update .`) — **zero** MCP tool-schema overhead, **100%** full AST power. Uncomment `graphify-mcp` in `opencode.jsonc` only in massive repos.
+- **Never run `graphify opencode install`:** its `graphify.js` plugin mutates your first shell command with an `echo` reminder, which pollutes `ai-memory`'s `tool.execute.before/after` observation capture and duplicates Horus's `AGENTS.md` rule.
+
+**Will `ai-memory` and `graphify` conflict now or in the future? No** (when following the setup above):
+They have **zero runtime, storage, port, hook, or MCP namespace overlap**:
+- **No file/git collision:** `ai-memory` lives in `~/.local/share/ai-memory/`; `graphify` writes strictly to `<repo>/graphify-out/`.
+- **No port collision:** `ai-memory` binds `127.0.0.1:49374`; `graphify-mcp` communicates over stdio (no listening TCP port).
+- **No MCP tool collision:** `ai-memory` exposes `memory_*` tools; `graphify-mcp` exposes graph-navigation tools under its own MCP server key.
+- **No plugin/hook collision:** Only `ai-memory` registers an OpenCode plugin (`~/.config/opencode/plugins/ai-memory.ts`).
+
+To keep the setup clean over future upgrades, follow **three operational rules**:
+
+1. **Remove duplicate `ai-memory-*` skill folders after `ai-memory setup`:**
+   Running `ai-memory setup --yes --agent opencode2` (or `--agent opencode` for V1) may
+   write 7 standalone `ai-memory-*` skills into `~/.config/opencode/skills/`. Delete those
+   7 folders — Horus already consolidates all 5 operational playbooks inside
+   `.opencode/skills/horus-memory/` with zero catalog bloat and zero trigger overlap.
+2. **Avoid `-ForceConfig` / `--force-config` on global upgrades after `ai-memory setup`:**
+   `ai-memory setup` edits your global `opencode.json`. When upgrading Horus globally
+   later, run `install.ps1 -Mode global` / `install.sh global` **without** `-ForceConfig`
+   (or re-run `ai-memory setup --yes --agent opencode2` if you intentionally reset your
+   global config).
+3. **Keep codebase topology out of `ai-memory` durable pages:**
+   Never copy raw `graphify-out/graph.json` or generated Graphify wiki dumps into
+   `ai-memory`. Let `graphify` stay the live source of truth for code structure, and keep
+   `ai-memory` focused on architectural decisions, debugging gotchas, user/team
+   preferences, cross-session handoffs, and cross-repo messages.
 
 ---
 
@@ -165,9 +242,9 @@ horus-super-agent/
 ├─ install.ps1 / install.sh   # project-local and global installers
 ├─ .opencode/
 │  ├─ agents/                 # horus + 6 subagents
-│  ├─ commands/               # 12 slash commands
+│  ├─ commands/               # 14 slash commands
 │  ├─ context-mode/           # Horus Context Mode MCP server + dashboard
-│  └─ skills/                 # 39 skills
+│  └─ skills/                 # 41 skills
 │     └─ vibe/                # 4 templates + 8 EN/AR handbooks
 └─ scripts/
    ├─ validate_horus.py       # integrity validator
@@ -208,10 +285,12 @@ Only `horus` may call the `question` tool. Workers that need a decision return
 | `/vibe` | Enter the 7-stage Vibe Engineering workflow |
 | `/graphify` | Official Graphify v0.9.115 knowledge graph build, query, path, explain, update, wiki & MCP |
 | `/horus-context` | Horus Context Mode token-savings report (`ctx_stats`), `ctx_doctor`, JIT FTS5 search, or dashboard |
+| `/horus-memory` | Cross-session/cross-project `ai-memory` wiki query, handoffs, inbox, lint & `ai-memory doctor` |
 | `/horus-foundry` | Launch, dry-run, or check Linear-orchestrated parallel background OpenCode pods |
 | `/horus-todo` | Git-tracked `.todo.md` checklist, 1-click AI Requirement Analysis, `plan.py` promote, or live sidebar |
-| `/design` | Design Engineering 20-playbook suite (animations, gestures, `break-ui`, prototyping, `DESIGN.md`, Apple/Swift) |
+| `/design` | Design Engineering 21-playbook suite (animations, gestures, `break-ui`, Stageshow faux-product-UI, prototyping, `DESIGN.md`, Apple/Swift) |
 | `/craft` | Engineering Craft 18-playbook suite (deep modules, domain modeling, wayfinder, PR/triage/retro, bug diagnosis) |
+| `/partner` | Senior Engineering Partner: `AUDIT:` report-first audit, Tier 0–2 rigor ladder, Cloud/K8s/Terraform/SRE/DR, compliance & toolchains |
 | `/security` | Defensive AppSec, C/C++ memory/mitigations, CI/CD & supply-chain hardening audit |
 
 ### Evidence gates (`plan.py`)
@@ -235,10 +314,10 @@ editing a checkbox by hand useless.
 
 ## The skills
 
-39 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
+41 skills, grouped by purpose. Full provenance and upstream attribution in [SKILLS.md](SKILLS.md).
 
 <details>
-<summary><b>Orchestration & evidence (9 Horus originals)</b></summary>
+<summary><b>Orchestration, memory, security & systems (16 skills)</b></summary>
 
 | Skill | Use it for |
 | :--- | :--- |
@@ -247,6 +326,7 @@ editing a checkbox by hand useless.
 | `anti-hallucination-harness` | Evidence-backed claims, minimal output, honest blockers |
 | `graphify` | Official Graphify v0.9.115 OpenCode skill + 8 references (AST graph, query/path/explain/section, wiki, MCP) |
 | `horus-context-mode` | SQLite FTS5 (BM25 + Trigram RRF) & sandboxed `ctx_execute` MCP server to keep huge logs/outputs out of context |
+| `horus-memory` | Cross-session, cross-project & cross-agent long-term Markdown wiki memory (`ai-memory` MCP/CLI) |
 | `horus-next-steps` | State-aware 1-click `question` follow-up polls at the end of substantive tasks/waves (primary agent only) |
 | `horus-foundry` | Linear-orchestrated parallel background OpenCode pods with isolated `git worktree` per ticket |
 | `horus-todo` | Git-tracked `.todo.md` checklist with AI Requirement Analysis, `plan.py` promoter & live sidebar UI |
@@ -286,7 +366,7 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 | `vercel-react-best-practices` | React/Next.js waterfalls and bundle size (70 rules) |
 | `supabase-postgres-best-practices` | Schema, RLS, indexing, connection management (31 rules) |
 | `frontend-design` | Distinctive web visual direction & typography |
-| `design-engineering` | 20 full Design Engineering playbooks + 2 cheatsheets (motion, choreography, gestures, `break-ui`, prototyping, mobile/Swift) |
+| `design-engineering` | 21 full Design Engineering playbooks + 2 cheatsheets (motion, choreography, gestures, `break-ui`, Stageshow faux-product-UI kit, mobile/Swift) |
 | `webapp-testing` | Playwright verification, screenshots, console logs |
 | `mcp-builder` | Building high-quality TypeScript & Python MCP servers |
 | `pdf` / `docx` / `xlsx` / `pptx` | Full document, spreadsheet, presentation & PDF engineering |
@@ -294,10 +374,11 @@ Handbooks: `workflow-7-stages`, `checklists`, `anti-patterns`, `prompt-blueprint
 </details>
 
 <details>
-<summary><b>Engineering discipline (6 full Superpowers v7.0.2 skills + 18-playbook `engineering-craft` suite)</b></summary>
+<summary><b>Engineering discipline (8 skills: 6 Superpowers v7.0.2 + `engineering-craft` + `senior-engineering-partner`)</b></summary>
 
 `brainstorming`, `test-driven-development`, `systematic-debugging`,
-`using-git-worktrees`, `finishing-a-development-branch`, `writing-skills`
+`using-git-worktrees`, `finishing-a-development-branch`, `writing-skills`,
+`engineering-craft` (18 playbooks), and `senior-engineering-partner` (Tier 0–2 rigor ladder, `AUDIT:` mode, 39 unique Cloud/SRE/DR/compliance/toolchain refs + 5 scripts).
 
 </details>
 
@@ -334,7 +415,7 @@ provider setup.
 
 ## Contributing
 
-- **Adding a skill:** follow `writing-skills`, keep frontmatter `name:` equal to the directory name, then run `python scripts/validate_horus.py`.
+- **Adding a skill:** follow `writing-skills`, keep frontmatter `name:` equal to the directory name, keep `description:` ≤ 150 chars, then run `python scripts/validate_horus.py`.
 - **Replacing offline editions:** `python scripts/sync_upstream.py --dry-run` to preview, `--only <group>` to scope. Backups and commit pins land in `SOURCES.lock.json`.
 - **Changing harness rules:** edit `AGENTS.md`, then `CHANGELOG.md`, then validate.
 
@@ -345,6 +426,8 @@ Built on [OpenCode](https://opencode.ai) and shaped by
 [vibe-engineering-playbook](https://github.com/abduallahJamal/vibe-engineering-playbook),
 [superpowers](https://github.com/obra/superpowers),
 [graphify](https://github.com/Graphify-Labs/graphify),
+[ai-memory](https://github.com/akitaonrails/ai-memory),
+[senior-engineering-partner](https://github.com/bjgreenberg/senior-engineering-partner),
 [rea](https://github.com/morluto/rea),
 [anthropics/skills](https://github.com/anthropics/skills),
 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), and
