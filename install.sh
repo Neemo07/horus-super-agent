@@ -92,7 +92,7 @@ done
 for s in sync_upstream.py validate_horus.py migrate-opencode-db.py horus_foundry.py horus_todo.py; do
   cp "$SCRIPT_DIR/scripts/$s" "$CFG/scripts/$s"
 done
-echo "Installed Horus v0.5.2 ($MODE) to $BASE"
+echo "Installed Horus v0.5.3 ($MODE) to $BASE"
 
 if command -v python3 >/dev/null 2>&1; then
   python3 "$CFG/scripts/validate_horus.py" || true

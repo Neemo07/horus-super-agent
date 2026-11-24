@@ -82,7 +82,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $Cfg "scripts") | Out-Null
 foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py", "horus_foundry.py", "horus_todo.py") {
   Copy-Item -Force (Join-Path $ScriptDir "scripts/$s") (Join-Path $Cfg "scripts/$s")
 }
-Write-Host "Installed Horus v0.5.2 ($Mode) to $Base"
+Write-Host "Installed Horus v0.5.3 ($Mode) to $Base"
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
   Write-Host "Note: Horus Context Mode MCP requires Node.js >= 22.5.0 (built-in node:sqlite)."
