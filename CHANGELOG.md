@@ -1,3 +1,12 @@
+## [0.7.0] - 2026-11-24
+### Added
+- **Multi-Harness Support (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:
+  - Added `scripts/install_harness.py`, `adapters/antigravity/mcp_config.json`, and `adapters/dsh/cordis.patch.yml`.
+  - Upgraded `install.ps1` (`-Harness opencode|antigravity|dsh|all`) and `install.sh` (`--harness opencode|antigravity|dsh|all`) with 100% backward compatibility.
+  - **Google Antigravity:** installs 41 skills to `.agents/skills/` (or `~/.gemini/config/skills/`), converts all 14 commands to Antigravity workflows (`.agents/workflows/`), generates `.agents/rules/horus.md` + `GEMINI.md`, and non-destructively merges `horus-context-mode` into `mcp_config.json`.
+  - **DeepSeek Harness Desktop App (`dsh`):** installs 41 skills to `skills/` (or `$DSH_HOME/skills/`), adapts `AGENTS.md`, copies agents/commands/context-mode to `.dsh/` (or `$DSH_HOME/horus/`), and generates a verified `@deepseek-ai/dsh-mcp-client` `cordis.patch.yml`.
+- Added 5 multi-harness integration tests in `tests/test_horus.py` (33/33 tests).
+
 ## [0.6.0] - 2026-11-24
 ### Changed
 - **Frontier Reasoning & Parallel-First Intelligence Upgrade (`AGENTS.md` + all 7 agents)**:

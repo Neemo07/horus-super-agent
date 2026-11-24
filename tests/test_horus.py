@@ -272,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.6.0", horus_md)
+        self.assertIn("v0.7.0", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -281,6 +281,68 @@ class TestValidateHorus(unittest.TestCase):
         for agent_name in ("architect.md", "reviewer.md", "c-engineer.md", "web-engineer.md", "ui-gui-engineer.md", "re-analyst.md"):
             body = (REPO_ROOT / ".opencode" / "agents" / agent_name).read_text(encoding="utf-8")
             self.assertIn("Parallel-First", body, f"{agent_name} missing Parallel-First grounding rule")
+
+    def test_antigravity_project_and_global_install(self) -> None:
+        if os.name == "nt":
+            self.skipTest("bash installer test runs on POSIX")
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "proj"
+            proj.mkdir()
+            r1 = subprocess.run(["bash", str(INSTALL_SH), "project", str(proj), "--harness", "antigravity"], capture_output=True, text=True)
+            self.assertEqual(r1.returncode, 0, r1.stdout + r1.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (antigravity/project)", r1.stdout)
+            self.assertTrue((proj / "GEMINI.md").exists())
+            self.assertTrue((proj / ".agents" / "rules" / "horus.md").exists())
+            self.assertEqual(len(list((proj / ".agents" / "workflows").glob("*.md"))), 14)
+            mcp = json.loads((proj / ".agents" / "mcp_config.json").read_text(encoding="utf-8"))
+            self.assertIn("horus-context-mode", mcp["mcpServers"])
+
+            # Global mode must non-destructively preserve existing mcpServers (e.g. ai-memory)
+            fake_home = Path(tmp) / "home"
+            existing_cfg = fake_home / ".gemini" / "config" / "mcp_config.json"
+            existing_cfg.parent.mkdir(parents=True)
+            existing_cfg.write_text(json.dumps({"mcpServers": {"ai-memory": {"serverUrl": "http://127.0.0.1:49374/mcp"}}}), encoding="utf-8")
+            r2 = subprocess.run(["bash", str(INSTALL_SH), "global", "--harness", "antigravity"], env=dict(os.environ, HOME=str(fake_home)), capture_output=True, text=True)
+            self.assertEqual(r2.returncode, 0, r2.stdout + r2.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (antigravity/global)", r2.stdout)
+            merged = json.loads(existing_cfg.read_text(encoding="utf-8"))
+            self.assertIn("ai-memory", merged["mcpServers"])
+            self.assertIn("horus-context-mode", merged["mcpServers"])
+
+    def test_dsh_project_global_and_all_harnesses_install(self) -> None:
+        if os.name == "nt":
+            self.skipTest("bash installer test runs on POSIX")
+        import yaml
+        with tempfile.TemporaryDirectory() as tmp:
+            proj = Path(tmp) / "dsh_proj"
+            proj.mkdir()
+            r1 = subprocess.run(["bash", str(INSTALL_SH), "project", str(proj), "--harness", "dsh"], capture_output=True, text=True)
+            self.assertEqual(r1.returncode, 0, r1.stdout + r1.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (dsh/project)", r1.stdout)
+            self.assertTrue((proj / "AGENTS.md").exists())
+            self.assertTrue((proj / "skills" / "horus-memory" / "SKILL.md").exists())
+            patch_data = yaml.safe_load((proj / ".dsh" / "cordis.patch.yml").read_text(encoding="utf-8"))
+            self.assertIsInstance(patch_data, list)
+            self.assertEqual(patch_data[0]["insert"][0]["name"], "@deepseek-ai/dsh-mcp-client")
+
+            # Global DSH mode using custom DSH_HOME
+            dsh_home = Path(tmp) / "dsh_home"
+            r2 = subprocess.run(["bash", str(INSTALL_SH), "global", "--harness", "dsh"], env=dict(os.environ, DSH_HOME=str(dsh_home)), capture_output=True, text=True)
+            self.assertEqual(r2.returncode, 0, r2.stdout + r2.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (dsh/global)", r2.stdout)
+            gpatch = yaml.safe_load((dsh_home / "horus" / "cordis.patch.yml").read_text(encoding="utf-8"))
+            self.assertEqual(gpatch[0]["insert"][0]["id"], "horus-context-mode")
+
+            # Multi-harness --harness all in one command
+            all_proj = Path(tmp) / "all_proj"
+            all_proj.mkdir()
+            r3 = subprocess.run(["bash", str(INSTALL_SH), "project", str(all_proj), "--harness", "all", "--force-config"], capture_output=True, text=True)
+            self.assertEqual(r3.returncode, 0, r3.stdout + r3.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (project)", r3.stdout)
+            self.assertIn("HORUS VALIDATION PASSED (antigravity/project)", r3.stdout)
+            self.assertIn("HORUS VALIDATION PASSED (dsh/project)", r3.stdout)
+            self.assertIn(".opencode/skills/", (all_proj / "AGENTS.md").read_text(encoding="utf-8"))
+            self.assertTrue((all_proj / ".dsh" / "AGENTS.md").exists())
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

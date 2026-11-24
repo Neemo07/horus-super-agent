@@ -1,0 +1,24 @@
+# Horus Super Agent v0.7.0 — DeepSeek Harness (DSH) Desktop App / Web UI Cordis MCP Patch
+# Merge into: $DSH_HOME/profiles/<profile>/cordis.patch.yml (DSH reloads live).
+# Requires Node.js >= 22.5.0 for horus-context-mode built-in node:sqlite.
+- insert:
+    - id: horus-context-mode
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: 'horus-context-mode'
+        transport: stdio
+        command: 'node'
+        args:
+          - '.dsh/context-mode/server.js'
+        toolCallTimeoutMs: 120000
+
+# Optional: uncomment below only on massive repos if you want Graphify MCP in addition to CLI-first mode:
+#    - id: graphify
+#      name: '@deepseek-ai/dsh-mcp-client'
+#      config:
+#        serverName: 'graphify'
+#        transport: stdio
+#        command: 'graphify-mcp'
+#        args:
+#          - 'graphify-out/graph.json'
+#        toolCallTimeoutMs: 120000

@@ -2,13 +2,13 @@
 
 # Horus Super Agent
 
-**A DAG-wave orchestrator and 41-skill harness for [OpenCode](https://opencode.ai).**
+**A DAG-wave orchestrator and 41-skill harness for [OpenCode](https://opencode.ai), Google Antigravity, and DeepSeek Harness Desktop App (`dsh`).**
 
 Specs before code, file-locked parallel subagents, and proof-gated task closure —
 with every decision surfaced as a native clickable poll instead of a wall of chat questions.
 
-[![Version](https://img.shields.io/badge/version-0.6.0-00d4aa?style=flat-square)](CHANGELOG.md)
-[![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%7C%20V2-6e56cf?style=flat-square)](https://opencode.ai)
+[![Version](https://img.shields.io/badge/version-0.7.0-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Harnesses](https://img.shields.io/badge/Harnesses-OpenCode%20%7C%20Antigravity%20%7C%20DSH-6e56cf?style=flat-square)](#multi-harness-install-opencode--antigravity--deepseek-harness)
 [![Skills](https://img.shields.io/badge/skills-41-3b82f6?style=flat-square)](SKILLS.md)
 [![Subagents](https://img.shields.io/badge/subagents-6-8b5cf6?style=flat-square)](#the-subagents)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#quick-start)
@@ -118,6 +118,38 @@ bash install.sh project /path/to/your/repo
 ```bash
 bash install.sh global --force-config
 ```
+
+### Multi-Harness Install (OpenCode + Antigravity + DeepSeek Harness)
+
+Horus keeps a single zero-duplication source of truth in `.opencode/` and adapts cleanly to **OpenCode (V1/V2)**, **Google Antigravity (IDE & `agy` CLI)**, and **DeepSeek Harness Desktop App / Web UI (`dsh`)** via `-Harness` / `--harness`:
+
+```powershell
+# Windows PowerShell — Google Antigravity (project or global)
+.\install.ps1 -Mode project -TargetDir "C:\path\to\your\repo" -Harness antigravity
+.\install.ps1 -Mode global -Harness antigravity
+
+# Windows PowerShell — DeepSeek Harness Desktop App / Web UI (project or global)
+.\install.ps1 -Mode project -TargetDir "C:\path\to\your\repo" -Harness dsh
+.\install.ps1 -Mode global -Harness dsh
+
+# Install for ALL three harnesses at once (OpenCode + Antigravity + DSH)
+.\install.ps1 -Mode project -TargetDir "C:\path\to\your\repo" -Harness all
+```
+
+```bash
+# Linux / macOS
+bash install.sh project /path/to/your/repo --harness antigravity
+bash install.sh global --harness antigravity
+bash install.sh project /path/to/your/repo --harness dsh
+bash install.sh global --harness dsh
+bash install.sh project /path/to/your/repo --harness all
+```
+
+| Harness | Project Layout | Global Layout | MCP / Rules Integration |
+| :--- | :--- | :--- | :--- |
+| **OpenCode (V1/V2)** | `.opencode/{agents,skills,commands,context-mode}`, `AGENTS.md`, `opencode.jsonc` | `~/.config/opencode/` + strict `opencode.json` | Native `opencode.jsonc` / `opencode.json` |
+| **Google Antigravity** | `.agents/{skills,workflows,rules,agents,context-mode}`, `GEMINI.md`, `.agents/mcp_config.json` | `~/.gemini/config/{skills,workflows,rules,agents,context-mode}` | Non-destructive merge into `~/.gemini/config/mcp_config.json` |
+| **DeepSeek Harness (`dsh`)** | `skills/`, `AGENTS.md`, `.dsh/{agents,commands,context-mode,cordis.patch.yml}` | `$DSH_HOME/skills/` + `$DSH_HOME/horus/` | Ready-to-merge `@deepseek-ai/dsh-mcp-client` Cordis YAML patch (`cordis.patch.yml`) |
 
 ### Upgrade an existing install
 
