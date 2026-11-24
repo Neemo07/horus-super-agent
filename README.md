@@ -7,7 +7,7 @@
 Specs before code, file-locked parallel subagents, and proof-gated task closure —
 with every decision surfaced as a native clickable poll instead of a wall of chat questions.
 
-[![Version](https://img.shields.io/badge/version-0.5.3-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.6.0-00d4aa?style=flat-square)](CHANGELOG.md)
 [![OpenCode](https://img.shields.io/badge/OpenCode-V1%20%7C%20V2-6e56cf?style=flat-square)](https://opencode.ai)
 [![Skills](https://img.shields.io/badge/skills-41-3b82f6?style=flat-square)](SKILLS.md)
 [![Subagents](https://img.shields.io/badge/subagents-6-8b5cf6?style=flat-square)](#the-subagents)

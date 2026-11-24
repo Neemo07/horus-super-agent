@@ -1,3 +1,12 @@
+## [0.6.0] - 2026-11-24
+### Changed
+- **Frontier Reasoning & Parallel-First Intelligence Upgrade (`AGENTS.md` + all 7 agents)**:
+  - Added first-principles root-cause analysis, parallel-first tool/read fan-out, deterministic-first verification, anti-looping circuit breaker, and smart autonomy (execute clear existing-repo tasks directly without bureaucratic kickoff polls; reserve `question` polls for greenfield kickoffs, genuine ambiguity, and destructive/architectural forks).
+  - Wired full 4-layer memory awareness (`graphify` CLI-first + `horus-memory` + `horus-context-mode` + `plan.py`) into `horus.md` and `AGENTS.md`, plus `AUDIT / HARDENING` adaptive pipeline routing.
+  - Raised subagent step budgets (`architect`/`reviewer`: 15→25, `re-analyst`: 25→30, `c-engineer`/`web-engineer`/`ui-gui-engineer`: 30→40) and expanded read-only `reviewer` deterministic verifiers (`mypy`, `ruff check`, `bandit`, `semgrep`, `cargo test`, `go test`, `git log`, `git show`).
+  - Added `systematic-debugging` allowlist to `ui-gui-engineer.md`.
+- Added unit test `test_v060_frontier_intelligence_contracts` (28/28 tests).
+
 ## [0.5.3] - 2026-11-24
 ### Added
 - **`senior-engineering-partner` skill & `/partner` command**: Adapted `bjgreenberg/senior-engineering-partner` v1.32.0 (Apache-2.0) into a lean ~5 KB OpenCode-native progressive-disclosure hub (139-char description; 39 unique Cloud/K8s/Terraform/SRE/DR/BC/compliance/supply-chain/Python/Bash/TS/Swift references + 5 deterministic helper scripts; 8 overlapping references explicitly deferred to Horus's native skills for zero overlap).

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Horus Super Agent v0.5.3 — DAG-Wave Orchestrator + Vibe Playbook + Graphify + Horus Context Mode + Native OpenCode Poll UI
+  // Horus Super Agent v0.6.0 — DAG-Wave Orchestrator + Vibe Playbook + Graphify + Horus Context Mode + Native OpenCode Poll UI
   "default_agent": "horus",
   "instructions": [
     "AGENTS.md"

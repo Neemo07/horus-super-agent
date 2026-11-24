@@ -267,6 +267,21 @@ class TestValidateHorus(unittest.TestCase):
         for sc in ("audit.sh", "actions-lint.sh", "leakage-guard.sh", "render-diagrams.sh", "self-review.md"):
             self.assertTrue((scripts_dir / sc).exists(), f"Missing helper script: {sc}")
 
+    def test_v060_frontier_intelligence_contracts(self) -> None:
+        agents_md = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("Parallel-first execution", agents_md)
+        self.assertIn("4-Layer Memory", agents_md)
+        horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
+        self.assertIn("v0.6.0", horus_md)
+        self.assertIn("Parallel-first discovery", horus_md)
+        self.assertIn("horus-memory", horus_md)
+        reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
+        for tool in ("mypy *", "ruff check*", "bandit *", "semgrep *", "cargo test*", "go test*"):
+            self.assertIn(tool, reviewer_md, f"reviewer.md missing read-only verifier: {tool}")
+        for agent_name in ("architect.md", "reviewer.md", "c-engineer.md", "web-engineer.md", "ui-gui-engineer.md", "re-analyst.md"):
+            body = (REPO_ROOT / ".opencode" / "agents" / agent_name).read_text(encoding="utf-8")
+            self.assertIn("Parallel-First", body, f"{agent_name} missing Parallel-First grounding rule")
+
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":
             self.skipTest("bash installer test runs on POSIX")
