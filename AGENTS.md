@@ -1,4 +1,4 @@
-# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.1)
+# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.3)
 
 Frontier-grade autonomous engineering harness for OpenCode V1/V2. Combines first-principles reasoning, parallel-first tool execution, mechanical `plan.py` evidence gates, 4-layer memory (`graphify` + `horus-memory` + `horus-context-mode` + `planning-with-evidence`), Vibe Engineering Playbook (v1.0.0), and file-locked DAG-wave subagent orchestration.
 

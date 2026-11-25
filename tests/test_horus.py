@@ -272,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.1", horus_md)
+        self.assertIn("v0.7.3", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -375,6 +375,95 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("--runner", r.stdout)
         self.assertIn("antigravity", r.stdout)
         self.assertIn("dsh", r.stdout)
+
+    def test_standalone_global_all_harnesses_works_for_every_app(self) -> None:
+        if os.name == "nt":
+            self.skipTest("bash installer test runs on POSIX")
+        import yaml
+        with tempfile.TemporaryDirectory() as tmp:
+            fake_home = Path(tmp) / "home"
+            dsh_home = Path(tmp) / "dsh_home"
+            # Pre-populate user GEMINI.md, Antigravity IDE mcp_config.json, and a DSH profile cordis.patch.yml
+            (fake_home / ".gemini").mkdir(parents=True)
+            (fake_home / ".gemini" / "GEMINI.md").write_text("# My Personal Gemini Notes\n", encoding="utf-8")
+            (fake_home / ".gemini" / "antigravity").mkdir(parents=True)
+            (fake_home / ".gemini" / "antigravity" / "mcp_config.json").write_text(
+                json.dumps({"mcpServers": {"ai-memory": {"serverUrl": "http://127.0.0.1:49374/mcp"}}}),
+                encoding="utf-8",
+            )
+            prof = dsh_home / "profiles" / "standard" / "cordis.patch.yml"
+            prof.parent.mkdir(parents=True)
+            prof.write_text("- insert:\n    - id: existing-plugin\n      name: '@deepseek-ai/dsh-todo-list'\n", encoding="utf-8")
+
+            env = dict(os.environ, HOME=str(fake_home), DSH_HOME=str(dsh_home))
+            # Run twice to verify full idempotency
+            for _ in range(2):
+                r = subprocess.run(
+                    ["bash", str(INSTALL_SH), "global", "--harness", "all", "--apply-dsh-profiles"],
+                    env=env,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+            # Verify OpenCode global standalone
+            self.assertTrue((fake_home / ".config" / "opencode" / "opencode.json").exists())
+            # Verify Antigravity global standalone (preserved user GEMINI.md + merged BOTH mcp_config.json files)
+            gem_txt = (fake_home / ".gemini" / "GEMINI.md").read_text(encoding="utf-8")
+            self.assertIn("# My Personal Gemini Notes", gem_txt)
+            self.assertEqual(gem_txt.count("<!-- HORUS:BEGIN -->"), 1)
+            ide_mcp = json.loads((fake_home / ".gemini" / "antigravity" / "mcp_config.json").read_text(encoding="utf-8"))
+            self.assertIn("ai-memory", ide_mcp["mcpServers"])
+            self.assertIn("horus-context-mode", ide_mcp["mcpServers"])
+            # Verify DSH global standalone (preserved existing plugin, wired horus-context-mode once, valid YAML)
+            dsh_agents = (dsh_home / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertEqual(dsh_agents.count("<!-- HORUS:BEGIN -->"), 1)
+            prof_txt = prof.read_text(encoding="utf-8")
+            self.assertEqual(prof_txt.count("id: horus-context-mode"), 1)
+            prof_data = yaml.safe_load(prof_txt)
+            self.assertEqual(len(prof_data), 2)
+
+    def test_standalone_global_resolves_all_scripts_skills_plugins_for_all_3_apps(self) -> None:
+        if os.name == "nt":
+            self.skipTest("bash installer test runs on POSIX")
+        # Verify horus-memory bundles hook templates for all 3 apps
+        hm_refs = REPO_ROOT / ".opencode" / "skills" / "horus-memory" / "references"
+        for hdir in ("opencode-hooks", "antigravity-hooks", "dsh-hooks"):
+            self.assertGreaterEqual(len(list((hm_refs / hdir).glob("*"))), 10, f"Missing hook templates in {hdir}")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            fake_home = Path(tmp) / "home"
+            dsh_home = Path(tmp) / "dsh_home"
+            brand_new_app = Path(tmp) / "brand_new_app"
+            fake_home.mkdir()
+            brand_new_app.mkdir()
+            env = dict(os.environ, HOME=str(fake_home), DSH_HOME=str(dsh_home))
+
+            r = subprocess.run(
+                ["bash", str(INSTALL_SH), "global", "--harness", "all", "--apply-dsh-profiles"],
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+            # Check each of the 3 global installs has exact absolute script & dashboard paths that actually exist on disk
+            checks = [
+                (fake_home / ".config" / "opencode", fake_home / ".config" / "opencode" / "skills", fake_home / ".config" / "opencode" / "scripts"),
+                (fake_home / ".gemini" / "config", fake_home / ".gemini" / "config" / "skills", fake_home / ".gemini" / "config" / "scripts"),
+                (dsh_home / "horus", dsh_home / "skills", dsh_home / "horus" / "scripts"),
+            ]
+            for base_dir, skills_dir, scripts_dir in checks:
+                todo_skill = (skills_dir / "horus-todo" / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn((scripts_dir / "horus_todo.py").as_posix(), todo_skill)
+                ctx_skill = (skills_dir / "horus-context-mode" / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn((base_dir / "context-mode" / "dashboard" / "server.mjs").as_posix(), ctx_skill)
+                plan_py = skills_dir / "planning-with-evidence" / "scripts" / "plan.py"
+                self.assertTrue(plan_py.exists())
+                # Actually execute installed scripts from inside an empty brand_new_app directory!
+                for sc in (plan_py, scripts_dir / "horus_todo.py", scripts_dir / "horus_foundry.py"):
+                    res = subprocess.run([sys.executable, str(sc), "--help"], cwd=str(brand_new_app), capture_output=True, text=True)
+                    self.assertEqual(res.returncode, 0, f"Standalone run failed for {sc}: {res.stderr}")
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

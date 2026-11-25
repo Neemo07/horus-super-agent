@@ -1,3 +1,17 @@
+## [0.7.3] - 2026-11-25
+### Added & Hardened
+- **100% Standalone Global Skills, Plugins/Hooks & Scripts Across All 3 Apps (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:
+  - `scripts/install_harness.py` now resolves every `.opencode/skills/`, `.opencode/context-mode/` (including `dashboard/server.mjs`), and `scripts/*.py` (`horus_todo.py`, `horus_foundry.py`, `validate_horus.py`, `plan.py`) reference to exact global absolute paths across OpenCode (`~/.config/opencode/`), Antigravity (`~/.gemini/config/`), and DSH (`$DSH_HOME/horus/`).
+  - Bundled native `ai-memory` hook templates for all 3 apps inside `horus-memory/references/` (`opencode-hooks/`, `antigravity-hooks/`, `dsh-hooks/`).
+- Added end-to-end empty-workspace standalone test `test_standalone_global_resolves_all_scripts_skills_plugins_for_all_3_apps` (34/34 tests).
+
+## [0.7.2] - 2026-11-25
+### Added
+- **One-Command Standalone Global Mode (`-Mode global -Harness all -ApplyDshProfiles` / `global --harness all --apply-dsh-profiles`)**:
+  - **Google Antigravity (IDE + CLI):** Non-destructively upserts a marked `<!-- HORUS:BEGIN -->` block into `~/.gemini/GEMINI.md` and merges `horus-context-mode` into BOTH `~/.gemini/config/mcp_config.json` and `~/.gemini/antigravity/mcp_config.json` so every workspace gets Horus automatically.
+  - **DeepSeek Harness Desktop App (`dsh`):** Non-destructively upserts a marked `<!-- HORUS:BEGIN -->` block into `$DSH_HOME/AGENTS.md` and safely, idempotently wires `horus-context-mode` into existing `$DSH_HOME/profiles/*/cordis.patch.yml` files (with `.bak` backup) when `--apply-dsh-profiles` / `-ApplyDshProfiles` is passed.
+- Added unit test `test_standalone_global_all_harnesses_works_for_every_app` (33/33 tests).
+
 ## [0.7.1] - 2026-11-25
 ### Added & Hardened
 - **Full Project Tri-Harness Compatibility (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:

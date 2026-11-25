@@ -38,7 +38,7 @@ Read ONLY the specific handbook needed for the current operation:
    ai-memory setup --yes --agent antigravity-cli  # Google Antigravity CLI/IDE
    ai-memory install-mcp --client dsh             # DeepSeek Harness Desktop App (print Cordis YAML patch)
    ```
-   *(If `ai-memory setup` adds extra `ai-memory-*` skill folders, remove them — Horus already consolidates all 5 operational playbooks here with zero catalog bloat. Reference OpenCode hooks are also bundled in `references/opencode-hooks/`.)*
+   *(If `ai-memory setup` adds extra `ai-memory-*` skill folders, remove them — Horus already consolidates all 5 operational playbooks here with zero catalog bloat. Reference hook templates for all 3 apps are bundled in `references/opencode-hooks/`, `references/antigravity-hooks/`, and `references/dsh-hooks/`.)*
 3. **Verify health:** run `ai-memory --version && ai-memory doctor`.
 
 ## 4. Recommended Coexistence with Graphify & Horus Subagents

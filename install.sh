@@ -4,12 +4,14 @@ set -euo pipefail
 MODE="${1:-project}"
 TARGET_DIR=""
 FORCE_CONFIG=0
+APPLY_DSH_PROFILES=0
 HARNESS="opencode"
 
 shift || true
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --force-config) FORCE_CONFIG=1 ;;
+    --apply-dsh-profiles) APPLY_DSH_PROFILES=1 ;;
     --harness)
       shift
       HARNESS="${1:-opencode}"
@@ -59,6 +61,9 @@ run_harness_adapter() {
   local extra=()
   if [[ "$FORCE_CONFIG" -eq 1 ]]; then
     extra+=(--force-config)
+  fi
+  if [[ "$APPLY_DSH_PROFILES" -eq 1 ]]; then
+    extra+=(--apply-dsh-profiles)
   fi
   python3 "$SCRIPT_DIR/scripts/install_harness.py" \
     --harness "$adapter" \
@@ -119,7 +124,10 @@ if [[ "$HARNESS" == "opencode" || "$HARNESS" == "all" ]]; then
   for s in sync_upstream.py validate_horus.py migrate-opencode-db.py horus_foundry.py horus_todo.py install_harness.py; do
     cp "$SCRIPT_DIR/scripts/$s" "$CFG/scripts/$s"
   done
-  echo "Installed Horus v0.7.1 ($MODE) to $BASE"
+  if [[ "$MODE" == "global" ]] && command -v python3 >/dev/null 2>&1; then
+    python3 "$CFG/scripts/install_harness.py" --harness opencode-global --mode global --target-dir "$BASE"
+  fi
+  echo "Installed Horus v0.7.3 ($MODE) to $BASE"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$CFG/scripts/validate_horus.py" || true

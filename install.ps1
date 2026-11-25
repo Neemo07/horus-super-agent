@@ -4,7 +4,8 @@ param(
   [string]$TargetDir = (Get-Location).Path,
   [ValidateSet("opencode", "antigravity", "dsh", "all")]
   [string]$Harness = "opencode",
-  [switch]$ForceConfig
+  [switch]$ForceConfig,
+  [switch]$ApplyDshProfiles
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,6 +38,7 @@ function Invoke-HarnessAdapter {
     "--target-dir", $TargetDir
   )
   if ($ForceConfig) { $argsList += "--force-config" }
+  if ($ApplyDshProfiles) { $argsList += "--apply-dsh-profiles" }
   & $pyCmd @argsList
   if ($LASTEXITCODE -ne 0) { throw "Harness adapter install failed for $AdapterName (exit $LASTEXITCODE)." }
 }
@@ -95,7 +97,10 @@ if ($Harness -eq "opencode" -or $Harness -eq "all") {
   foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py", "horus_foundry.py", "horus_todo.py", "install_harness.py") {
     Copy-Item -Force (Join-Path $ScriptDir "scripts/$s") (Join-Path $Cfg "scripts/$s")
   }
-  Write-Host "Installed Horus v0.7.1 ($Mode) to $Base"
+  if ($Mode -eq "global" -and (Get-Command python -ErrorAction SilentlyContinue)) {
+    python (Join-Path $Cfg "scripts/install_harness.py") --harness opencode-global --mode global --target-dir $Base
+  }
+  Write-Host "Installed Horus v0.7.3 ($Mode) to $Base"
 
   if (Get-Command python -ErrorAction SilentlyContinue) {
     python (Join-Path $Cfg "scripts/validate_horus.py")
