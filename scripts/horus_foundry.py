@@ -42,6 +42,14 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+# argparse prints help via stdout; on Windows cp1252 consoles a non-ASCII
+# character in a help string raises UnicodeEncodeError before parsing.
+# Force UTF-8 so --help works regardless of the active code page.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 LINEAR_GRAPHQL_URL = os.environ.get("LINEAR_API_URL", "https://api.linear.app/graphql")
 PREFIX = "∞"
 
