@@ -34,8 +34,6 @@ Horus adds evidence-gated planning, file-locked parallel subagents, and read-onl
 - **`.todo.md` workflow**: git-tracked checklist, AI requirement analysis, and promotion into `task_plan.md`.
 - **Integrity validator** for all three harness layouts, including a 150-character skill-description cap and zero duplicate reference-playbook names.
 
-<!-- TODO: add screenshot -->
-
 ## Tech stack
 
 | Component | Implementation |
