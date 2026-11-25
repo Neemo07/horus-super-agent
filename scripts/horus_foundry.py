@@ -258,15 +258,23 @@ def slugify(text: str, max_len: int = 36) -> str:
     return (s[:max_len].rstrip("-")) or "task"
 
 
-def find_opencode_cli() -> str:
-    override = os.environ.get("OPENCODE_BIN")
+def find_runner_cli(runner: str = "opencode") -> str:
+    env_map = {
+        "opencode": ("OPENCODE_BIN", ("opencode", "opencode.exe", "opencode.cmd")),
+        "antigravity": ("ANTIGRAVITY_BIN", ("agy", "agy.exe", "agy.cmd")),
+        "dsh": ("DSH_BIN", ("dsh", "dsh.exe", "dsh.cmd")),
+    }
+    if runner not in env_map:
+        raise RuntimeError(f"Unsupported runner {runner!r} (expected: opencode, antigravity, dsh)")
+    env_var, names = env_map[runner]
+    override = os.environ.get(env_var)
     if override and os.path.exists(override):
         return override
-    for name in ("opencode", "opencode.exe", "opencode.cmd"):
+    for name in names:
         found = shutil.which(name)
         if found:
             return found
-    raise RuntimeError("`opencode` CLI not found on PATH. Install OpenCode or set OPENCODE_BIN.")
+    raise RuntimeError(f"`{names[0]}` CLI not found on PATH. Install {runner} or set {env_var}.")
 
 
 def ensure_worktree(repo_root: Path, branch: str, wt_path: Path) -> Path:
@@ -308,19 +316,28 @@ def build_worker_prompt(issue: dict, stage: str, branch: str, merge_mode: str) -
     )
 
 
-def run_opencode_worker(
+def run_worker(
     wt_path: Path,
     prompt: str,
     agent: str,
     model: str | None,
     timeout: int,
     log_path: Path,
+    runner: str = "opencode",
 ) -> tuple[int, str]:
-    cli = find_opencode_cli()
-    cmd = [cli, "run", "--agent", agent]
-    if model:
-        cmd += ["--model", model]
-    cmd.append(prompt)
+    cli = find_runner_cli(runner)
+    if runner == "opencode":
+        cmd = [cli, "run", "--agent", agent]
+        if model:
+            cmd += ["--model", model]
+        cmd.append(prompt)
+    elif runner == "antigravity":
+        cmd = [cli, "run"]
+        if model:
+            cmd += ["--model", model]
+        cmd.append(prompt)
+    else:
+        cmd = [cli, "run", prompt]
     try:
         r = subprocess.run(
             cmd,
@@ -353,6 +370,7 @@ def process_ticket(
     model: str | None,
     timeout: int,
     dry_run: bool,
+    runner: str = "opencode",
 ) -> dict:
     key = issue["identifier"]
     cur_state = issue["state"]["name"]
@@ -394,7 +412,7 @@ def process_ticket(
 
     # 3. Run OpenCode worker
     prompt = build_worker_prompt(issue, stage, branch, merge_mode)
-    code, out = run_opencode_worker(wt_path, prompt, agent, model, timeout, log_path)
+    code, out = run_worker(wt_path, prompt, agent, model, timeout, log_path, runner=runner)
 
     # 4. Advance or block ticket in Linear (0 LLM tokens)
     blocked_match = re.search(r"FOUNDRY_BLOCKED:\s*(.+)", out)
@@ -432,7 +450,8 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--workers", type=int, default=None, help="Parallel git worktree workers (default: 1)")
     p_run.add_argument("--mode", choices=("staged", "oneshot"), default=None)
     p_run.add_argument("--merge", choices=("pr", "merge", "auto"), default=None)
-    p_run.add_argument("--agent", default=None, help="OpenCode agent name (default: horus)")
+    p_run.add_argument("--runner", choices=("opencode", "antigravity", "dsh"), default=None, help="CLI harness runner (default: opencode)")
+    p_run.add_argument("--agent", default=None, help="Agent name (default: horus)")
     p_run.add_argument("--model", default=None, help="Optional provider/model override")
     p_run.add_argument("--poll-seconds", type=int, default=60, help="Sleep interval when no tickets ready")
     p_run.add_argument("--timeout", type=int, default=1800, help="Per-ticket worker timeout in seconds")
@@ -474,6 +493,7 @@ def main(argv: list[str] | None = None) -> int:
 
     workers = max(1, args.workers or int(os.environ.get("HORUS_FOUNDRY_WORKERS", "1")))
     merge_mode = args.merge or os.environ.get("HORUS_FOUNDRY_MERGE", "pr")
+    runner = args.runner or os.environ.get("HORUS_FOUNDRY_RUNNER", "opencode")
     agent = args.agent or os.environ.get("HORUS_FOUNDRY_AGENT", "horus")
     model = args.model or os.environ.get("HORUS_FOUNDRY_MODEL") or None
 
@@ -502,6 +522,7 @@ def main(argv: list[str] | None = None) -> int:
                     model,
                     args.timeout,
                     args.dry_run,
+                    runner,
                 )
                 for iss in batch
             ]

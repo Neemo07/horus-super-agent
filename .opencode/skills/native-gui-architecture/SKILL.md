@@ -2,7 +2,7 @@
 name: native-gui-architecture
 description: "Native C/C++ desktop GUI engineering (Win32/Direct2D, ImGui, GTK4, SDL3, Clay): DPI scaling, 120fps rendering, threading, dark mode."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 ---
 # Native Desktop GUI Architecture (C / C++)
 

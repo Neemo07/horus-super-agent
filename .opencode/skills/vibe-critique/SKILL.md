@@ -2,7 +2,7 @@
 name: vibe-critique
 description: "Adversarial anti-sycophancy code review & incoming PR feedback audit with file:line evidence and confidence scores."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus integration)
   category: adversarial-review

@@ -2,7 +2,7 @@
 name: engineering-craft
 description: "18-playbook senior engineering suite: deep modules, domain modeling, wayfinder, tickets, PRs, triage, retros, bug diagnosis, pre-commit."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: mattpocock/skills (curated 18 non-overlapping playbooks, adapted for OpenCode & Horus)
   version: "0.4.6-horus"

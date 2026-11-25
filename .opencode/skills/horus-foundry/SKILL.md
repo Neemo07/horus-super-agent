@@ -2,7 +2,7 @@
 name: horus-foundry
 description: "Orchestrate parallel background OpenCode agents via Linear state machine and isolated git worktrees (scripts/horus_foundry.py)."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: leixusam/foundry (upgraded & ported for Horus / OpenCode)
   version: "0.4.2-horus"

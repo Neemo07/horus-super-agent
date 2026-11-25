@@ -2,7 +2,7 @@
 name: horus-next-steps
 description: "Primary-agent-only end-of-turn momentum: 2-4 state-aware continuations (plan.py/git/Graphify) in a native OpenCode question poll."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: Domush/antigravity-plugin-suggest-next-steps (upgraded & adapted for Horus / OpenCode)
   version: "2.0.0-horus"

@@ -2,7 +2,7 @@
 name: horus-context-mode
 description: "Keep massive logs, bulk shell outputs, and huge files out of context via SQLite FTS5 (ctx_search, ctx_execute, ctx_batch, ctx_stats)."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: Domush/antigravity-plugin-context-mode (adapted for Horus / OpenCode)
   version: "2.0.0-horus"

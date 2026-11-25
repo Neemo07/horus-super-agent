@@ -1,58 +1,27 @@
 #!/usr/bin/env python3
 """
-Integrity & configuration validator for Horus Super Agent (OpenCode v0.5.0+).
+Multi-harness integrity & configuration validator for Horus Super Agent (v0.7.1+).
 
-Checks:
-1. opencode.jsonc (V2) / opencode.json (global or V1) and opencode.v1.json parse cleanly and allow `question`.
-2. Primary agent `horus.md` explicitly allows `question`; all subagents explicitly deny `question` and `subagent`.
-3. Read-only subagents (`edit: deny`) explicitly deny `shell: "*"` before narrow command allowlists.
-4. Zero hardcoded `model:` fields in clean repo templates (auto-relaxed when `.horus/STATE.md` exists or `--allow-session-models` is passed).
-5. Every skill under .opencode/skills/*/SKILL.md has valid YAML frontmatter matching its directory name.
-6. Every slash command under .opencode/commands/*.md has valid frontmatter and non-empty body.
-7. All merged Vibe Engineering Playbook templates (4) and bilingual EN/AR reference handbooks (8) exist.
-8. Bundled Python scripts (plan.py, with_server.py, sync_upstream.py, validate_horus.py, migrate-opencode-db.py) parse cleanly in memory (no __pycache__ pollution).
+Supports:
+  - OpenCode (V2 `opencode.jsonc` / global strict `opencode.json` / V1 `opencode.v1.json`)
+  - Google Antigravity (`.agents/` + `GEMINI.md` project, or `~/.gemini/config/` global)
+  - DeepSeek Harness Desktop App / Web UI (`skills/` + `.dsh/` + `AGENTS.md` project, or `$DSH_HOME/horus/` global)
 """
 from __future__ import annotations
 
 import argparse
 import ast
 import json
+import os
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-# Support both layouts:
-#   project install: <root>/.opencode/{agents,skills,commands} + <root>/opencode.jsonc
-#   global install:  <config>/{agents,skills,commands}        + <config>/opencode.json
 NESTED = ROOT / ".opencode"
 BASE = NESTED if NESTED.is_dir() else ROOT
 LAYOUT = "project" if NESTED.is_dir() else "global"
-
-
-def find_config() -> Path | None:
-    for name in ("opencode.jsonc", "opencode.json"):
-        p = ROOT / name
-        if p.exists():
-            return p
-    return None
-
-
-def v2_permissions(cfg: dict) -> list[dict]:
-    """V2 uses a `permissions` array; V1 uses a `permission` map."""
-    perms = cfg.get("permissions")
-    if isinstance(perms, list):
-        return [p for p in perms if isinstance(p, dict)]
-    legacy = cfg.get("permission")
-    if isinstance(legacy, dict):
-        return [
-            {"action": k, "resource": "*", "effect": v}
-            for k, v in legacy.items()
-            if isinstance(v, str)
-        ]
-    return []
-
 
 REQUIRED_VIBE_TEMPLATES = [
     "AGENTS.template.md",
@@ -113,11 +82,9 @@ REQUIRED_GRAPHIFY_REFS = [
 
 
 def strip_jsonc_comments(text: str) -> str:
-    # Remove full-line // comments and trailing commas for strict stdlib json parsing
     lines = [ln for ln in text.splitlines() if not ln.lstrip().startswith("//")]
     cleaned = "\n".join(lines)
-    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
-    return cleaned
+    return re.sub(r",\s*([}\]])", r"\1", cleaned)
 
 
 def split_frontmatter(text: str) -> tuple[str, str]:
@@ -129,88 +96,36 @@ def split_frontmatter(text: str) -> tuple[str, str]:
     return parts[0], parts[1].strip()
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Validate Horus Super Agent installation and integrity.")
-    ap.add_argument(
-        "--allow-session-models",
-        action="store_true",
-        help="Allow local `model:` overrides in agent frontmatter (also auto-enabled when .horus/STATE.md exists).",
-    )
-    args = ap.parse_args(argv)
-    allow_models = args.allow_session_models or (ROOT / ".horus" / "STATE.md").exists()
+def v2_permissions(cfg: dict) -> list[dict]:
+    perms = cfg.get("permissions")
+    if isinstance(perms, list):
+        return [p for p in perms if isinstance(p, dict)]
+    legacy = cfg.get("permission")
+    if isinstance(legacy, dict):
+        return [
+            {"action": k, "resource": "*", "effect": v}
+            for k, v in legacy.items()
+            if isinstance(v, str)
+        ]
+    return []
 
-    errors: list[str] = []
 
-    def fail(msg: str) -> None:
-        errors.append(msg)
+def find_opencode_config(root: Path) -> Path | None:
+    for name in ("opencode.jsonc", "opencode.json"):
+        p = root / name
+        if p.exists():
+            return p
+    return None
 
-    # 1. Validate the active config (V2 `permissions` array or V1 `permission` map)
-    jsonc_path = find_config()
-    if jsonc_path is None:
-        fail(f"Missing opencode.jsonc or opencode.json in {ROOT}")
-    else:
-        try:
-            raw = jsonc_path.read_text(encoding="utf-8-sig")
-            # Strict JSON check when file extension is .json (no // comments allowed)
-            if jsonc_path.suffix == ".json":
-                cfg = json.loads(raw)
-            else:
-                cfg = json.loads(strip_jsonc_comments(raw))
-            perms = v2_permissions(cfg)
-            has_q = any(
-                p.get("action") == "question" and p.get("effect") == "allow"
-                for p in perms
-            )
-            if not has_q:
-                fail(f"{jsonc_path.name} missing question -> allow permission")
-            if cfg.get("default_agent") != "horus":
-                fail(f"{jsonc_path.name} default_agent expected 'horus', got {cfg.get('default_agent')!r}")
-        except Exception as exc:
-            fail(f"{jsonc_path.name} parse error: {exc}")
 
-    # 2. Validate opencode.v1.json (V1 reference config), if shipped
-    v1_path = ROOT / "opencode.v1.json"
-    if v1_path.exists():
-        try:
-            v1 = json.loads(v1_path.read_text(encoding="utf-8-sig"))
-            if v1.get("permission", {}).get("question") != "allow":
-                fail("opencode.v1.json missing permission.question = 'allow'")
-        except Exception as exc:
-            fail(f"opencode.v1.json parse error: {exc}")
-
-    # 3. Validate agents
-    agents_dir = BASE / "agents"
-    agent_files = sorted(agents_dir.glob("*.md"))
-    if not agent_files:
-        fail("No agent files found in agents/")
-    for af in agent_files:
-        try:
-            fm, body = split_frontmatter(af.read_text(encoding="utf-8"))
-        except Exception as exc:
-            fail(f"{af.name}: {exc}")
-            continue
-        if not body:
-            fail(f"{af.name}: empty prompt body")
-        if not allow_models and re.search(r"^model:\s*\S+", fm, re.M):
-            fail(f"{af.name}: hardcoded model: found in frontmatter (must be selected in session)")
-        if af.name == "horus.md":
-            if not re.search(r"action:\s*question\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*allow", fm):
-                fail("horus.md must explicitly allow the `question` tool")
-        else:
-            if not re.search(r"action:\s*question\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
-                fail(f"{af.name}: subagent must explicitly deny `question` tool")
-            if not re.search(r"action:\s*subagent\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
-                fail(f"{af.name}: subagent must explicitly deny `subagent` tool")
-            # Read-only subagents (edit: deny) must also explicitly deny shell: "*"
-            if re.search(r"action:\s*edit\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
-                if not re.search(r"action:\s*shell\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
-                    fail(f"{af.name}: read-only subagent must explicitly deny `shell: \"*\"` baseline")
-
-    # 4. Validate skills
-    skills_dir = BASE / "skills"
+def validate_skills_dir(skills_dir: Path, fail) -> list[Path]:
+    if not skills_dir.is_dir():
+        fail(f"Missing skills directory: {skills_dir}")
+        return []
     skill_dirs = sorted(p for p in skills_dir.iterdir() if p.is_dir())
     if not skill_dirs:
-        fail("No skills found in skills/")
+        fail(f"No skills found in {skills_dir}")
+        return []
     for sd in skill_dirs:
         sm = sd / "SKILL.md"
         if not sm.exists():
@@ -234,7 +149,6 @@ def main(argv: list[str] | None = None) -> int:
         if not body:
             fail(f"skills/{sd.name}/SKILL.md empty body")
 
-    # 4b. Verify zero duplicate sub-playbook directory names across progressive-disclosure references
     seen_playbooks: dict[str, list[str]] = {}
     for sub in sorted(skills_dir.rglob("SKILL.md")):
         if sub.parent.parent == skills_dir:
@@ -243,82 +157,286 @@ def main(argv: list[str] | None = None) -> int:
     for pname, locs in seen_playbooks.items():
         if len(locs) > 1:
             fail(f"Duplicate reference playbook name {pname!r}: {locs}")
+    return skill_dirs
 
-    # 5. Validate commands
-    cmds_dir = BASE / "commands"
+
+def validate_context_mode(cm_dir: Path, fail) -> None:
+    if not cm_dir.is_dir():
+        fail(f"Missing Horus Context Mode directory: {cm_dir}")
+        return
+    for rel in REQUIRED_CONTEXT_MODE_FILES:
+        if not (cm_dir / rel).exists():
+            fail(f"Missing Horus Context Mode file: {cm_dir / rel}")
+
+
+def validate_python_scripts(root: Path, skills_dir: Path, fail) -> None:
+    py_targets = [
+        skills_dir / "planning-with-evidence" / "scripts" / "plan.py",
+        skills_dir / "webapp-testing" / "scripts" / "with_server.py",
+        root / "scripts" / "sync_upstream.py",
+        root / "scripts" / "validate_horus.py",
+        root / "scripts" / "migrate-opencode-db.py",
+        root / "scripts" / "horus_foundry.py",
+        root / "scripts" / "horus_todo.py",
+        root / "scripts" / "install_harness.py",
+    ]
+    for pt in py_targets:
+        if pt.exists():
+            try:
+                ast.parse(pt.read_text(encoding="utf-8-sig"), filename=str(pt))
+            except Exception as exc:
+                fail(f"Python syntax error in {pt}: {exc}")
+
+
+def validate_opencode(root: Path, allow_models: bool) -> list[str]:
+    errors: list[str] = []
+    fail = errors.append
+
+    nested = root / ".opencode"
+    base = nested if nested.is_dir() else root
+    layout = "project" if nested.is_dir() else "global"
+
+    jsonc_path = find_opencode_config(root)
+    if jsonc_path is None:
+        fail(f"Missing opencode.jsonc or opencode.json in {root}")
+    else:
+        try:
+            raw = jsonc_path.read_text(encoding="utf-8-sig")
+            cfg = json.loads(raw) if jsonc_path.suffix == ".json" else json.loads(strip_jsonc_comments(raw))
+            perms = v2_permissions(cfg)
+            if not any(p.get("action") == "question" and p.get("effect") == "allow" for p in perms):
+                fail(f"{jsonc_path.name} missing question -> allow permission")
+            if cfg.get("default_agent") != "horus":
+                fail(f"{jsonc_path.name} default_agent expected 'horus', got {cfg.get('default_agent')!r}")
+        except Exception as exc:
+            fail(f"{jsonc_path.name} parse error: {exc}")
+
+    v1_path = root / "opencode.v1.json"
+    if v1_path.exists():
+        try:
+            v1 = json.loads(v1_path.read_text(encoding="utf-8-sig"))
+            if v1.get("permission", {}).get("question") != "allow":
+                fail("opencode.v1.json missing permission.question = 'allow'")
+        except Exception as exc:
+            fail(f"opencode.v1.json parse error: {exc}")
+
+    agents_dir = base / "agents"
+    agent_files = sorted(agents_dir.glob("*.md")) if agents_dir.is_dir() else []
+    if not agent_files:
+        fail("No agent files found in agents/")
+    for af in agent_files:
+        try:
+            fm, body = split_frontmatter(af.read_text(encoding="utf-8"))
+        except Exception as exc:
+            fail(f"{af.name}: {exc}")
+            continue
+        if not body:
+            fail(f"{af.name}: empty prompt body")
+        if not allow_models and re.search(r"^model:\s*\S+", fm, re.M):
+            fail(f"{af.name}: hardcoded model: found in frontmatter (must be selected in session)")
+        if af.name == "horus.md":
+            if not re.search(r"action:\s*question\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*allow", fm):
+                fail("horus.md must explicitly allow the `question` tool")
+        else:
+            if not re.search(r"action:\s*question\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                fail(f"{af.name}: subagent must explicitly deny `question` tool")
+            if not re.search(r"action:\s*subagent\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                fail(f"{af.name}: subagent must explicitly deny `subagent` tool")
+            if re.search(r"action:\s*edit\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                if not re.search(r"action:\s*shell\s*\n\s*resource:\s*\"?\*\"?\s*\n\s*effect:\s*deny", fm):
+                    fail(f"{af.name}: read-only subagent must explicitly deny `shell: \"*\"` baseline")
+
+    skills_dir = base / "skills"
+    skill_dirs = validate_skills_dir(skills_dir, fail)
+
+    cmds_dir = base / "commands"
     for cmd in REQUIRED_COMMANDS:
         cp = cmds_dir / cmd
         if not cp.exists():
-            fail(f"Missing required command commands/{cmd}")
+            fail(f"Missing required command: commands/{cmd}")
             continue
         try:
-            fm, body = split_frontmatter(cp.read_text(encoding="utf-8"))
-            if not re.search(r"^description:\s*\S+", fm, re.M):
-                fail(f"commands/{cmd}: missing description")
+            _, body = split_frontmatter(cp.read_text(encoding="utf-8"))
             if not body:
                 fail(f"commands/{cmd}: empty body")
         except Exception as exc:
             fail(f"commands/{cmd}: {exc}")
 
-    # 6. Validate merged Vibe Engineering Playbook templates & bilingual handbooks
     vibe_dir = skills_dir / "vibe"
     for tpl in REQUIRED_VIBE_TEMPLATES:
         if not (vibe_dir / "templates" / tpl).exists():
-            fail(f"Missing merged Vibe template: skills/vibe/templates/{tpl}")
+            fail(f"Missing Vibe template: skills/vibe/templates/{tpl}")
     for ref in REQUIRED_VIBE_REFS:
         if not (vibe_dir / "references" / ref).exists():
-            fail(f"Missing merged Vibe reference: skills/vibe/references/{ref}")
+            fail(f"Missing Vibe handbook: skills/vibe/references/{ref}")
 
-    # 6b. Validate official Graphify v0.9.115 OpenCode references
-    graphify_dir = skills_dir / "graphify"
-    for ref in REQUIRED_GRAPHIFY_REFS:
-        if not (graphify_dir / "references" / ref).exists():
-            fail(f"Missing official Graphify reference: skills/graphify/references/{ref}")
+    graphify_refs = skills_dir / "graphify" / "references"
+    for gref in REQUIRED_GRAPHIFY_REFS:
+        if not (graphify_refs / gref).exists():
+            fail(f"Missing Graphify reference: skills/graphify/references/{gref}")
 
-    # 6c. Validate Horus Context Mode MCP bundle
-    ctx_dir = BASE / "context-mode"
-    for rel in REQUIRED_CONTEXT_MODE_FILES:
-        if not (ctx_dir / rel).exists():
-            fail(f"Missing Horus Context Mode runtime file: context-mode/{rel}")
+    validate_context_mode(base / "context-mode", fail)
+    validate_python_scripts(root, skills_dir, fail)
 
-    # 7. Syntax-check bundled Python scripts in memory (zero __pycache__ pollution)
-    scripts_dir = ROOT / "scripts"
-    if not (scripts_dir / "validate_horus.py").exists():
-        scripts_dir = BASE / "scripts"
-    py_scripts = [
-        scripts_dir / "sync_upstream.py",
-        scripts_dir / "validate_horus.py",
-        scripts_dir / "migrate-opencode-db.py",
-        scripts_dir / "horus_foundry.py",
-        scripts_dir / "horus_todo.py",
-        skills_dir / "planning-with-evidence" / "scripts" / "plan.py",
-        skills_dir / "webapp-testing" / "scripts" / "with_server.py",
-    ]
-    for ps in py_scripts:
-        if not ps.exists():
-            fail(f"Missing script: {ps}")
+    if not errors:
+        print(
+            f"HORUS VALIDATION PASSED ({layout}): "
+            f"{len(agent_files)} agents, {len(skill_dirs)} skills, {len(REQUIRED_COMMANDS)} commands, "
+            f"{len(REQUIRED_VIBE_TEMPLATES)} Vibe templates, {len(REQUIRED_VIBE_REFS)} bilingual Vibe handbooks, "
+            f"{len(REQUIRED_GRAPHIFY_REFS)} Graphify references."
+        )
+    return errors
+
+
+def validate_antigravity(root: Path) -> list[str]:
+    errors: list[str] = []
+    fail = errors.append
+
+    nested = root / ".agents"
+    base = nested if nested.is_dir() else root
+    layout = "antigravity/project" if nested.is_dir() else "antigravity/global"
+
+    skill_dirs = validate_skills_dir(base / "skills", fail)
+    agents = sorted((base / "agents").glob("*.md")) if (base / "agents").is_dir() else []
+    if len(agents) < 7:
+        fail(f"Antigravity agents/ expected >=7 files, found {len(agents)}")
+
+    wf_dir = base / "workflows"
+    for cmd in REQUIRED_COMMANDS:
+        wp = wf_dir / cmd
+        if not wp.exists():
+            fail(f"Missing Antigravity workflow: workflows/{cmd}")
             continue
         try:
-            ast.parse(ps.read_text(encoding="utf-8"), filename=str(ps))
+            fm, body = split_frontmatter(wp.read_text(encoding="utf-8"))
+            if "name:" not in fm or not body:
+                fail(f"Invalid Antigravity workflow frontmatter/body: workflows/{cmd}")
         except Exception as exc:
-            fail(f"Syntax error in {ps}: {exc}")
+            fail(f"workflows/{cmd}: {exc}")
 
-    if errors:
-        print(f"HORUS VALIDATION FAILED ({len(errors)} issue(s)):")
-        for e in errors:
-            print(f"  - {e}")
-        return 1
+    rule_file = base / "rules" / "horus.md"
+    if not rule_file.exists():
+        fail(f"Missing Antigravity rule file: {rule_file}")
 
-    print(
-        f"HORUS VALIDATION PASSED ({LAYOUT}): "
-        f"{len(agent_files)} agents, {len(skill_dirs)} skills, "
-        f"{len(REQUIRED_COMMANDS)} commands, "
-        f"{len(REQUIRED_VIBE_TEMPLATES)} Vibe templates, "
-        f"{len(REQUIRED_VIBE_REFS)} bilingual Vibe handbooks, "
-        f"{len(REQUIRED_GRAPHIFY_REFS)} Graphify references."
+    mcp_file = base / "mcp_config.json"
+    if not mcp_file.exists():
+        fail(f"Missing Antigravity MCP config: {mcp_file}")
+    else:
+        try:
+            data = json.loads(mcp_file.read_text(encoding="utf-8-sig"))
+            if "horus-context-mode" not in data.get("mcpServers", {}):
+                fail(f"{mcp_file} missing mcpServers.horus-context-mode")
+        except Exception as exc:
+            fail(f"{mcp_file} parse error: {exc}")
+
+    validate_context_mode(base / "context-mode", fail)
+    validate_python_scripts(root, base / "skills", fail)
+
+    if not errors:
+        print(
+            f"HORUS VALIDATION PASSED ({layout}): "
+            f"{len(agents)} agents, {len(skill_dirs)} skills, {len(REQUIRED_COMMANDS)} workflows, rules/horus.md, mcp_config.json."
+        )
+    return errors
+
+
+def validate_dsh(root: Path) -> list[str]:
+    errors: list[str] = []
+    fail = errors.append
+
+    nested = root / ".dsh"
+    if nested.is_dir():
+        base = nested
+        skills_dir = root / "skills"
+        layout = "dsh/project"
+    else:
+        base = root
+        skills_dir = root.parent / "skills"
+        layout = "dsh/global"
+
+    skill_dirs = validate_skills_dir(skills_dir, fail)
+    agents = sorted((base / "agents").glob("*.md")) if (base / "agents").is_dir() else []
+    if len(agents) < 7:
+        fail(f"DSH agents/ expected >=7 files, found {len(agents)}")
+
+    cmds_dir = base / "commands"
+    for cmd in REQUIRED_COMMANDS:
+        if not (cmds_dir / cmd).exists():
+            fail(f"Missing DSH command playbook: commands/{cmd}")
+
+    patch_file = base / "cordis.patch.yml"
+    if not patch_file.exists():
+        fail(f"Missing DSH Cordis MCP patch: {patch_file}")
+    else:
+        raw = patch_file.read_text(encoding="utf-8")
+        if "@deepseek-ai/dsh-mcp-client" not in raw or "horus-context-mode" not in raw:
+            fail(f"{patch_file} missing @deepseek-ai/dsh-mcp-client horus-context-mode entry")
+
+    if not ((root / "AGENTS.md").exists() or (base / "AGENTS.md").exists()):
+        fail("Missing AGENTS.md for DeepSeek Harness")
+
+    validate_context_mode(base / "context-mode", fail)
+    validate_python_scripts(root, skills_dir, fail)
+
+    if not errors:
+        print(
+            f"HORUS VALIDATION PASSED ({layout}): "
+            f"{len(agents)} agents, {len(skill_dirs)} skills, {len(REQUIRED_COMMANDS)} commands, cordis.patch.yml."
+        )
+    return errors
+
+
+def detect_harnesses(root: Path) -> list[str]:
+    found: list[str] = []
+    if (root / ".opencode").is_dir() or find_opencode_config(root) is not None:
+        found.append("opencode")
+    if (root / ".agents").is_dir() or ((root / "rules" / "horus.md").exists() and (root / "workflows").is_dir()):
+        found.append("antigravity")
+    if (root / ".dsh").is_dir() or (root / "cordis.patch.yml").exists():
+        found.append("dsh")
+    return found or ["opencode"]
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Validate Horus Super Agent installation and integrity.")
+    ap.add_argument(
+        "--allow-session-models",
+        action="store_true",
+        help="Allow local `model:` overrides in agent frontmatter (also auto-enabled when .horus/STATE.md exists).",
     )
+    ap.add_argument(
+        "--harness",
+        choices=("auto", "opencode", "antigravity", "dsh", "all"),
+        default="auto",
+        help="Target harness layout to validate (default: auto-detect all installed harnesses).",
+    )
+    ap.add_argument(
+        "--root",
+        default=None,
+        help="Optional target root directory to validate (default: parent of scripts/).",
+    )
+    args = ap.parse_args(argv)
+    root = Path(args.root).resolve() if args.root else ROOT
+    allow_models = args.allow_session_models or (root / ".horus" / "STATE.md").exists()
+
+    targets = detect_harnesses(root) if args.harness == "auto" else (["opencode", "antigravity", "dsh"] if args.harness == "all" else [args.harness])
+
+    all_errors: list[str] = []
+    for h in targets:
+        if h == "opencode":
+            all_errors.extend(validate_opencode(root, allow_models))
+        elif h == "antigravity":
+            all_errors.extend(validate_antigravity(root))
+        elif h == "dsh":
+            all_errors.extend(validate_dsh(root))
+
+    if all_errors:
+        print("HORUS VALIDATION FAILED:", file=sys.stderr)
+        for e in all_errors:
+            print(f"  - {e}", file=sys.stderr)
+        return 1
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

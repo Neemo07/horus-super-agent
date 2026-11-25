@@ -2,7 +2,7 @@
 name: reverse-engineer-anything
 description: "Inspect PE/ELF/Mach-O binaries, Electron/JS bundles, archives, and binary hardening via REA MCP or CLI."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: https://github.com/morluto/rea
 ---

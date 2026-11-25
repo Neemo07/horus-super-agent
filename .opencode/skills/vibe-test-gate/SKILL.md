@@ -2,7 +2,7 @@
 name: vibe-test-gate
 description: "Anti-test-theater mutation audit and 16-point Pre-Launch Production Gate before shipping MVP/Production builds."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus integration)
   category: testing-and-release-gate

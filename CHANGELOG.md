@@ -1,3 +1,12 @@
+## [0.7.1] - 2026-11-25
+### Added & Hardened
+- **Full Project Tri-Harness Compatibility (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:
+  - Upgraded `scripts/validate_horus.py` with `--harness auto|opencode|antigravity|dsh|all` to auto-detect and validate all three harness layouts.
+  - Upgraded `scripts/install_harness.py` to rewrite `.opencode/skills/` and `.opencode/context-mode/server.js` inside installed Antigravity/DSH skill, agent, and command copies (zero dangling `.opencode/` paths) and automatically run `validate_horus.py`.
+  - Upgraded `scripts/horus_foundry.py` with `--runner opencode|antigravity|dsh` (`HORUS_FOUNDRY_RUNNER`, `OPENCODE_BIN`, `ANTIGRAVITY_BIN`, `DSH_BIN`).
+  - Updated `compatibility: opencode, antigravity, dsh` across Horus skills and added Antigravity + DSH `ai-memory` setup commands to `horus-memory/SKILL.md`.
+- Added unit tests for tri-harness `validate_horus.py`, zero dangling `.opencode/` paths in Antigravity/DSH installs, and multi-runner `horus_foundry.py` (32/32 tests).
+
 ## [0.7.0] - 2026-11-24
 ### Added
 - **Multi-Harness Support (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:

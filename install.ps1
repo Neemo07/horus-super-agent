@@ -95,7 +95,7 @@ if ($Harness -eq "opencode" -or $Harness -eq "all") {
   foreach ($s in "sync_upstream.py", "validate_horus.py", "migrate-opencode-db.py", "horus_foundry.py", "horus_todo.py", "install_harness.py") {
     Copy-Item -Force (Join-Path $ScriptDir "scripts/$s") (Join-Path $Cfg "scripts/$s")
   }
-  Write-Host "Installed Horus v0.7.0 ($Mode) to $Base"
+  Write-Host "Installed Horus v0.7.1 ($Mode) to $Base"
 
   if (Get-Command python -ErrorAction SilentlyContinue) {
     python (Join-Path $Cfg "scripts/validate_horus.py")

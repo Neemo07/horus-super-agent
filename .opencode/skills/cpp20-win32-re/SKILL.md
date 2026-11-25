@@ -2,7 +2,7 @@
 name: cpp20-win32-re
 description: "Port legacy Win32/x86 C++ and PE32/PE32+ binaries to clean modern C++20 (_WIN64) using REA/Ghidra evidence."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: https://github.com/morluto/rea
 ---

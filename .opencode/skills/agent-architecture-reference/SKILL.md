@@ -2,7 +2,7 @@
 name: agent-architecture-reference
 description: "17-chapter EN/ZH coding-agent harness architecture reference (query loop, tools, plugins, compaction, swarms; query via ctx_search)."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: claude-reviews-claude (17-chapter EN/ZH architectural deep-dive, adapted for OpenCode & Horus)
   version: "0.4.8-horus"

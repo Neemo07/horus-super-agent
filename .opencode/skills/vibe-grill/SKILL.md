@@ -2,7 +2,7 @@
 name: vibe-grill
 description: "Pre-code Socratic requirements interview via OpenCode question polls to draft PRD.md and project AGENTS.md."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus OpenCode poll integration)
   category: requirements-discovery

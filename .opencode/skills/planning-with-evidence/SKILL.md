@@ -2,7 +2,7 @@
 name: planning-with-evidence
 description: "Evidence-gated task_plan.md tracking, mechanical plan.py done --run proofs, SHA-256 checks, and HANDOFF.md recovery for 3+ step work."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 ---
 
 # Planning with Evidence

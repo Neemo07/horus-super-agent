@@ -2,7 +2,7 @@
 name: ui-ux-design-systems
 description: "Design system tokens (OKLCH, 4/8px grid, WCAG/APCA) plus Audit, Document, and Extend modes for desktop and web UI."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   version: "0.4.4-horus"
 ---

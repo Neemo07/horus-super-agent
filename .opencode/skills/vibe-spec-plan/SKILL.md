@@ -2,7 +2,7 @@
 name: vibe-spec-plan
 description: "Convert PRD.md into a phased IMPLEMENTATION_PLAN.md and Horus task_plan.md with boundaries, security, and dependency rules."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus OpenCode poll integration)
   category: architecture-planning

@@ -2,7 +2,7 @@
 name: vibe
 description: "Master 7-stage Vibe Engineering router (/vibe): specs before code, interactive question polls, scoped builds, critique, launch gate."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus OpenCode poll integration)
   category: engineering-governance

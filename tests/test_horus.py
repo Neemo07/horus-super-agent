@@ -272,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.0", horus_md)
+        self.assertIn("v0.7.1", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -343,6 +343,38 @@ class TestValidateHorus(unittest.TestCase):
             self.assertIn("HORUS VALIDATION PASSED (dsh/project)", r3.stdout)
             self.assertIn(".opencode/skills/", (all_proj / "AGENTS.md").read_text(encoding="utf-8"))
             self.assertTrue((all_proj / ".dsh" / "AGENTS.md").exists())
+
+    def test_tri_harness_zero_dangling_opencode_paths_and_validator(self) -> None:
+        if os.name == "nt":
+            self.skipTest("bash installer test runs on POSIX")
+        with tempfile.TemporaryDirectory() as tmp:
+            ag_dir = Path(tmp) / "ag_only"
+            ag_dir.mkdir()
+            r1 = subprocess.run(["bash", str(INSTALL_SH), "project", str(ag_dir), "--harness", "antigravity"], capture_output=True, text=True)
+            self.assertEqual(r1.returncode, 0, r1.stdout + r1.stderr)
+            plan_skill = (ag_dir / ".agents" / "skills" / "planning-with-evidence" / "SKILL.md").read_text(encoding="utf-8")
+            self.assertNotIn(".opencode/skills/", plan_skill)
+            self.assertIn(".agents/skills/", plan_skill)
+            rv1 = subprocess.run([sys.executable, str(ag_dir / "scripts" / "validate_horus.py")], capture_output=True, text=True)
+            self.assertEqual(rv1.returncode, 0, rv1.stdout + rv1.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (antigravity/project)", rv1.stdout)
+
+            dsh_dir = Path(tmp) / "dsh_only"
+            dsh_dir.mkdir()
+            r2 = subprocess.run(["bash", str(INSTALL_SH), "project", str(dsh_dir), "--harness", "dsh"], capture_output=True, text=True)
+            self.assertEqual(r2.returncode, 0, r2.stdout + r2.stderr)
+            dsh_plan_skill = (dsh_dir / "skills" / "planning-with-evidence" / "SKILL.md").read_text(encoding="utf-8")
+            self.assertNotIn(".opencode/skills/", dsh_plan_skill)
+            rv2 = subprocess.run([sys.executable, str(dsh_dir / "scripts" / "validate_horus.py")], capture_output=True, text=True)
+            self.assertEqual(rv2.returncode, 0, rv2.stdout + rv2.stderr)
+            self.assertIn("HORUS VALIDATION PASSED (dsh/project)", rv2.stdout)
+
+    def test_foundry_accepts_tri_harness_runners(self) -> None:
+        r = run_py(REPO_ROOT / "scripts" / "horus_foundry.py", "run", "--help")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("--runner", r.stdout)
+        self.assertIn("antigravity", r.stdout)
+        self.assertIn("dsh", r.stdout)
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

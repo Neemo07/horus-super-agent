@@ -2,7 +2,7 @@
 name: horus-memory
 description: "Cross-session, cross-project & cross-agent long-term Markdown wiki memory via ai-memory MCP/CLI (retrieval, durable pages, handoffs, inbox, lint)."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: akitaonrails/ai-memory (curated 5-playbook progressive-disclosure OpenCode integration)
   version: "0.5.2-horus"
@@ -34,7 +34,9 @@ Read ONLY the specific handbook needed for the current operation:
    - Windows (PowerShell): `irm https://github.com/akitaonrails/ai-memory/releases/latest/download/install.ps1 | iex`
 2. **Wire OpenCode daemon + hooks + MCP:**
    ```bash
-   ai-memory setup --yes --agent opencode2   # or --agent opencode for V1
+   ai-memory setup --yes --agent opencode2        # OpenCode V2 (or --agent opencode for V1)
+   ai-memory setup --yes --agent antigravity-cli  # Google Antigravity CLI/IDE
+   ai-memory install-mcp --client dsh             # DeepSeek Harness Desktop App (print Cordis YAML patch)
    ```
    *(If `ai-memory setup` adds extra `ai-memory-*` skill folders, remove them — Horus already consolidates all 5 operational playbooks here with zero catalog bloat. Reference OpenCode hooks are also bundled in `references/opencode-hooks/`.)*
 3. **Verify health:** run `ai-memory --version && ai-memory doctor`.

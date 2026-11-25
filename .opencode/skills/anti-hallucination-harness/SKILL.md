@@ -2,7 +2,7 @@
 name: anti-hallucination-harness
 description: "Signal-only output, evidence-backed claims, zero noisy code, and honest blocker reporting paired with plan.py."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: https://github.com/deepseek-ai/dsh-superagent-prototype
 ---

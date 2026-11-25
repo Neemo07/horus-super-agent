@@ -2,7 +2,7 @@
 name: vibe-scoped-build
 description: "Disciplined single-task incremental implementation: focused <=30-line functions, root-cause fixes, zero AI slop, clean checkpoints."
 license: MIT
-compatibility: opencode, claude-code, codex
+compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus integration)
   category: incremental-execution

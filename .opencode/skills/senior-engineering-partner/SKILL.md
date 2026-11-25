@@ -2,7 +2,7 @@
 name: senior-engineering-partner
 description: "Phase-aware (Tier 0-2) production standards & AUDIT: mode: Cloud/K8s/Terraform, DR/BC, SRE, compliance, supply chain, Python/Bash/TS/Swift."
 license: Apache-2.0
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: bjgreenberg/senior-engineering-partner v1.32.0 (OpenCode progressive-disclosure edition; 8 overlapping refs deferred to Horus native skills)
   version: "0.5.3-horus"

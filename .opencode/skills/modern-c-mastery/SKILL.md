@@ -2,7 +2,7 @@
 name: modern-c-mastery
 description: "Modern C11/C17/C23 engineering: arena allocators, UB elimination, strict compiler hardening flags, and sanitizer verification."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 ---
 # Modern C (C11 / C17 / C23) Mastery
 

@@ -2,7 +2,7 @@
 name: design-engineering
 description: "21-playbook motion, UI craft & faux-product-UI suite: animations, choreography, 120fps, gestures, break-ui, stageshow demos, mobile, Swift."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: emilkowalski/skills (full 20-playbook Design Engineering suite, adapted for OpenCode & Horus)
   version: "0.4.5-horus"

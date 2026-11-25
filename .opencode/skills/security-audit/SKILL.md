@@ -2,7 +2,7 @@
 name: security-audit
 description: "Defensive AppSec & hardening audit: OWASP/API/Auth/RLS, C/C++ mitigations & libFuzzer, CI/CD & supply-chain CWE remediation."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   version: "0.4.7-horus"
 ---

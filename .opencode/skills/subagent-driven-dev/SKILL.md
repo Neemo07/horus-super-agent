@@ -2,7 +2,7 @@
 name: subagent-driven-dev
 description: "DAG-wave OpenCode orchestrator: kickoff poll, file-locked parallel waves, Dispatch/Result envelopes, smart retries, plan.py closure."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 ---
 # Next-Gen Subagent Orchestrator Protocol (DAG-Wave SDD + Evidence Gate + Interactive Polls)
 

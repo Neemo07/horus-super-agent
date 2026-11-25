@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-harness adapter installer for Horus Super Agent v0.7.0.
+Multi-harness adapter installer for Horus Super Agent v0.7.1.
 
 Installs Horus from its single canonical `.opencode/` source of truth into:
   - Google Antigravity (IDE & `agy` CLI): `.agents/{skills,workflows,rules,agents,context-mode}` + `GEMINI.md` + `mcp_config.json`
@@ -16,10 +16,11 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.7.0"
+VERSION = "0.7.1"
 HELPER_SCRIPTS = [
     "sync_upstream.py",
     "validate_horus.py",
@@ -38,6 +39,23 @@ def copy_tree(src: Path, dst: Path) -> None:
         dst,
         ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store"),
     )
+
+
+def rewrite_installed_markdown_paths(root_dir: Path, *, skills_root: str, ctx_server: str) -> None:
+    """Rewrite `.opencode/` paths inside installed copies so Antigravity/DSH installs have zero dangling paths."""
+    if not root_dir.is_dir():
+        return
+    for md in root_dir.rglob("*.md"):
+        try:
+            raw = md.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        updated = (
+            raw.replace(".opencode/skills/", f"{skills_root}/")
+            .replace(".opencode/context-mode/server.js", ctx_server)
+        )
+        if updated != raw:
+            md.write_text(updated, encoding="utf-8", newline="\n")
 
 
 def write_with_backup(dst: Path, content: str, *, force: bool) -> str:
@@ -62,9 +80,10 @@ def split_frontmatter(text: str) -> tuple[str, str]:
 
 
 def adapt_text_for_harness(text: str, harness: str, *, skills_root: str, ctx_server: str) -> str:
-    out = text
-    out = out.replace(".opencode/skills/", f"{skills_root}/")
-    out = out.replace(".opencode/context-mode/server.js", ctx_server)
+    out = (
+        text.replace(".opencode/skills/", f"{skills_root}/")
+        .replace(".opencode/context-mode/server.js", ctx_server)
+    )
     if harness == "antigravity":
         note = (
             "\n> **Antigravity Runtime Adapter Note:** Whenever a Horus rule or skill references "
@@ -84,16 +103,19 @@ def adapt_text_for_harness(text: str, harness: str, *, skills_root: str, ctx_ser
     return out
 
 
-def convert_command_to_antigravity_workflow(cmd_path: Path) -> str:
+def convert_command_to_antigravity_workflow(cmd_path: Path, *, skills_root: str, ctx_server: str) -> str:
     fm, body = split_frontmatter(cmd_path.read_text(encoding="utf-8"))
     name = cmd_path.stem
     dm = re.search(r"^description:\s*(.+)$", fm, re.M)
     desc = dm.group(1).strip() if dm else f'"Horus workflow: {name}"'
     if not (desc.startswith('"') or desc.startswith("'")):
         desc = f'"{desc}"'
-    body = body.replace(".opencode/skills/", ".agents/skills/")
-    body = body.replace("OpenCode's native `question` tool", "Antigravity's native interactive confirmation/choice prompt")
-    body = body.replace("OpenCode's built-in `question` tool", "Antigravity's native interactive confirmation/choice prompt")
+    body = (
+        body.replace(".opencode/skills/", f"{skills_root}/")
+        .replace(".opencode/context-mode/server.js", ctx_server)
+        .replace("OpenCode's native `question` tool", "Antigravity's native interactive confirmation/choice prompt")
+        .replace("OpenCode's built-in `question` tool", "Antigravity's native interactive confirmation/choice prompt")
+    )
     return f"---\nname: {name}\ndescription: {desc}\n---\n\n# Workflow: /{name}\n\n{body}\n"
 
 
@@ -121,10 +143,9 @@ def merge_antigravity_mcp_config(cfg_path: Path, server_js: str) -> str:
 
 
 def render_dsh_cordis_patch(server_js: str) -> str:
-    # Exact Cordis YAML schema verified against @deepseek-ai/dsh-mcp-client
     escaped = server_js.replace("'", "''")
     return (
-        "# Horus Super Agent v0.7.0 — DeepSeek Harness (DSH) Desktop App / Web UI Cordis MCP Patch\n"
+        f"# Horus Super Agent v{VERSION} — DeepSeek Harness (DSH) Desktop App / Web UI Cordis MCP Patch\n"
         "# Merge into: $DSH_HOME/profiles/<profile>/cordis.patch.yml (DSH reloads live).\n"
         "# Requires Node.js >= 22.5.0 for horus-context-mode built-in node:sqlite.\n"
         "- insert:\n"
@@ -153,6 +174,14 @@ def render_dsh_cordis_patch(server_js: str) -> str:
     )
 
 
+def run_validator(scripts_dst: Path, harness: str, root: Path) -> int:
+    val = scripts_dst / "validate_horus.py"
+    if not val.exists():
+        return 0
+    r = subprocess.run([sys.executable, str(val), "--harness", harness, "--root", str(root)])
+    return r.returncode
+
+
 def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_config: bool) -> int:
     src_opencode = repo_root / ".opencode"
     if mode == "global":
@@ -169,17 +198,17 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
     copy_tree(src_opencode / "skills", base / "skills")
     copy_tree(src_opencode / "agents", base / "agents")
     copy_tree(src_opencode / "context-mode", base / "context-mode")
+    rewrite_installed_markdown_paths(base / "skills", skills_root=skills_rel, ctx_server=ctx_server)
+    rewrite_installed_markdown_paths(base / "agents", skills_root=skills_rel, ctx_server=ctx_server)
 
     wf_dir = base / "workflows"
     wf_dir.mkdir(parents=True, exist_ok=True)
-    wf_count = 0
     for cmd_file in sorted((src_opencode / "commands").glob("*.md")):
         (wf_dir / cmd_file.name).write_text(
-            convert_command_to_antigravity_workflow(cmd_file),
+            convert_command_to_antigravity_workflow(cmd_file, skills_root=skills_rel, ctx_server=ctx_server),
             encoding="utf-8",
             newline="\n",
         )
-        wf_count += 1
 
     rules_dir = base / "rules"
     rules_dir.mkdir(parents=True, exist_ok=True)
@@ -187,7 +216,7 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
     horus_rule = (
         "---\n"
         "name: horus\n"
-        'description: "Horus Super Agent v0.7.0 always-on harness rules for Google Antigravity"\n'
+        f'description: "Horus Super Agent v{VERSION} always-on harness rules for Google Antigravity"\n'
         "---\n\n"
         + adapt_text_for_harness(agents_md, "antigravity", skills_root=skills_rel, ctx_server=ctx_server)
     )
@@ -203,11 +232,9 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
             "- Horus Context Mode MCP server: `.agents/context-mode/server.js` (config snippet in `.agents/mcp_config.json`)\n"
         )
         print(write_with_backup(cfg_root / "GEMINI.md", gemini_md, force=force_config))
-        mcp_path = base / "mcp_config.json"
-        print(merge_antigravity_mcp_config(mcp_path, ctx_server))
-    else:
-        mcp_path = base / "mcp_config.json"
-        print(merge_antigravity_mcp_config(mcp_path, ctx_server))
+
+    mcp_path = base / "mcp_config.json"
+    print(merge_antigravity_mcp_config(mcp_path, ctx_server))
 
     scripts_dst = cfg_root / "scripts"
     scripts_dst.mkdir(parents=True, exist_ok=True)
@@ -216,20 +243,14 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
         if src_s.exists():
             shutil.copy2(src_s, scripts_dst / s)
 
-    skill_count = sum(1 for d in (base / "skills").iterdir() if d.is_dir() and (d / "SKILL.md").exists())
-    agent_count = len(list((base / "agents").glob("*.md")))
     print(f"Installed Horus v{VERSION} (antigravity/{mode}) to {base}")
-    print(
-        f"HORUS VALIDATION PASSED (antigravity/{mode}): "
-        f"{agent_count} agents, {skill_count} skills, {wf_count} workflows, rules/horus.md, mcp_config.json."
-    )
+    rc = run_validator(scripts_dst, "antigravity", cfg_root)
     if mode == "global":
         print(
             "Note: If your Antigravity IDE reads ~/.gemini/antigravity/mcp_config.json instead of "
-            "~/.gemini/config/mcp_config.json, copy the horus-context-mode block from "
-            f"{mcp_path}."
+            f"~/.gemini/config/mcp_config.json, copy the horus-context-mode block from {mcp_path}."
         )
-    return 0
+    return rc
 
 
 def install_dsh(repo_root: Path, mode: str, target_dir: Path, force_config: bool) -> int:
@@ -252,15 +273,17 @@ def install_dsh(repo_root: Path, mode: str, target_dir: Path, force_config: bool
     skills_dst.mkdir(parents=True, exist_ok=True)
     for sd in sorted(d for d in (src_opencode / "skills").iterdir() if d.is_dir()):
         copy_tree(sd, skills_dst / sd.name)
+    rewrite_installed_markdown_paths(skills_dst, skills_root=skills_rel, ctx_server=ctx_server)
 
     copy_tree(src_opencode / "agents", base / "agents")
     copy_tree(src_opencode / "commands", base / "commands")
     copy_tree(src_opencode / "context-mode", base / "context-mode")
+    rewrite_installed_markdown_paths(base / "agents", skills_root=skills_rel, ctx_server=ctx_server)
+    rewrite_installed_markdown_paths(base / "commands", skills_root=skills_rel, ctx_server=ctx_server)
 
     agents_md = (repo_root / "AGENTS.md").read_text(encoding="utf-8")
     dsh_agents_md = adapt_text_for_harness(agents_md, "dsh", skills_root=skills_rel, ctx_server=ctx_server)
     if mode == "project" and (target_dir / ".opencode").is_dir() and (cfg_root / "AGENTS.md").exists():
-        # Co-installed alongside OpenCode: keep root AGENTS.md intact and store DSH-adapted rules under .dsh/
         print(write_with_backup(base / "AGENTS.md", dsh_agents_md, force=True))
     else:
         print(write_with_backup(cfg_root / "AGENTS.md", dsh_agents_md, force=force_config))
@@ -277,19 +300,13 @@ def install_dsh(repo_root: Path, mode: str, target_dir: Path, force_config: bool
         if src_s.exists():
             shutil.copy2(src_s, scripts_dst / s)
 
-    skill_count = sum(1 for d in (src_opencode / "skills").iterdir() if d.is_dir() and (skills_dst / d.name / "SKILL.md").exists())
-    agent_count = len(list((base / "agents").glob("*.md")))
-    cmd_count = len(list((base / "commands").glob("*.md")))
     print(f"Installed Horus v{VERSION} (dsh/{mode}) to {base}")
-    print(
-        f"HORUS VALIDATION PASSED (dsh/{mode}): "
-        f"{agent_count} agents, {skill_count} skills, {cmd_count} commands, cordis.patch.yml."
-    )
+    rc = run_validator(scripts_dst, "dsh", cfg_root)
     print(
         "Next step (DeepSeek Harness Desktop App / Web UI): merge the entry from "
         f"{patch_path} into $DSH_HOME/profiles/<profile>/cordis.patch.yml (DSH reloads live)."
     )
-    return 0
+    return rc
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -2,7 +2,7 @@
 name: horus-todo
 description: "Git-tracked .todo.md checklist with AI requirement analysis, plan.py promotion, and live local sidebar (scripts/horus_todo.py)."
 license: MIT
-compatibility: opencode
+compatibility: opencode, antigravity, dsh
 metadata:
   source: deepseek-ai/dsh-todo-list (upgraded & ported for Horus / OpenCode)
   version: "0.4.3-horus"
