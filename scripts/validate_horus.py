@@ -44,6 +44,7 @@ REQUIRED_VIBE_REFS = [
 REQUIRED_COMMANDS = [
     "vibe.md",
     "graphify.md",
+    "reach.md",
     "design.md",
     "craft.md",
     "partner.md",

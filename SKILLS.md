@@ -1,4 +1,4 @@
-# Skill Provenance (v0.7.4 — 41 zero-bloat skills)
+# Skill Provenance (v0.7.5 — 42 zero-bloat skills)
 
 "verbatim" = byte-identical to the source. "full merged + Horus polls" = full upstream skill + bundled templates/handbooks upgraded with OpenCode's native `question` tool poll workflow. "offline edition" = re-authored, condensed, works with no network; replace with exact upstream using `python scripts/sync_upstream.py` (needs git + network).
 
@@ -12,6 +12,7 @@
 | brainstorming, test-driven-development, systematic-debugging, using-git-worktrees, finishing-a-development-branch, writing-skills | obra/superpowers (v7.0.2) | **full upstream v7.0.2 + Horus integration** — complete skills + companion references/scripts (`writing-good-tests.md`, `root-cause-tracing.md`, `defense-in-depth.md`, `find-polluter.sh`, `visual-companion.md`, `writing-skills/references/`, `render-graphs.js`), adapted for Horus native `question` polls, bare OpenCode skill IDs, and signal-only output |
 | `graphify` + `/graphify` | Graphify-Labs/graphify (v0.9.115 / `graphifyy`) | **verbatim official OpenCode edition** — `skill-opencode.md` + all 8 `references/` handbooks |
 | `horus-context-mode` + `/horus-context` | Domush/antigravity-plugin-context-mode (v2.0.0, MIT) | **full OpenCode MCP port** — `.opencode/context-mode/` (SQLite FTS5 BM25+Trigram RRF MCP server + sandboxed `ctx_execute` + standalone dashboard), rebranded to Horus Context Mode |
+| `agent-reach` + `/reach` | Panniantong/Agent-Reach (v1.6.1, MIT) | **zero-bloat tri-harness edition** — read-only multi-platform JSON CLI/MCP (`capabilities`, `sessions`, `maintenance` refs), adapted for Horus signal-only output, native `question` polls, and `horus-context-mode` |
 | `horus-memory` + `/horus-memory` | akitaonrails/ai-memory (MIT) | **consolidated 5-handbook OpenCode edition** — cross-session/cross-project/cross-agent Markdown wiki memory (`retrieval`, `durable-pages`, `handoff`, `learning-maintenance`, `messaging` + OpenCode hook templates in `references/`), zero catalog bloat |
 | `horus-next-steps` | Domush/antigravity-plugin-suggest-next-steps (MIT) | **upgraded OpenCode edition** — native `question` poll schema (`header`/`label`/`description`/`multiple`), state-aware grounding (`plan.py`/git/Graphify/Vibe), smart suppression, primary-agent-only isolation |
 | `horus-foundry` + `/horus-foundry` | leixusam/foundry (v0.1.10, MIT) | **upgraded zero-dep OpenCode port** — `scripts/horus_foundry.py` (0-token Linear GraphQL claim/update, parallel `git worktree` pods, native `opencode run --agent horus`, mobile `∞ Blocked` triage) |

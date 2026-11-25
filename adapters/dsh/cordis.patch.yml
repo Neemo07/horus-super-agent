@@ -1,4 +1,4 @@
-# Horus Super Agent v0.7.4 — DeepSeek Harness (DSH) Desktop App / Web UI Cordis MCP Patch
+# Horus Super Agent v0.7.5 — DeepSeek Harness (DSH) Desktop App / Web UI Cordis MCP Patch
 # Merge into: $DSH_HOME/profiles/<profile>/cordis.patch.yml (DSH reloads live).
 # Requires Node.js >= 22.5.0 for horus-context-mode built-in node:sqlite.
 - insert:

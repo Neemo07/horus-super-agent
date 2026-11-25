@@ -1,3 +1,10 @@
+## [0.7.5] - 2026-11-25
+### Added
+- **`agent-reach` skill & `/reach` command (`Panniantong/Agent-Reach` v1.6.1, MIT)**:
+  - Read-only multi-platform web/content CLI & MCP integration (YouTube subtitles/transcripts, GitHub, Reddit, X/Twitter, Bilibili, Xiaohongshu, V2EX, Xueqiu, LinkedIn, Boss, Instagram, Facebook, Xiaoyuzhou, and anonymous public web fallback) with all 3 progressive-disclosure references (`capabilities.md`, `sessions.md`, `maintenance.md`).
+  - Tightened description from 655 chars to 144 chars (42 skills | 5,078 chars total ≤ 5,200c cap), removed verbose narration rule to match Horus signal-only output, wired consent gates (`add`, `login`, `update`, `uninstall`) to OpenCode's native `question` tool (and Antigravity/DSH native prompts), and paired large transcripts/threads with `horus-context-mode`.
+- Added unit test `test_agent_reach_integration_zero_bloat_and_signal_only` (36/36 tests).
+
 ## [0.7.4] - 2026-11-25
 ### Added
 - **Bundled `elayadesign/ai-design-skills` (`figma-designer` + `landing-page-design`) into `design-engineering` (23 playbooks + 2 cheatsheets — +0 top-level skills, -6 chars catalog size, 0 overlap)**:

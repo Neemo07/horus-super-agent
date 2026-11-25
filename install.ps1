@@ -100,7 +100,7 @@ if ($Harness -eq "opencode" -or $Harness -eq "all") {
   if ($Mode -eq "global" -and (Get-Command python -ErrorAction SilentlyContinue)) {
     python (Join-Path $Cfg "scripts/install_harness.py") --harness opencode-global --mode global --target-dir $Base
   }
-  Write-Host "Installed Horus v0.7.4 ($Mode) to $Base"
+  Write-Host "Installed Horus v0.7.5 ($Mode) to $Base"
 
   if (Get-Command python -ErrorAction SilentlyContinue) {
     python (Join-Path $Cfg "scripts/validate_horus.py")

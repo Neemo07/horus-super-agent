@@ -4,16 +4,16 @@
 
 # Horus Super Agent
 
-**A frontier multi-harness DAG-wave orchestrator and 41-skill engineering suite for [OpenCode](https://opencode.ai), Google Antigravity, and DeepSeek Harness Desktop App (`dsh`).**
+**A frontier multi-harness DAG-wave orchestrator and 42-skill engineering suite for [OpenCode](https://opencode.ai), Google Antigravity, and DeepSeek Harness Desktop App (`dsh`).**
 
 Specs before code · File-locked parallel subagents · Mechanical proof-gated task closure · 4-layer zero-overlap memory · Zero catalog bloat.
 
 [![CI](https://github.com/Neemo07/horus-super-agent/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.4-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.5-00d4aa?style=flat-square)](CHANGELOG.md)
 [![Harnesses](https://img.shields.io/badge/Harnesses-OpenCode%20%7C%20Antigravity%20%7C%20DSH-6e56cf?style=flat-square)](#standalone-global-install-recommended--works-for-every-app)
-[![Skills](https://img.shields.io/badge/skills-41%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
+[![Skills](https://img.shields.io/badge/skills-42%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
 [![Agents](https://img.shields.io/badge/agents-1%20orchestrator%20%2B%206%20specialists-8b5cf6?style=flat-square)](#the-7-agents)
-[![Commands](https://img.shields.io/badge/commands-14%20workflows-06b6d4?style=flat-square)](#slash-commands--workflows)
+[![Commands](https://img.shields.io/badge/commands-15%20workflows-06b6d4?style=flat-square)](#slash-commands--workflows)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#installation)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
@@ -26,7 +26,7 @@ Specs before code · File-locked parallel subagents · Mechanical proof-gated ta
   <a href="#4-layer-memory-context--knowledge-graph">4-Layer Memory</a> ·
   <a href="#the-7-agents">Agents</a> ·
   <a href="#slash-commands--workflows">Commands</a> ·
-  <a href="#the-41-skills">Skills</a> ·
+  <a href="#the-42-skills">Skills</a> ·
   <a href="#tooling--scripts">Tooling</a> ·
   <a href="#configuration--verification">Config & Verify</a>
 </p>
@@ -45,7 +45,7 @@ Horus makes those failure modes structurally hard — across **OpenCode (V1/V2)*
 | **Hand-ticked "done"** | `plan.py done <id> --run "<cmd>"` requires exit code `0` and writes SHA-256 / log proofs to `evidence/`; hand-edited `[x]` fails `plan.py verify` as `UNPROVEN` |
 | **Context window drift & bloat** | 4-layer stack: `graphify` AST queries + `horus-context-mode` SQLite FTS5 sandbox + `horus-memory` wiki + `HANDOFF.md` |
 | **Parallel edit collisions** | Every wave task declares `OWNED_FILES`; only strictly disjoint file sets execute concurrently |
-| **Skill catalog bloat & overlap** | Hard mechanical cap enforced by `validate_horus.py`: every skill description ≤ 150 chars (`4,937` chars total across 41 skills), **0** duplicate sub-playbooks |
+| **Skill catalog bloat & overlap** | Hard mechanical cap enforced by `validate_horus.py`: every skill description ≤ 150 chars (`5,078` chars total across 42 skills), **0** duplicate sub-playbooks |
 | **Sycophantic self-review** | Read-only `reviewer` runs deterministic linters/typecheckers/tests (`mypy`, `ruff`, `bandit`, `semgrep`, `pytest`, `tsc`, `playwright`) and returns `PASS`/`FAIL` with `file:line` evidence |
 | **Bureaucratic friction on simple tasks** | Smart autonomy executes clear, scoped existing-repo tasks directly and reserves interactive polls for greenfield kickoffs, architectural forks, and destructive actions |
 
@@ -230,6 +230,7 @@ Available as `/command` in OpenCode, `.agents/workflows/` in Antigravity, and `.
 | `/horus-review` | Adversarial read-only review + deterministic verifiers + anti-test-theater audit |
 | `/vibe` | Enter the 7-stage Vibe Engineering Playbook (EN & AR templates + handbooks) |
 | `/graphify` | Official Graphify v0.9.115 AST knowledge graph build, query, path, explain, update & wiki |
+| `/reach` | Read-only multi-platform web/content CLI & MCP (`agent-reach`: YouTube subtitles, Reddit, X, GitHub, Bilibili, V2EX) |
 | `/horus-context` | Horus Context Mode token-savings stats (`ctx_stats`), `ctx_doctor`, JIT FTS5 search, or dashboard |
 | `/horus-memory` | Cross-session/cross-project `ai-memory` wiki retrieval, durable pages, handoffs, inbox & lint |
 | `/horus-foundry` | Launch, dry-run, or inspect Linear-orchestrated parallel background worktree workers |
@@ -241,12 +242,12 @@ Available as `/command` in OpenCode, `.agents/workflows/` in Antigravity, and `.
 
 ---
 
-## The 41 Skills
+## The 42 Skills
 
-All 41 top-level skills enforce a strict **≤ 150-character description budget** (`4,937` chars total, `0` overlapping sub-playbooks). Heavy suites use **progressive disclosure** so only the exact reference handbook needed is ever loaded into context. Full upstream provenance lives in [SKILLS.md](SKILLS.md).
+All 42 top-level skills enforce a strict **≤ 150-character description budget** (`5,078` chars total, `0` overlapping sub-playbooks). Heavy suites use **progressive disclosure** so only the exact reference handbook needed is ever loaded into context. Full upstream provenance lives in [SKILLS.md](SKILLS.md).
 
 <details>
-<summary><b>Orchestration, Memory, Security & Systems (16 skills)</b></summary>
+<summary><b>Orchestration, Memory, Reach, Security & Systems (17 skills)</b></summary>
 
 | Skill | Use It For |
 | :--- | :--- |
@@ -259,6 +260,7 @@ All 41 top-level skills enforce a strict **≤ 150-character description budget*
 | `horus-next-steps` | State-aware 1-click follow-up polls after substantive waves (primary agent only) |
 | `horus-foundry` | Linear-orchestrated parallel background worktree pods (`--runner opencode\|antigravity\|dsh`) |
 | `horus-todo` | Git-tracked `.todo.md` checklist with AI Requirement Analysis, `plan.py` promoter & live sidebar UI |
+| `agent-reach` | Read-only multi-platform web/content CLI & MCP (YouTube subtitles, GitHub, Reddit, X, Bilibili, Xiaohongshu, LinkedIn, V2EX) |
 | `security-audit` | Defensive AppSec, OWASP/API/Auth, C/C++ mitigations & CI/CD hardening (CWE-grounded) |
 | `agent-architecture-reference` | 17-chapter bilingual (EN/ZH) coding-agent architecture reference (queried via `ctx_search`) |
 | `reverse-engineer-anything` | Binary, PE, bundle, and archive inspection via REA |
@@ -365,9 +367,9 @@ horus-super-agent/
 │  └─ horus-hero.jpg               # README hero banner
 ├─ .opencode/                      # Single canonical source of truth
 │  ├─ agents/                      # horus + 6 specialist subagents
-│  ├─ commands/                    # 14 slash commands / workflows
+│  ├─ commands/                    # 15 slash commands / workflows
 │  ├─ context-mode/                # Horus Context Mode SQLite FTS5 MCP server + dashboard
-│  └─ skills/                      # 41 zero-bloat skills (progressive-disclosure hubs)
+│  └─ skills/                      # 42 zero-bloat skills (progressive-disclosure hubs)
 ├─ scripts/
 │  ├─ validate_horus.py            # Tri-harness auto-detecting integrity validator
 │  ├─ install_harness.py           # Antigravity & DeepSeek Harness adapter + global path resolver
@@ -387,7 +389,7 @@ python -m pip install pyyaml
 # Auto-detect and validate installed harness(es) (OpenCode, Antigravity, DSH, or all)
 python scripts/validate_horus.py
 
-# Run full 35-test integrity & multi-harness suite (zero __pycache__)
+# Run full 36-test integrity & multi-harness suite (zero __pycache__)
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
 
 # Lint first-party scripts
@@ -424,7 +426,8 @@ Built for [OpenCode](https://opencode.ai), Google Antigravity, and [DeepSeek Har
 [`emilkowalski/skills`](https://github.com/emilkowalski/skills),
 [`mattpocock/skills`](https://github.com/mattpocock/skills),
 [`antigravity-plugin-context-mode`](https://github.com/Domush/antigravity-plugin-context-mode), and
-[`foundry`](https://github.com/leixusam/foundry).
+[`foundry`](https://github.com/leixusam/foundry), and
+[`Agent-Reach`](https://github.com/Panniantong/Agent-Reach).
 
 ## License
 

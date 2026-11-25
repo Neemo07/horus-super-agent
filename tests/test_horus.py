@@ -181,8 +181,6 @@ class TestValidateHorus(unittest.TestCase):
         playbooks = sorted(p.name for p in refs.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
         self.assertEqual(len(playbooks), 23, f"Expected 23 design-engineering playbooks, got {len(playbooks)}")
         self.assertIn("stageshow", playbooks)
-        self.assertIn("figma-designer", playbooks)
-        self.assertIn("landing-page-design", playbooks)
         self.assertTrue((refs / "stageshow" / "kit" / "act.ts").exists())
         self.assertTrue((refs / "stageshow" / "scripts" / "film.mjs").exists())
         self.assertGreaterEqual(len(list((refs / "stageshow" / "references").glob("*.md"))), 15)
@@ -274,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.4", horus_md)
+        self.assertIn("v0.7.5", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -295,7 +293,7 @@ class TestValidateHorus(unittest.TestCase):
             self.assertIn("HORUS VALIDATION PASSED (antigravity/project)", r1.stdout)
             self.assertTrue((proj / "GEMINI.md").exists())
             self.assertTrue((proj / ".agents" / "rules" / "horus.md").exists())
-            self.assertEqual(len(list((proj / ".agents" / "workflows").glob("*.md"))), 14)
+            self.assertEqual(len(list((proj / ".agents" / "workflows").glob("*.md"))), 15)
             mcp = json.loads((proj / ".agents" / "mcp_config.json").read_text(encoding="utf-8"))
             self.assertIn("horus-context-mode", mcp["mcpServers"])
 
@@ -480,6 +478,18 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("question", lp.read_text(encoding="utf-8"))
         self.assertIn("ui-ux-design-systems", lp.read_text(encoding="utf-8"))
         self.assertIn("question", fd.read_text(encoding="utf-8"))
+
+    def test_agent_reach_integration_zero_bloat_and_signal_only(self) -> None:
+        ar = REPO_ROOT / ".opencode" / "skills" / "agent-reach"
+        sm = ar / "SKILL.md"
+        self.assertTrue(sm.exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "reach.md").exists())
+        body = sm.read_text(encoding="utf-8")
+        self.assertNotIn("{{VERSION}}", body)
+        self.assertIn("question", body)
+        self.assertIn("horus-context-mode", body)
+        for ref in ("capabilities.md", "maintenance.md", "sessions.md"):
+            self.assertTrue((ar / "references" / ref).exists(), f"Missing agent-reach ref: {ref}")
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

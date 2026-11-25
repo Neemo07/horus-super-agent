@@ -1,4 +1,4 @@
-# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.4)
+# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.5)
 
 Frontier-grade autonomous engineering harness for OpenCode V1/V2. Combines first-principles reasoning, parallel-first tool execution, mechanical `plan.py` evidence gates, 4-layer memory (`graphify` + `horus-memory` + `horus-context-mode` + `planning-with-evidence`), Vibe Engineering Playbook (v1.0.0), and file-locked DAG-wave subagent orchestration.
 
@@ -74,6 +74,7 @@ Load the skill when its trigger matches. Never narrate "I will use skill X".
 | Build an MCP server (TypeScript or Python) | `mcp-builder` |
 | Create, edit, or extract Office/PDF files | `pdf`, `docx`, `xlsx`, `pptx` |
 | Large logs, bulk outputs, huge files, `/horus-context` | `horus-context-mode` (`ctx_search`, `ctx_execute`, `ctx_batch`, `ctx_stats`) |
+| Read-only multi-platform web/video/social content (YouTube, Reddit, X, Bilibili, V2EX), `/reach` | `agent-reach` (MCP-first or `agent-reach` JSON CLI + 3 refs) |
 | Cross-session/cross-project wiki memory, handoffs, inbox, `/horus-memory` | `horus-memory` (`ai-memory` MCP/CLI — 5 handbooks in `references/`) |
 | End of substantive task/wave (primary agent only) | `horus-next-steps` (state-aware 1-click `question` continuations) |
 | Parallel background OpenCode pods via Linear, `/horus-foundry` | `horus-foundry` (`scripts/horus_foundry.py` + isolated git worktrees) |

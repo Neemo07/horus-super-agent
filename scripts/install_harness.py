@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-harness standalone & project adapter installer for Horus Super Agent v0.7.4.
+Multi-harness standalone & project adapter installer for Horus Super Agent v0.7.5.
 
 Ensures every skill, command/workflow, agent brief, plugin/hook reference, and script
 (`plan.py`, `horus_todo.py`, `horus_foundry.py`, `validate_horus.py`, `context-mode`)
@@ -20,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.7.4"
+VERSION = "0.7.5"
 MARKER_BEGIN = "<!-- HORUS:BEGIN -->"
 MARKER_END = "<!-- HORUS:END -->"
 HELPER_SCRIPTS = [
@@ -365,8 +365,8 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
         gemini_md = (
             "# Horus Super Agent (Google Antigravity / Gemini CLI)\n\n"
             "Follow all harness rules in `.agents/rules/horus.md`.\n"
-            "- Skills (41 zero-bloat progressive-disclosure skills): `.agents/skills/`\n"
-            "- Workflows (14 slash commands): `.agents/workflows/`\n"
+            "- Skills (42 zero-bloat progressive-disclosure skills): `.agents/skills/`\n"
+            "- Workflows (15 slash commands): `.agents/workflows/`\n"
             "- Subagent role playbooks (7): `.agents/agents/`\n"
             "- Horus Context Mode MCP server: `.agents/context-mode/server.js` (config snippet in `.agents/mcp_config.json`)\n"
         )
@@ -376,8 +376,8 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
         global_gemini_block = (
             f"# Horus Super Agent v{VERSION} (Global Standalone — Every Antigravity Workspace)\n\n"
             f"Follow all harness rules in `{(base / 'rules' / 'horus.md').as_posix()}`.\n"
-            f"- Global skills (41): `{skills_rel}/`\n"
-            f"- Global workflows (14): `{(base / 'workflows').as_posix()}/`\n"
+            f"- Global skills (42): `{skills_rel}/`\n"
+            f"- Global workflows (15): `{(base / 'workflows').as_posix()}/`\n"
             f"- Global subagent playbooks (7): `{(base / 'agents').as_posix()}/`\n"
             f"- Global scripts: `{scripts_root}/`\n"
             f"- Global Context Mode MCP: `{ctx_server}`"
@@ -451,9 +451,9 @@ def install_dsh(
         global_dsh_block = (
             f"# Horus Super Agent v{VERSION} (Global Standalone — Every DeepSeek Harness Workspace)\n\n"
             f"Follow all harness rules in `{(base / 'AGENTS.md').as_posix()}`.\n"
-            f"- Global skills (41): `{skills_rel}/`\n"
+            f"- Global skills (42): `{skills_rel}/`\n"
             f"- Global subagent playbooks (7): `{(base / 'agents').as_posix()}/`\n"
-            f"- Global command playbooks (14): `{(base / 'commands').as_posix()}/`\n"
+            f"- Global command playbooks (15): `{(base / 'commands').as_posix()}/`\n"
             f"- Global scripts: `{scripts_root}/`\n"
             f"- Global Context Mode MCP: `{ctx_server}` (Cordis patch: `{(base / 'cordis.patch.yml').as_posix()}`)"
         )
