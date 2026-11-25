@@ -1,4 +1,4 @@
-# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.3)
+# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.4)
 
 Frontier-grade autonomous engineering harness for OpenCode V1/V2. Combines first-principles reasoning, parallel-first tool execution, mechanical `plan.py` evidence gates, 4-layer memory (`graphify` + `horus-memory` + `horus-context-mode` + `planning-with-evidence`), Vibe Engineering Playbook (v1.0.0), and file-locked DAG-wave subagent orchestration.
 
@@ -65,7 +65,7 @@ Load the skill when its trigger matches. Never narrate "I will use skill X".
 | SQL, schema, RLS, Supabase/Postgres | `supabase-postgres-best-practices` |
 | DB queries, lists, images, caching, loading states, "slow" | `speed-engineer` (size tier S/M/L first) |
 | Visual design, UI polish, or design-system audit/docs/extend | `frontend-design`, `ui-ux-design-systems` |
-| Animations, gestures, `break-ui` stress-test, prototyping, `/design` | `design-engineering` (21 playbooks incl. Stageshow faux-product-UI + 2 cheatsheets) |
+| Animations, gestures, `break-ui` stress-test, prototyping, `/design` | `design-engineering` (23 playbooks incl. Stageshow faux-product-UI + 2 cheatsheets) |
 | Deep-module architecture, domain model, PR/triage/retro, `/craft` | `engineering-craft` (18 senior-engineering playbooks loaded on demand) |
 | Cloud/K8s/Terraform/SRE/DR, compliance, supply chain, `AUDIT:` report, `/partner` | `senior-engineering-partner` (Tier 0–2 rigor ladder + 39 unique refs + 5 scripts) |
 | Defensive AppSec, OWASP/API/Auth, C++ mitigations, CI/CD, `/security` | `security-audit` (CWE-grounded hardening & remediation audit) |

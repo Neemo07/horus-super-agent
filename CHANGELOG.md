@@ -1,3 +1,10 @@
+## [0.7.4] - 2026-11-25
+### Added
+- **Bundled `elayadesign/ai-design-skills` (`figma-designer` + `landing-page-design`) into `design-engineering` (23 playbooks + 2 cheatsheets — +0 top-level skills, -6 chars catalog size, 0 overlap)**:
+  - `figma-designer`: Figma MCP two-layer `Core Colors`/`Color System` Light/Dark tokens, `spacing`/`radius` variables, Tailwind text styles, 25-variant button matrix, and live-bound `Foundations` canvas frame.
+  - `landing-page-design`: Scoped cleanly to landing/marketing conversion pages (deferring dashboards/app UIs to `ui-ux-design-systems` + `frontend-design`), upgraded A1 intake to OpenCode's native `question` tool (or native confirmation UI on Antigravity/DSH), and paired with `stageshow` + `webapp-testing`.
+- Added unit test `test_ai_design_skills_figma_and_landing_page_zero_bloat` (35/35 tests).
+
 ## [0.7.3] - 2026-11-25
 ### Added & Hardened
 - **100% Standalone Global Skills, Plugins/Hooks & Scripts Across All 3 Apps (`OpenCode` + `Google Antigravity` + `DeepSeek Harness Desktop App`)**:

@@ -9,7 +9,7 @@
 Specs before code · File-locked parallel subagents · Mechanical proof-gated task closure · 4-layer zero-overlap memory · Zero catalog bloat.
 
 [![CI](https://github.com/Neemo07/horus-super-agent/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.3-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.4-00d4aa?style=flat-square)](CHANGELOG.md)
 [![Harnesses](https://img.shields.io/badge/Harnesses-OpenCode%20%7C%20Antigravity%20%7C%20DSH-6e56cf?style=flat-square)](#standalone-global-install-recommended--works-for-every-app)
 [![Skills](https://img.shields.io/badge/skills-41%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
 [![Agents](https://img.shields.io/badge/agents-1%20orchestrator%20%2B%206%20specialists-8b5cf6?style=flat-square)](#the-7-agents)
@@ -234,7 +234,7 @@ Available as `/command` in OpenCode, `.agents/workflows/` in Antigravity, and `.
 | `/horus-memory` | Cross-session/cross-project `ai-memory` wiki retrieval, durable pages, handoffs, inbox & lint |
 | `/horus-foundry` | Launch, dry-run, or inspect Linear-orchestrated parallel background worktree workers |
 | `/horus-todo` | Git-tracked `.todo.md` checklist, 1-click AI Requirement Analysis, `plan.py` promote, or live sidebar |
-| `/design` | Design Engineering 21-playbook suite (animations, gestures, `break-ui`, Stageshow faux-product-UI, Swift) |
+| `/design` | Design Engineering 23-playbook suite (animations, gestures, `break-ui`, Stageshow faux-product-UI, Swift) |
 | `/craft` | Engineering Craft 18-playbook suite (deep modules, domain modeling, wayfinder, PR/triage/retro, bug diagnosis) |
 | `/partner` | Senior Engineering Partner: `AUDIT:` report-first audit, Tier 0–2 rigor ladder, Cloud/K8s/Terraform/SRE/DR & toolchains |
 | `/security` | Defensive AppSec, OWASP/API/Auth/RLS, C/C++ mitigations & CI/CD supply-chain hardening audit |
@@ -294,7 +294,7 @@ Templates (`PRD`, `IMPLEMENTATION_PLAN`, `AGENTS` EN/AR) and bilingual handbooks
 | `vercel-react-best-practices` | Full v1.0.0 React/Next.js waterfall & bundle optimization (70 rules) |
 | `supabase-postgres-best-practices` | Full v1.1.1 schema, RLS, indexing, locking & connection management (31 rules) |
 | `frontend-design` | Distinctive, non-generic visual direction & typography |
-| `design-engineering` | 21 Design Engineering playbooks (motion, choreography, gestures, `break-ui`, Stageshow faux-product-UI kit, Swift) + 2 cheatsheets |
+| `design-engineering` | 23 Design Engineering playbooks (motion, choreography, gestures, `break-ui`, Stageshow faux-product-UI kit, Swift) + 2 cheatsheets |
 | `webapp-testing` | Real-browser Playwright verification, screenshots, console & assertion gates |
 | `mcp-builder` | Building high-quality TypeScript & Python MCP servers |
 | `pdf` / `docx` / `xlsx` / `pptx` | Full document, spreadsheet, presentation & PDF engineering + validation scripts |
@@ -387,7 +387,7 @@ python -m pip install pyyaml
 # Auto-detect and validate installed harness(es) (OpenCode, Antigravity, DSH, or all)
 python scripts/validate_horus.py
 
-# Run full 34-test integrity & multi-harness suite (zero __pycache__)
+# Run full 35-test integrity & multi-harness suite (zero __pycache__)
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
 
 # Lint first-party scripts
@@ -406,7 +406,7 @@ python -m ruff check scripts tests
 - **Syncing upstream skills:** Preview with `python scripts/sync_upstream.py --dry-run` (Horus-customized skills are protected unless `--force-customized` is passed).
 - **Changing harness rules:** Update `AGENTS.md` and `CHANGELOG.md` in the same commit, then validate.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full skill, agent, and adapter conventions. CI and lint configuration are in [ci.yml](.github/workflows/ci.yml) and [ruff.toml](ruff.toml).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full conventions. CI and lint config live in [ci.yml](.github/workflows/ci.yml) and [ruff.toml](ruff.toml).
 
 ## Credits
 

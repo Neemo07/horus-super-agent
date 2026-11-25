@@ -127,7 +127,7 @@ if [[ "$HARNESS" == "opencode" || "$HARNESS" == "all" ]]; then
   if [[ "$MODE" == "global" ]] && command -v python3 >/dev/null 2>&1; then
     python3 "$CFG/scripts/install_harness.py" --harness opencode-global --mode global --target-dir "$BASE"
   fi
-  echo "Installed Horus v0.7.3 ($MODE) to $BASE"
+  echo "Installed Horus v0.7.4 ($MODE) to $BASE"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$CFG/scripts/validate_horus.py" || true

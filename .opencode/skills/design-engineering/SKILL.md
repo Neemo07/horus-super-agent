@@ -1,16 +1,16 @@
 ---
 name: design-engineering
-description: "21-playbook motion, UI craft & faux-product-UI suite: animations, choreography, 120fps, gestures, break-ui, stageshow demos, mobile, Swift."
+description: "23-playbook UI craft, motion, Stageshow, Figma MCP & landing-page suite: animations, gestures, break-ui, conversion copy, tokens, Swift."
 license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
-  source: emilkowalski/skills (full 20-playbook Design Engineering suite, adapted for OpenCode & Horus)
-  version: "0.4.5-horus"
+  source: emilkowalski/skills + Benjitaylor/skills (stageshow) + elayadesign/ai-design-skills (figma-designer, landing-page-design)
+  version: "0.7.4-horus"
 ---
 
 # Design Engineering Playbook Suite (Progressive Disclosure Router)
 
-All 21 full Design Engineering playbooks (20 Emil Kowalski craft playbooks + Benji Taylor's full Stageshow faux-product-UI kit) and 2 quick-reference cheatsheets live under `.opencode/skills/design-engineering/references/`. **Never load all playbooks at once** — read ONLY the specific playbook(s) matching the user's task, then execute cleanly following Horus `AGENTS.md`.
+All 23 full Design Engineering playbooks (20 Emil Kowalski craft playbooks + Benji Taylor's Stageshow faux-product-UI kit + Elaya Design's `figma-designer` & `landing-page-design`) and 2 quick-reference cheatsheets live under `.opencode/skills/design-engineering/references/`. **Never load all playbooks at once** — read ONLY the specific playbook(s) matching the user's task, then execute cleanly following Horus `AGENTS.md`.
 
 > **Quick Cheatsheets (always fast to skim first):**
 > - `references/ui-cheatsheet.md` — concise UI craft & polish rules
@@ -38,6 +38,8 @@ All 21 full Design Engineering playbooks (20 Emil Kowalski craft playbooks + Ben
 | Stress-test UI with worst-case data (long strings, RTL, overflow, empty) | `break-ui/SKILL.md` (+ `break-ui/CATALOG.md`) |
 | Build multiple genuinely different UI variants behind a switcher | `ui-prototype/SKILL.md` (+ `ui-prototype/PICKER.md`) |
 | Build faux product UI, marketing hero demos, cursor walkthroughs & bento shots (React/CSS) | `stageshow/SKILL.md` (+ `stageshow/kit/`, `examples/`, `references/`, `scripts/film.mjs`) |
+| Design inside Figma via Figma MCP (two-layer Light/Dark tokens, auto layout, 25-state buttons, Foundations frame) | `figma-designer/SKILL.md` |
+| Build a high-converting landing/marketing page from scratch (intake, 12-section structure, copy, SEO/AEO, tagline reveal) | `landing-page-design/SKILL.md` |
 | Turn session design corrections into durable `DESIGN.md` rules | `learn-taste/SKILL.md` |
 | Choose the right frontend primitive/toast/drawer/combobox library | `pick-ui-library/SKILL.md` |
 | Wire up and customize Sonner toasts cleanly | `ask-sonner/SKILL.md` (+ `ask-sonner/API.md`) |

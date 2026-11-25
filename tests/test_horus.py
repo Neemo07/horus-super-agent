@@ -179,8 +179,10 @@ class TestValidateHorus(unittest.TestCase):
         self.assertTrue((refs / "ui-cheatsheet.md").exists())
         self.assertTrue((refs / "performance-cheatsheet.md").exists())
         playbooks = sorted(p.name for p in refs.iterdir() if p.is_dir() and (p / "SKILL.md").exists())
-        self.assertEqual(len(playbooks), 21, f"Expected 21 design-engineering playbooks, got {len(playbooks)}")
+        self.assertEqual(len(playbooks), 23, f"Expected 23 design-engineering playbooks, got {len(playbooks)}")
         self.assertIn("stageshow", playbooks)
+        self.assertIn("figma-designer", playbooks)
+        self.assertIn("landing-page-design", playbooks)
         self.assertTrue((refs / "stageshow" / "kit" / "act.ts").exists())
         self.assertTrue((refs / "stageshow" / "scripts" / "film.mjs").exists())
         self.assertGreaterEqual(len(list((refs / "stageshow" / "references").glob("*.md"))), 15)
@@ -272,7 +274,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.3", horus_md)
+        self.assertIn("v0.7.4", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -464,6 +466,20 @@ class TestValidateHorus(unittest.TestCase):
                 for sc in (plan_py, scripts_dir / "horus_todo.py", scripts_dir / "horus_foundry.py"):
                     res = subprocess.run([sys.executable, str(sc), "--help"], cwd=str(brand_new_app), capture_output=True, text=True)
                     self.assertEqual(res.returncode, 0, f"Standalone run failed for {sc}: {res.stderr}")
+
+    def test_ai_design_skills_figma_and_landing_page_zero_bloat(self) -> None:
+        de_refs = REPO_ROOT / ".opencode" / "skills" / "design-engineering" / "references"
+        fd = de_refs / "figma-designer" / "SKILL.md"
+        lp = de_refs / "landing-page-design" / "SKILL.md"
+        self.assertTrue(fd.exists(), "Missing figma-designer playbook")
+        self.assertTrue(lp.exists(), "Missing landing-page-design playbook")
+        # Must NOT exist as top-level skills (zero catalog bloat)
+        self.assertFalse((REPO_ROOT / ".opencode" / "skills" / "figma-designer").exists())
+        self.assertFalse((REPO_ROOT / ".opencode" / "skills" / "landing-page-design").exists())
+        # Must include OpenCode question tool integration and zero-overlap scope
+        self.assertIn("question", lp.read_text(encoding="utf-8"))
+        self.assertIn("ui-ux-design-systems", lp.read_text(encoding="utf-8"))
+        self.assertIn("question", fd.read_text(encoding="utf-8"))
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":
