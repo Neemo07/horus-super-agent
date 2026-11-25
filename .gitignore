@@ -15,13 +15,15 @@ venv/
 *.bak
 
 # Harness runtime artifacts (per-project, not part of the harness)
-task_plan.md
-findings.md
-progress.md
-HANDOFF.md
-evidence/
-.horus/
-graphify-out/
+# Anchor to repo root so a bundled skill's references/handoff.md is not ignored
+# on case-insensitive filesystems.
+/task_plan.md
+/findings.md
+/progress.md
+/HANDOFF.md
+/evidence/
+/.horus/
+/graphify-out/
 
 # Upstream sync artifacts
 .opencode/SOURCES.lock.json

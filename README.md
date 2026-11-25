@@ -381,11 +381,17 @@ horus-super-agent/
 
 ### Verify & Test
 ```bash
+# Test dependency (CI installs this too)
+python -m pip install pyyaml
+
 # Auto-detect and validate installed harness(es) (OpenCode, Antigravity, DSH, or all)
 python scripts/validate_horus.py
 
 # Run full 34-test integrity & multi-harness suite (zero __pycache__)
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
+
+# Lint first-party scripts
+python -m ruff check scripts tests
 ```
 
 ### OpenCode V2 vs V1
