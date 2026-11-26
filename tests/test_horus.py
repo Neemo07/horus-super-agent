@@ -272,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.5", horus_md)
+        self.assertIn("v0.7.8", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -490,6 +490,25 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("horus-context-mode", body)
         for ref in ("capabilities.md", "maintenance.md", "sessions.md"):
             self.assertTrue((ar / "references" / ref).exists(), f"Missing agent-reach ref: {ref}")
+
+    def test_v076_xhigh_deep_reasoning_and_foundry_variant(self) -> None:
+        agents_md = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("xhigh", agents_md)
+        self.assertIn("Competing hypotheses", agents_md)
+        self.assertIn("Adversarial self-refutation", agents_md)
+        horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
+        self.assertIn("variant: xhigh", horus_md)
+        r = run_py(REPO_ROOT / "scripts" / "horus_foundry.py", "run", "--help")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("--variant", r.stdout)
+
+    def test_v078_model_agnostic_reasoning_amplifier(self) -> None:
+        agents_md = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for needle in ("Reasoning Amplifier", "4-Line Pre-Edit Contract", "Hard 2-Strike Diagnosis Reset", "5-Point Pre-Delivery Self-Check"):
+            self.assertIn(needle, agents_md)
+        for wf in ("horus.md", "c-engineer.md", "web-engineer.md", "ui-gui-engineer.md"):
+            body = (REPO_ROOT / ".opencode" / "agents" / wf).read_text(encoding="utf-8")
+            self.assertIn("Reasoning Amplifier", body, f"{wf} missing Reasoning Amplifier")
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":

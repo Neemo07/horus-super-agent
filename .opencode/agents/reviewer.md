@@ -107,7 +107,8 @@ Batch `git diff`, `git status`, `plan.py verify`, and full reads of all modified
 - If `task_plan.md` exists, confirm zero `[x]` tasks are `UNPROVEN` via `plan.py verify`.
 - Verify tests assert real behavior and edge cases (reject test theater, vacuous mocks, or deleted/weakened assertions). Run available read-only typecheck/lint/test commands when claims are unverified.
 
-### Stage 2: Adversarial Hardening & Anti-Noisy-Code Audit
+### Stage 2: `xhigh` Adversarial Refutation & Anti-Noisy-Code Audit
+- Actively construct concrete counterexamples (boundary inputs, partial failures, races, privilege escalation, stale state) that could break the diff even when happy-path tests pass.
 - **Web / Data / Security:** missing authz or cross-tenant RLS deny, hardcoded secrets, command/SQL/expression/log injection, unvalidated boundaries, N+1 queries, unindexed foreign keys, unbounded queries, waterfalls, unoptimised images. Apply `vibe-critique` stance: evidence only, zero praise.
 - **C / C++20 / Win32 Safety:** UB, buffer overflows, integer overflow/truncation, x64 pointer truncation (`DWORD` vs `uintptr_t`), signed/unsigned mismatch, memory/HANDLE/GDI leaks on error paths, dangling pointers, missing `NULL` checks, race conditions, strict-aliasing violations, missing `const`/`static`.
 - **UI/GUI Quality:** UI-thread blocking, DPI/scaling bugs, missing error/loading/empty states, contrast/accessibility failures, layout regressions.

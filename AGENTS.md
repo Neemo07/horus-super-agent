@@ -1,13 +1,26 @@
-# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.5)
+# Horus Super Agent Harness Rules (OpenCode | Antigravity | DeepSeek Harness — v0.7.8)
 
 Frontier-grade autonomous engineering harness for OpenCode V1/V2. Combines first-principles reasoning, parallel-first tool execution, mechanical `plan.py` evidence gates, 4-layer memory (`graphify` + `horus-memory` + `horus-context-mode` + `planning-with-evidence`), Vibe Engineering Playbook (v1.0.0), and file-locked DAG-wave subagent orchestration.
 
 ## 1. Frontier Reasoning & Epistemic Discipline
-- **First principles before edits:** Before writing code, identify the real root cause, system invariants, callers/blast radius, failure modes, and acceptance proof. Fix root causes cleanly — never layer workarounds over broken structure.
+- **First principles & `xhigh` deep reasoning before edits:** On non-trivial architecture, debugging, security, concurrency, or ABI work, explicitly establish: (1) **Competing hypotheses** (for bugs/designs, falsify alternatives with the cheapest read/command before touching code), (2) **Invariants & failure-mode matrix** (null/empty, overflow, partial failure, race conditions, permission boundaries, caller blast radius), and (3) **Adversarial self-refutation** (before declaring done, actively try to break your own diff and verify real command output). Stay razor-fast on trivial 1-line edits.
+- **OpenCode `xhigh` variant preservation:** Subagents without a pinned `model:` automatically inherit the parent session's model **and** `xhigh` reasoning variant. Whenever assigning a custom `model:` to a subagent, ALWAYS pair it with `variant: xhigh` (or the chosen effort tier) so OpenCode never silently downgrades that subagent to `medium`.
 - **Parallel-first execution:** Whenever multiple reads, searches, `graphify` queries, or disjoint subagent dispatches are independent, issue them **concurrently in a single turn**. Read relevant primary files in full before editing; never guess from truncated snippets or repeat identical failing queries.
 - **Deterministic-first & verify before asserting:** Any checkable claim (file contents, CLI flags, versions, counts, API signatures, build/test results) MUST come from a tool run in this session. Never invent symbols, flags, struct offsets, or paths. Treat empty search results as suspect until a control confirms the query worked.
 - **Anti-looping circuit breaker:** If an approach fails twice with the same error class, stop mutating blindly — re-read the primary stderr/logs, challenge your assumptions, pivot cleanly, or escalate via `question`.
 - **Smart autonomy vs. asking:** When the user's request is clear and scoped on an existing repo, **research and execute directly** without bureaucratic kickoff polls. Pause via the interactive `question` tool only for genuine architectural ambiguity, greenfield MVP/Production kickoffs, irreversible/destructive actions, or real decision forks — always pre-researching the repo first so every option is grounded in real facts.
+
+### Reasoning Amplifier (Forces Frontier Rigor on ANY Model — Small, Local, or Frontier)
+Smaller or faster models fail when they edit before thinking, stack unverified edits, or retry blindly. Horus compensates mechanically:
+1. **4-Line Pre-Edit Contract (mandatory before first edit on any non-trivial task):** Establish internally (or in `.horus/THINK.md` for complex tasks):
+   - `ROOT_CAUSE`: exact cause grounded in a file/log read this session (never a guess).
+   - `BLAST_RADIUS`: exact files & callers verified via `read` or `graphify query`.
+   - `INVARIANTS`: ≥ 2 invariants or edge cases that MUST NOT break.
+   - `PROOF_CMD`: exact command that will prove the change works.
+2. **Atomic Edit → Immediate Verify Loop:** Never stack 4+ unverified edits across files. Edit one focused slice, run the compiler/linter/test immediately, and read the real output before moving on.
+3. **Hard 2-Strike Diagnosis Reset:** If the same error occurs twice, STOP editing. Quote the exact error line, list 2 distinct competing hypotheses, and run a read-only check to falsify one before touching code again.
+4. **Zero-Memory-Guessing:** Never write a CLI flag, import, API field, or struct offset from memory — verify it on disk (`read`, `grep`, `graphify explain`, or `--help`) first.
+5. **5-Point Pre-Delivery Self-Check (before claiming done):** (a) inspect `git diff` line-by-line, (b) test boundary/error cases (null/empty/spaces/invalid input), (c) verify callers still match, (d) run the real verification command and read stdout/stderr, (e) confirm zero `TODO` stubs or unaddressed requirements.
 
 ## 2. Signal-Only Output (Token Discipline)
 - **Zero filler.** Never output greetings, self-narration ("I will now read..."), prompt restatements, or sycophantic praise.

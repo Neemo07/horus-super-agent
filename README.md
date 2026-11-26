@@ -9,7 +9,7 @@
 Specs before code · File-locked parallel subagents · Mechanical proof-gated task closure · 4-layer zero-overlap memory · Zero catalog bloat.
 
 [![CI](https://github.com/Neemo07/horus-super-agent/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.5-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.7.8-00d4aa?style=flat-square)](CHANGELOG.md)
 [![Harnesses](https://img.shields.io/badge/Harnesses-OpenCode%20%7C%20Antigravity%20%7C%20DSH-6e56cf?style=flat-square)](#standalone-global-install-recommended--works-for-every-app)
 [![Skills](https://img.shields.io/badge/skills-42%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
 [![Agents](https://img.shields.io/badge/agents-1%20orchestrator%20%2B%206%20specialists-8b5cf6?style=flat-square)](#the-7-agents)
@@ -389,7 +389,7 @@ python -m pip install pyyaml
 # Auto-detect and validate installed harness(es) (OpenCode, Antigravity, DSH, or all)
 python scripts/validate_horus.py
 
-# Run full 36-test integrity & multi-harness suite (zero __pycache__)
+# Run full 38-test integrity & multi-harness suite (zero __pycache__)
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
 
 # Lint first-party scripts

@@ -1,3 +1,20 @@
+## [0.7.8] - 2026-11-26
+### Added
+- **Model-Agnostic Reasoning Amplifier (`AGENTS.md`, `horus.md`, `c-engineer.md`, `web-engineer.md`, `ui-gui-engineer.md`)**: Engineered concrete externalized scaffolding so even smaller, faster, or local models achieve frontier-level accuracy: **4-Line Pre-Edit Contract** (`ROOT_CAUSE`, `BLAST_RADIUS`, `INVARIANTS`, `PROOF_CMD`), **Atomic Edit → Immediate Verify**, **Hard 2-Strike Diagnosis Reset** (2 competing hypotheses + read-only falsification), **Zero-Memory-Guessing**, and **5-Point Pre-Delivery Self-Check**.
+- Added unit test `test_v078_model_agnostic_reasoning_amplifier` (38/38 tests).
+
+## [0.7.7] - 2026-11-26
+### Changed
+- **Refined `horus.md` Operating Demeanor & `xhigh` Execution Cadence**: Added Section 0 (*Think deeply invisibly, deliver cleanly visibly*; peer-collaborator candor; Turn-1 parallel discovery + in-loop self-verification; zero ceremony on clear tasks, full `xhigh` rigor on complex systems).
+
+## [0.7.6] - 2026-11-26
+### Added & Upgraded
+- **`xhigh` Deep Reasoning Protocol & OpenCode Variant Support (`AGENTS.md`, `horus.md`, `architect.md`, `reviewer.md`, `horus_foundry.py`)**:
+  - Added competing-hypothesis falsification, pre-edit invariant & failure-mode matrices, and pre-delivery adversarial self-refutation across `AGENTS.md`, `horus.md`, `architect.md`, and `reviewer.md`.
+  - Documented and enforced the verified OpenCode `variant: xhigh` preservation rule (subagents without a pinned `model:` inherit parent `xhigh` automatically; pinned custom models must pair `variant: xhigh` to avoid silent downgrade to `medium`).
+  - Added `--variant` (`HORUS_FOUNDRY_VARIANT`, e.g. `--variant xhigh`) to `scripts/horus_foundry.py` for high-reasoning headless background pods.
+- Added unit test `test_v076_xhigh_deep_reasoning_and_foundry_variant` (37/37 tests).
+
 ## [0.7.5] - 2026-11-25
 ### Added
 - **`agent-reach` skill & `/reach` command (`Panniantong/Agent-Reach` v1.6.1, MIT)**:

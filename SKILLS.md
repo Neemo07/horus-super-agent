@@ -1,4 +1,4 @@
-# Skill Provenance (v0.7.5 — 42 zero-bloat skills)
+# Skill Provenance (v0.7.8 — 42 zero-bloat skills)
 
 "verbatim" = byte-identical to the source. "full merged + Horus polls" = full upstream skill + bundled templates/handbooks upgraded with OpenCode's native `question` tool poll workflow. "offline edition" = re-authored, condensed, works with no network; replace with exact upstream using `python scripts/sync_upstream.py` (needs git + network).
 

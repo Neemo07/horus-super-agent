@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-harness standalone & project adapter installer for Horus Super Agent v0.7.5.
+Multi-harness standalone & project adapter installer for Horus Super Agent v0.7.8.
 
 Ensures every skill, command/workflow, agent brief, plugin/hook reference, and script
 (`plan.py`, `horus_todo.py`, `horus_foundry.py`, `validate_horus.py`, `context-mode`)
@@ -20,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.7.5"
+VERSION = "0.7.8"
 MARKER_BEGIN = "<!-- HORUS:BEGIN -->"
 MARKER_END = "<!-- HORUS:END -->"
 HELPER_SCRIPTS = [

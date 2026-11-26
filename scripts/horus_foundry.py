@@ -332,12 +332,15 @@ def run_worker(
     timeout: int,
     log_path: Path,
     runner: str = "opencode",
+    variant: str | None = None,
 ) -> tuple[int, str]:
     cli = find_runner_cli(runner)
     if runner == "opencode":
         cmd = [cli, "run", "--agent", agent]
         if model:
             cmd += ["--model", model]
+        if variant:
+            cmd += ["--variant", variant]
         cmd.append(prompt)
     elif runner == "antigravity":
         cmd = [cli, "run"]
@@ -379,6 +382,7 @@ def process_ticket(
     timeout: int,
     dry_run: bool,
     runner: str = "opencode",
+    variant: str | None = None,
 ) -> dict:
     key = issue["identifier"]
     cur_state = issue["state"]["name"]
@@ -420,7 +424,7 @@ def process_ticket(
 
     # 3. Run OpenCode worker
     prompt = build_worker_prompt(issue, stage, branch, merge_mode)
-    code, out = run_worker(wt_path, prompt, agent, model, timeout, log_path, runner=runner)
+    code, out = run_worker(wt_path, prompt, agent, model, timeout, log_path, runner=runner, variant=variant)
 
     # 4. Advance or block ticket in Linear (0 LLM tokens)
     blocked_match = re.search(r"FOUNDRY_BLOCKED:\s*(.+)", out)
@@ -461,6 +465,7 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--runner", choices=("opencode", "antigravity", "dsh"), default=None, help="CLI harness runner (default: opencode)")
     p_run.add_argument("--agent", default=None, help="Agent name (default: horus)")
     p_run.add_argument("--model", default=None, help="Optional provider/model override")
+    p_run.add_argument("--variant", default=None, help="Optional reasoning effort variant (e.g. high, xhigh, max)")
     p_run.add_argument("--poll-seconds", type=int, default=60, help="Sleep interval when no tickets ready")
     p_run.add_argument("--timeout", type=int, default=1800, help="Per-ticket worker timeout in seconds")
     p_run.add_argument("--once", action="store_true", help="Process one wave and exit")
@@ -504,6 +509,7 @@ def main(argv: list[str] | None = None) -> int:
     runner = args.runner or os.environ.get("HORUS_FOUNDRY_RUNNER", "opencode")
     agent = args.agent or os.environ.get("HORUS_FOUNDRY_AGENT", "horus")
     model = args.model or os.environ.get("HORUS_FOUNDRY_MODEL") or None
+    variant = args.variant or os.environ.get("HORUS_FOUNDRY_VARIANT") or None
 
     while True:
         issues = api.list_candidate_issues(team["id"], mode)
@@ -531,6 +537,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.timeout,
                     args.dry_run,
                     runner,
+                    variant,
                 )
                 for iss in batch
             ]
