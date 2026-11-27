@@ -269,3 +269,8 @@ ls -1 "$PWD"/slide-*.jpg
 ## Dependencies
 
 `pptxgenjs` (npm, preinstalled — install only if `require('pptxgenjs')` fails) · `python-pptx`, `Pillow`, `defusedxml`, `lxml` (pip — slide_text, thumbnail, clean, validate) · LibreOffice (`soffice`, auto-configured for sandboxed environments via `scripts/office/soffice.py`) · `pdftoppm` (Poppler)
+---
+
+## Horus Super-Upgrade (Slide Visual QA & Density Gate)
+- **Mandatory Slide-by-Slide Render Check:** Convert the finished `.pptx` via LibreOffice → PDF → PNG (`soffice --headless --convert-to pdf` + `pdftoppm -png -r 150`) and visually inspect every slide for text overflow, overlapping shapes, or unreadable contrast.
+- **Anti-Wall-of-Text Standard:** Enforce crisp visual hierarchy (native charts/tables/cards over dense bullet walls) and close via `python <plan.py> done <id> --file <output.pptx>`.

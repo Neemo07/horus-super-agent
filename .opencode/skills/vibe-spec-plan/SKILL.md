@@ -26,6 +26,8 @@ Read `PRD.md`, `AGENTS.md` / `CLAUDE.md`, and `.opencode/skills/vibe/templates/I
 - Rendering and state model (`SSR` / `SSG` / `CSR`), avoiding hidden client-side request storms (N+1 fetches per view).
 - Database access strategy: mandatory **Connection Pooling**, thread/async safety, migrations, and zero raw `DROP`/`DELETE` paths exposed to automation.
 - Size performance tier (`S` / `M` / `L`) with `speed-engineer` before freezing schemas and endpoints.
+- **Deep System Design (Tier-2 / distributed / multi-tenant):** For complex domains or production scale, load `engineering-craft` (`references/domain-modeling/SKILL.md`, `references/codebase-design/SKILL.md`) for bounded contexts & deep modules, and `senior-engineering-partner` (`references/scalability-and-system-design.md`, `references/resilience-engineering.md`, `references/caching.md`, `references/disaster-recovery.md`, `references/threat-modeling-and-api-design.md`) for queues/DLQ, circuit breakers, tenant-scoped caching, DR/RTO/RPO, and STRIDE threat models.
+- **UI Design System (web / desktop UIs):** Lock semantic tokens, spacing grids, and WCAG/APCA contrast via `ui-ux-design-systems` (Audit/Document/Extend modes) before building UI slices; pair with `design-engineering` (`references/figma-designer/SKILL.md` for Figma MCP or `references/landing-page-design/SKILL.md` for marketing landing pages).
 
 ### 2. Security & Input Controls
 - Dual validation: client-side UX validation + **mandatory server-side schema validation**.
@@ -52,3 +54,10 @@ Under **Horus**, translate every checkpoint into mechanical `plan.py` tasks (`- 
 ## Gate Rule (Interactive Poll)
 
 Present `IMPLEMENTATION_PLAN.md` and **stop for explicit approval via OpenCode's `question` tool** (`header: "Plan Gate"`, options: `Approve & Start T1 (Recommended)`, `Revise Architecture`, `Trim or Add Scope`) before executing Task 1.
+---
+
+- **Complex Multi-Module Systems (RPG Method):** Load `references/rpg-method.md` (Dual-Semantics WHAT→HOW + Topological Dependency Graph Phase 0→3 + complexity ≥ 6 subtask expansion) before writing `IMPLEMENTATION_PLAN.md`.
+
+## Horus Super-Upgrade (4-Line Contract & `plan.py` Readiness)
+- **Checkable Acceptance Criteria:** Every task emitted into `IMPLEMENTATION_PLAN.md` and `task_plan.md` MUST include a deterministic `| accept: <command or file>` proof and disjoint `Owns Files` locks so `horus` can dispatch parallel waves safely.
+- **Frozen Invariants:** Copy the system-design boundaries, API/DB contracts, and UI token invariants into `.horus/STATE.md` before Wave 1 starts.

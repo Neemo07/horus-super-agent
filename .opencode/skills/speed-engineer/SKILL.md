@@ -289,3 +289,8 @@ Run through this for the code you touched (Build) or the whole app (Audit):
 - [ ] Every async view has skeleton, empty and error states; no blank screen; independent requests run in parallel
 - [ ] Nothing added is bigger than the tier needs (no Redis/CDN/queues for tier S)
 - [ ] Behavior and permissions unchanged
+---
+
+## Horus Super-Upgrade (Measured Before/After Proof Gate)
+- **Zero Unmeasured Optimization Claims:** Every optimization MUST record **before and after numbers** (wall-clock, p95/p99 latency, RSS memory, or gzipped bundle bytes) via `ctx_execute` — never claim an improvement without observed benchmark output.
+- **Hot-Path Blast Radius:** Use `graphify query` to inspect all callers of a hot function before changing data structures or caching semantics, and run correctness + concurrency regression tests (`plan.py done --run`) to prove identical observable behavior.

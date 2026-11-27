@@ -328,3 +328,10 @@ Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+---
+
+## Horus Super-Upgrade (Anti-Test-Theater & Proof Closure)
+- **Mutation / Sabotage Check:** Verify every new test **actually fails** when the production body is stubbed or reverted — reject tautological tests that only assert mock call counts.
+- **Mandatory Unhappy-Path Matrix:** Pair every happy-path test with boundary/adversarial cases: empty/null/oversized inputs, integer/date/Unicode/RTL edge cases, auth/RBAC denial (`User A` → `User B`), and timeout/partial-failure paths.
+- **Zero-Bloat Runner Output:** Route verbose test suites (>200 lines) through `ctx_execute` or `ctx_search` so only failing assertions enter context.
+- **Evidence-Gated Completion:** Record passing test proofs mechanically via `python <plan.py> done <id> --run "<test_cmd>"`.

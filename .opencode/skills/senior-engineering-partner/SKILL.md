@@ -1,6 +1,6 @@
 ---
 name: senior-engineering-partner
-description: "Phase-aware (Tier 0-2) production standards & AUDIT: mode: Cloud/K8s/Terraform, DR/BC, SRE, compliance, supply chain, Python/Bash/TS/Swift."
+description: "Phase-aware (Tier 0-2) production standards & AUDIT: Cloud/K8s/Terraform, DR/BC, SRE, compliance, Python/TS/Swift."
 license: Apache-2.0
 compatibility: opencode, antigravity, dsh
 metadata:
@@ -100,3 +100,7 @@ Do **not** duplicate Horus's native skills — delegate to them directly:
 | Distilling team conventions into checkable floor-vs-ADR standards | `references/standards-authoring.md` |
 | Environment isolation (no-prod-dev, git-out-of-file-sync, sandboxing) & IDE hygiene | `references/dev-environment-isolation.md`, `references/dev-environments.md` |
 | Deterministic helper scripts & self-review checklist | `scripts/audit.sh`, `scripts/actions-lint.sh`, `scripts/leakage-guard.sh`, `scripts/render-diagrams.sh`, `scripts/self-review.md` |
+
+## Horus Super-Upgrade (Tri-Harness Wiring)
+- **Recon:** Use `graphify query` for blast radius and `ctx_search`/`ctx_execute` for large logs before `AUDIT:`/`DESIGN:`.
+- **Proofs & Memory:** Save ADRs via `memory_write_page`, close via `plan.py done --run`, and offer OpenCode `question` polls.

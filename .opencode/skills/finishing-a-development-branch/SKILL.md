@@ -223,3 +223,9 @@ place. If your platform provides a workspace-exit tool, use it.
 | "The merged-result failure is probably flaky" | A failing merged result stops everything. Branch and worktree stay put while you investigate. |
 | "The base branch is obviously main" | Confirm the fork point or ask. Merging into the wrong base is expensive to undo. |
 | "The push was rejected — force-push will fix it" | A rejected push means the remote moved. Investigate; force-push only on your human partner's explicit request. |
+---
+
+## Horus Super-Upgrade (Pre-Merge Evidence & Clean-Room Gate)
+- **Mechanical Proof Before Merge:** Run `python <plan.py> verify --rerun`, `git status --short`, and the full project test/lint suite — never offer merge/PR if any task is `UNPROVEN` or any `__pycache__`/`.pyc`/secret/debug file is untracked.
+- **Launch & Graph Hygiene:** Run `graphify update .` after structural changes; for `MVP / Production` branches, pass `vibe-test-gate` (16-point launch gate) before merging.
+- **Tri-Harness Decision Gate:** On OpenCode, present Merge / Create PR / Keep Branch / Discard via the native `question` tool (`header: "Finish"`, recommended option first); on Antigravity/DSH, ask for explicit confirmation before destructive discard or push.

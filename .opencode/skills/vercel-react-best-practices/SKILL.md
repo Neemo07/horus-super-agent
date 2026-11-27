@@ -147,3 +147,8 @@ Each rule file contains:
 ## Full Compiled Document
 
 For the complete guide with all rules expanded: `AGENTS.md`
+---
+
+## Horus Super-Upgrade (Verification & Network-Waterfall Gate)
+- **Server/Client Boundary Audit:** Verify `'use client'` stays at leaf interactive islands and zero secrets or server-only modules leak into client bundles.
+- **Measured Proof:** Capture production build output via `ctx_execute` (bundle size diff + zero TypeScript/hydration warnings) and audit live network waterfalls/duplicate fetches via `webapp-testing` (Playwright) before marking UI tasks done.

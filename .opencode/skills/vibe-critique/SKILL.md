@@ -6,7 +6,7 @@ compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus integration)
   category: adversarial-review
-  version: "1.1.0-horus"
+  version: "1.2.0-horus"
 ---
 
 # `vibe-critique` — Anti-Sycophancy Adversarial Reviewer
@@ -19,11 +19,19 @@ Reference catalog of all 26 Vibe anti-patterns: `.opencode/skills/vibe/reference
 
 ---
 
+## Pre-Critique Grounding & Blast-Radius Check
+Before writing a single critique line:
+1. Read `git diff` + full modified files (never judge from a partial diff hunk when surrounding invariants matter).
+2. Run `graphify query` on modified public symbols to inspect **callers and blast radius** across the repo.
+3. Route large diffs, test outputs, or logs through `horus-context-mode` (`ctx_search` / `ctx_execute`).
+4. **Escalation Triggers:** Pull in `security-audit` for auth, crypto, RLS, parser, or C/C++ memory diffs; pull in `senior-engineering-partner` (`references/audit-report-format.md`) for full-repository architectural audits.
+
 ## Mandatory Critique Rules
 
 1. **Zero Flattery or Reassurance:** Omit praise, polite filler, and optimistic summaries. Assume the posture of an **independent Staff Security & Principal Code Auditor** whose job is to find reasons to **reject** the change.
 2. **Ground Every Claim in Evidence:** Cite exact `file:line` locations for code findings, or state your grounding source and **confidence score (`0–100`)** for architectural claims. If uncertain, say `Unverified` — never hallucinate certainty.
-3. **Evaluate the Production Triangle:**
+3. **Adversarial Self-Refutation Check:** Verify whether the author's stated invariants (`4-Line Pre-Edit Contract`) actually hold under boundary inputs, partial failures, and concurrency — and flag any tautological/mock-only test immediately.
+4. **Evaluate the Production Triangle:**
    - **Security:** Missing server-side validation, broken RBAC/IDOR, hardcoded secrets, unsafe deserialization, prompt injection surfaces, or risky transitive dependencies.
    - **Performance & Scalability:** Missing DB connection pools, thread-safety hazards, N+1 queries, redundant client network calls, unindexed lookups, or memory leaks under 1,000+ concurrent users.
    - **Maintainability:** AI slop, >30-line monolithic functions, duplicated logic, dead code, or undocumented assumptions that will trap the next engineer.

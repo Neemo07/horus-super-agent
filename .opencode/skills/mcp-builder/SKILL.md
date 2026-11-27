@@ -250,3 +250,9 @@ Load these resources as needed during development:
   - XML format specifications
   - Example questions and answers
   - Running an evaluation with the provided scripts
+---
+
+## Horus Super-Upgrade (Tri-Harness MCP & Stdio Hygiene)
+- **Strict Stdio Purity:** Local stdio MCP servers MUST write ONLY valid JSON-RPC frames to `stdout` (send all diagnostics to `stderr`), preventing silent disconnects across OpenCode, Antigravity, and DeepSeek Harness.
+- **Context-Safe Responses:** Paginate or cap large tool responses (with `detail: "summary"` / cursor args) so MCP tools never flood the agent's context window.
+- **Tri-Harness Registration & Smoke Test:** Provide clean config snippets for `opencode.jsonc`, Antigravity `mcp_config.json`, and DSH `cordis.patch.yml`, and verify `tools/list` + one live tool call before finishing.

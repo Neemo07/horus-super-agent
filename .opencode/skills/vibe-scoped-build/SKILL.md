@@ -33,6 +33,8 @@ Prevent **Blind-Accept Regressions (A1, E1)**, **AI Slop (C1, C2)**, and **Trunc
 3. **Network & UI Layer Sanity:**
    - Consolidate data fetching (bulk endpoints over 5 sequential client requests for one screen).
    - Verify CSS layering (`z-index`, `overflow`, `visibility`, mobile breakpoints) rather than stacking `!important` hacks.
+- **UI Design System & Stress-Test:** Follow locked tokens from `ui-ux-design-systems` (no ad-hoc hex or off-grid spacing), stress-test edge cases with `design-engineering` (`references/break-ui/SKILL.md`), and verify desktop + 390px mobile states in a real browser via `webapp-testing`.
+- **System Resilience:** On backend/API slices, apply `supabase-postgres-best-practices` / `speed-engineer` and `senior-engineering-partner` resilience rules (explicit timeouts, idempotency keys on writes, structured JSON logs, zero swallowed errors).
 
 4. **Root-Cause Bug Fixing Protocol (Anti-Doom-Loop):**
    - When given an error, **diagnose and explain the root cause first** — never stack wrapper/fallback patches (`Truncation Patching`) around broken logic.
@@ -45,3 +47,8 @@ Prevent **Blind-Accept Regressions (A1, E1)**, **AI Slop (C1, C2)**, and **Trunc
      - Dependencies added (`none` by default),
      - Test & linter command outputs (recorded via `plan.py done <id> --run` under Horus),
      - A suggested atomic `git commit` message so the human engineer can checkpoint cleanly.
+---
+
+## Horus Super-Upgrade (Model-Agnostic Reasoning Amplifier)
+- **4-Line Pre-Edit Contract:** Before modifying any non-trivial file, state `ROOT_CAUSE`, `BLAST_RADIUS` (via `graphify query`), `INVARIANTS`, and `PROOF_CMD`.
+- **Atomic Edit → Immediate Verify & 2-Strike Reset:** Verify every single vertical slice immediately with real build/test/Playwright commands (`plan.py done <id> --run "..."`); after 2 failed fix attempts, stop editing and re-diagnose from raw evidence.

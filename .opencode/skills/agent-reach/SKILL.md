@@ -1,6 +1,6 @@
 ---
 name: agent-reach
-description: "Read-only multi-platform web/content CLI & MCP (YouTube subtitles, GitHub, Reddit, X, Bilibili, Xiaohongshu, LinkedIn, V2EX, web read/search)."
+description: "Read-only multi-platform web/content CLI & MCP (YouTube, GitHub, Reddit, X, Bilibili, Xiaohongshu, LinkedIn, web)."
 license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
@@ -46,3 +46,9 @@ Read ONLY when needed:
 - **`references/capabilities.md`** — declared per-platform read/search/subtitle boundaries (public vs. Reach vs. locally verified).
 - **`references/sessions.md`** — dedicated headless browser lifecycle, safe single-site cookie reuse, login/logout/remove rules.
 - **`references/maintenance.md`** — `doctor`, `check`, `update`, `configure`, port-9222 conflict resolution, and `uninstall --dry-run`.
+---
+
+## Horus Super-Upgrade (Tri-Harness Consent & Evidence Grounding)
+- **Zero-Bloat Paging:** Never dump raw scraped threads, transcripts, or search JSON straight into chat; filter and summarize via `horus-context-mode` (`ctx_execute` / `ctx_search`).
+- **Tri-Harness Consent Gate:** Before any authenticated session, cookie import, browser login, or external write/post action, require explicit user consent via OpenCode's native `question` tool (or an explicit confirmation prompt on Antigravity/DSH).
+- **Strict Attribution:** Tag every retrieved external claim with its exact observed source URL and timestamp; mark unreachable/paywalled sources honestly without guessing.

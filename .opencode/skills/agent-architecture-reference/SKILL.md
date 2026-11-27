@@ -1,11 +1,11 @@
 ---
 name: agent-architecture-reference
-description: "17-chapter EN/ZH coding-agent harness architecture reference (query loop, tools, plugins, compaction, swarms; query via ctx_search)."
+description: "17-chapter EN/ZH coding-agent harness architecture reference (query loop, tools, plugins, compaction, swarms)."
 license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
   source: claude-reviews-claude (17-chapter EN/ZH architectural deep-dive, adapted for OpenCode & Horus)
-  version: "0.4.8-horus"
+  version: "0.8.2-horus"
 ---
 
 # Coding-Agent Architecture Reference (17 Chapters — EN / ZH)
@@ -14,7 +14,15 @@ A progressive-disclosure architectural reference covering production coding-agen
 
 > **Context-Window Discipline (Horus Context Mode):** Chapters are 16–44 KB each. Never bulk-read multiple chapters into context. Prefer `ctx_search(queries: ["..."], path: ".opencode/skills/agent-architecture-reference/references/en/<file>.md")` or targeted `read` line slices on the exact chapter you need. Match the user's language (`references/en/` for English, `references/zh-CN/` for Chinese).
 
-## Chapter Routing Table
+## 1. Horus Subsystem Quick-Lookup Map
+When extending or debugging Horus (or an OpenCode / Antigravity / DSH plugin), jump directly to the matching chapters:
+- **DAG Waves, File Locks & Subagent Isolation (`horus.md`, `subagent-driven-dev`):** Chapters `03` (Coordinator) & `08` (Agent Swarms)
+- **Context Budget, Prompt Caching & Compaction (`horus-context-mode`, `planning-with-evidence`):** Chapters `10` (Context Assembly) & `11` (Compaction System)
+- **Hooks, Plugins & Long-Term Memory (`horus-memory`, `opencode-hooks/`):** Chapters `04` (Plugins), `05` (Hooks) & `09` (Session Persistence)
+- **Permissions, Shell Safety & Tool Dispatch (`opencode.jsonc`, `adapters/`):** Chapters `02` (Tool System), `06` (Bash Engine) & `07` (Permission Pipeline)
+- **Multi-Harness Bootstrap & Config (`install_harness.py`, `horus_foundry.py`):** Chapters `12` (Startup Bootstrap), `13` (Bridge) & `16` (Infrastructure/Config)
+
+## 2. Full Chapter Routing Table
 
 | # | Topic | Reference File (`references/<lang>/...`) |
 | :--- | :--- | :--- |
@@ -38,6 +46,6 @@ A progressive-disclosure architectural reference covering production coding-agen
 | 16 | Infrastructure & Configuration | `16-infrastructure-config.md` |
 | 17 | Telemetry, Privacy & Operations | `17-telemetry-privacy-operations.md` |
 
-## When to Use in OpenCode / Horus
-- Designing or extending OpenCode plugins, MCP servers, permission pipelines, compaction strategies, or multi-agent orchestrators (like Horus itself).
+## 3. When to Use in OpenCode / Antigravity / DSH
+- Designing or extending OpenCode/Antigravity/DSH plugins, MCP servers, permission pipelines, compaction strategies, or multi-agent orchestrators (like Horus itself).
 - Comparing architectural trade-offs (e.g., prompt-cache prefix stability, subagent isolation, tool-call sandboxing, session resume) and grounding recommendations in concrete chapter sections.

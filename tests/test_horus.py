@@ -272,7 +272,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Parallel-first execution", agents_md)
         self.assertIn("4-Layer Memory", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("v0.7.8", horus_md)
+        self.assertIn("v0.8.9", horus_md)
         self.assertIn("Parallel-first discovery", horus_md)
         self.assertIn("horus-memory", horus_md)
         reviewer_md = (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8")
@@ -293,7 +293,7 @@ class TestValidateHorus(unittest.TestCase):
             self.assertIn("HORUS VALIDATION PASSED (antigravity/project)", r1.stdout)
             self.assertTrue((proj / "GEMINI.md").exists())
             self.assertTrue((proj / ".agents" / "rules" / "horus.md").exists())
-            self.assertEqual(len(list((proj / ".agents" / "workflows").glob("*.md"))), 15)
+            self.assertEqual(len(list((proj / ".agents" / "workflows").glob("*.md"))), 18)
             mcp = json.loads((proj / ".agents" / "mcp_config.json").read_text(encoding="utf-8"))
             self.assertIn("horus-context-mode", mcp["mcpServers"])
 
@@ -497,7 +497,7 @@ class TestValidateHorus(unittest.TestCase):
         self.assertIn("Competing hypotheses", agents_md)
         self.assertIn("Adversarial self-refutation", agents_md)
         horus_md = (REPO_ROOT / ".opencode" / "agents" / "horus.md").read_text(encoding="utf-8")
-        self.assertIn("variant: xhigh", horus_md)
+        self.assertIn("variant: high", horus_md)
         r = run_py(REPO_ROOT / "scripts" / "horus_foundry.py", "run", "--help")
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn("--variant", r.stdout)
@@ -509,6 +509,14 @@ class TestValidateHorus(unittest.TestCase):
         for wf in ("horus.md", "c-engineer.md", "web-engineer.md", "ui-gui-engineer.md"):
             body = (REPO_ROOT / ".opencode" / "agents" / wf).read_text(encoding="utf-8")
             self.assertIn("Reasoning Amplifier", body, f"{wf} missing Reasoning Amplifier")
+
+    def test_vibe_wired_with_system_design_and_ui_design_systems(self) -> None:
+        vsp = (REPO_ROOT / ".opencode" / "skills" / "vibe-spec-plan" / "SKILL.md").read_text(encoding="utf-8")
+        vsb = (REPO_ROOT / ".opencode" / "skills" / "vibe-scoped-build" / "SKILL.md").read_text(encoding="utf-8")
+        for needle in ("scalability-and-system-design.md", "domain-modeling/SKILL.md", "ui-ux-design-systems", "figma-designer/SKILL.md"):
+            self.assertIn(needle, vsp, f"vibe-spec-plan missing {needle}")
+        for needle in ("ui-ux-design-systems", "break-ui/SKILL.md", "webapp-testing", "senior-engineering-partner"):
+            self.assertIn(needle, vsb, f"vibe-scoped-build missing {needle}")
 
     def test_global_install_produces_strict_json_and_validates(self) -> None:
         if os.name == "nt":
@@ -759,6 +767,161 @@ class TestHorusTodo(unittest.TestCase):
             self.assertNotEqual(r.returncode, 0)
             self.assertIn("unmanaged-file", r.stderr)
 
+
+    def test_v080_core_skills_upgraded_cleanly(self):
+        """v0.8.9: Verify all 8 upgraded core Horus skills keep valid frontmatter and key additions."""
+        expected_markers = {
+            "anti-hallucination-harness": ["False-Negative Search Guard", "ctx_search", "4-Line Pre-Edit Contract"],
+            "native-gui-architecture": ["DWMWA_USE_IMMERSIVE_DARK_MODE", "WM_DPICHANGED", "D2DERR_RECREATE_TARGET"],
+            "planning-with-evidence": ["SHA-256", "memory_handoff_begin", "os.replace"],
+            "modern-c-mastery": ["SIZE_MAX", "/fsanitize=address", "libFuzzer"],
+            "reverse-engineer-anything": ["OBSERVED", "INFERRED", "graphify"],
+            "cpp20-win32-re": ["SetWindowLongPtr", "<intrin.h>", "uintptr_t"],
+            "subagent-driven-dev": ["variant: high", "parentID", "INVARIANTS"],
+            "horus-foundry": ["--runner", "--variant high", "HORUS_FOUNDRY_VARIANT=high", "antigravity"],
+        }
+        import yaml
+        for skill, markers in expected_markers.items():
+            p = REPO_ROOT / ".opencode" / "skills" / skill / "SKILL.md"
+            raw = p.read_text(encoding="utf-8")
+            self.assertTrue(raw.startswith("---\n"), f"{skill} missing YAML frontmatter")
+            fm_end = raw.index("\n---\n", 4)
+            meta = yaml.safe_load(raw[4:fm_end])
+            self.assertEqual(meta["name"], skill)
+            self.assertLessEqual(len(meta["description"]), 150, f"{skill} description > 150c")
+            for m in markers:
+                self.assertIn(m, raw, f"{skill} missing v0.8.9 marker: {m}")
+
+    def test_v082_batch2_skills_upgraded_cleanly(self):
+        """v0.8.9: Verify all 10 Batch-2 upgraded Horus skills keep valid frontmatter and key additions."""
+        expected_markers = {
+            "security-audit": ["OBSERVED", "THEORETICAL", "audit-report-format.md"],
+            "ui-ux-design-systems": ["margin-inline", "clamp(", "WCAG 2.2 AA"],
+            "horus-todo": ["Decision Boundary", "$DSH_HOME/horus/scripts/horus_todo.py", "promote"],
+            "horus-context-mode": ["journal_mode = WAL", "~16 KB", "4-Layer Memory Boundary"],
+            "horus-memory": ["Write Hygiene", "memory_handoff_begin", "parentID"],
+            "horus-next-steps": ["Zero Generic Filler", "Antigravity / DeepSeek Harness", "Next Step"],
+            "vibe-grill": ["10 Core Dimensions", "System Design Boundaries", "UI & Locale System"],
+            "vibe-critique": ["Pre-Critique Grounding", "Adversarial Self-Refutation", "security-audit"],
+            "vibe-test-gate": ["Zero-Waiver Security Floor", "libFuzzer", "verify --rerun"],
+            "agent-architecture-reference": ["Horus Subsystem Quick-Lookup Map", "horus-context-mode", "install_harness.py"],
+        }
+        import yaml
+        for skill, markers in expected_markers.items():
+            p = REPO_ROOT / ".opencode" / "skills" / skill / "SKILL.md"
+            raw = p.read_text(encoding="utf-8")
+            self.assertTrue(raw.startswith("---\n"), f"{skill} missing YAML frontmatter")
+            fm_end = raw.index("\n---\n", 4)
+            meta = yaml.safe_load(raw[4:fm_end])
+            self.assertEqual(meta["name"], skill)
+            self.assertLessEqual(len(meta["description"]), 150, f"{skill} description > 150c")
+            for m in markers:
+                self.assertIn(m, raw, f"{skill} missing v0.8.9 marker: {m}")
+
+    def test_v083_all_42_skills_upgraded_cleanly(self):
+        """v0.8.9: Verify all 24 Batch-3 upstream/router skills include Horus Super-Upgrade gates and valid frontmatter."""
+        batch3 = [
+            "brainstorming", "systematic-debugging", "test-driven-development",
+            "using-git-worktrees", "finishing-a-development-branch", "writing-skills",
+            "senior-engineering-partner", "engineering-craft", "speed-engineer",
+            "vercel-react-best-practices", "supabase-postgres-best-practices",
+            "mcp-builder", "webapp-testing", "design-engineering", "frontend-design",
+            "graphify", "agent-reach", "vibe", "vibe-spec-plan", "vibe-scoped-build",
+            "docx", "pdf", "pptx", "xlsx",
+        ]
+        import yaml
+        for skill in batch3:
+            p = REPO_ROOT / ".opencode" / "skills" / skill / "SKILL.md"
+            raw = p.read_text(encoding="utf-8")
+            self.assertTrue(raw.startswith("---\n"), f"{skill} missing YAML frontmatter")
+            fm_end = raw.index("\n---\n", 4)
+            meta = yaml.safe_load(raw[4:fm_end])
+            self.assertEqual(meta["name"], skill)
+            self.assertLessEqual(len(meta["description"]), 150, f"{skill} description > 150c")
+            self.assertIn("## Horus Super-Upgrade", raw, f"{skill} missing Horus Super-Upgrade section")
+
+    def test_v084_taskmaster_promax_integration(self):
+        """v0.8.9: Verify TaskMasterProMax upgraded dashboard, Foundry loop presets, RPG method, bridge, and zero catalog bloat."""
+        # 1. Upgraded dashboard files + /portfolio command
+        for f in ("server.mjs", "model.mjs", "index.html", "app.mjs", "styles.css", "demo.mjs"):
+            self.assertTrue((REPO_ROOT / ".opencode" / "dashboard" / f).exists(), f"Missing dashboard/{f}")
+        model_js = (REPO_ROOT / ".opencode" / "dashboard" / "model.mjs").read_text(encoding="utf-8")
+        for fn in ("parseHorusPlan", "parseHorusTodo", "horus-plan", "taskmaster", "[PROVEN]"):
+            self.assertIn(fn, model_js)
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "portfolio.md").exists())
+
+        # 2. RPG method & TaskMasterProMax bridge references (zero new top-level skills)
+        self.assertTrue((REPO_ROOT / ".opencode" / "skills" / "vibe-spec-plan" / "references" / "rpg-method.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "skills" / "planning-with-evidence" / "references" / "taskmaster-promax-bridge.md").exists())
+
+        # 3. horus_foundry.py loop --dry-run works locally without LINEAR_API_KEY
+        env = dict(os.environ)
+        env.pop("LINEAR_API_KEY", None)
+        r = subprocess.run(
+            [sys.executable, str(FOUNDRY_PY), "loop", "--preset", "test-coverage", "-n", "3", "--runner", "opencode", "--variant", "high", "--dry-run"],
+            capture_output=True, text=True, check=True, env=env,
+        )
+        data = json.loads(r.stdout.strip())
+        self.assertEqual(data["mode"], "loop")
+        self.assertEqual(data["preset"], "test-coverage")
+        self.assertEqual(data["variant"], "high")
+        self.assertTrue(data["dry_run"])
+
+        # 4. Missing --prompt-file fails cleanly with exit code 1 (no traceback)
+        r_bad = subprocess.run(
+            [sys.executable, str(FOUNDRY_PY), "loop", "--prompt-file", "/nonexistent/prompt.md", "--dry-run"],
+            capture_output=True, text=True, env=env,
+        )
+        self.assertEqual(r_bad.returncode, 1)
+        self.assertIn("--prompt-file not found", r_bad.stderr)
+
+        # 5. Dashboard HTML uses Horus Portfolio branding & mentions task_plan.md
+        idx_html = (REPO_ROOT / ".opencode" / "dashboard" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Horus<span>Portfolio</span>", idx_html)
+        self.assertIn("task_plan.md", idx_html)
+
+
+    def test_v086_modern_web_guidance_integration(self):
+        """v0.8.9: Verify modern-web-guidance skill, offline references, /modernize command, agent wiring, and <=5200c catalog cap."""
+        mwg = REPO_ROOT / ".opencode" / "skills" / "modern-web-guidance"
+        raw = (mwg / "SKILL.md").read_text(encoding="utf-8")
+        import yaml
+        meta = yaml.safe_load(raw[4:raw.index("\n---\n", 4)])
+        self.assertEqual(meta["name"], "modern-web-guidance")
+        self.assertLessEqual(len(meta["description"]), 150)
+        for marker in ("npx -y modern-web-guidance@latest", "legacy-scan", "ctx_search", "webapp-testing", "Zero-Overlap"):
+            self.assertIn(marker, raw)
+        self.assertTrue((mwg / "references" / "platform-cheatsheet.md").exists())
+        self.assertTrue((mwg / "references" / "legacy-modernization.md").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "modernize.md").exists())
+        for ag in ("web-engineer.md", "ui-gui-engineer.md"):
+            self.assertIn("modern-web-guidance", (REPO_ROOT / ".opencode" / "agents" / ag).read_text(encoding="utf-8"))
+        # Verify total catalog stays <= 5200 chars across all 43 skills
+        all_skills = sorted((REPO_ROOT / ".opencode" / "skills").glob("*/SKILL.md"))
+        self.assertEqual(len(all_skills), 44)
+        total_chars = sum(len(yaml.safe_load(s.read_text(encoding="utf-8")[4:s.read_text(encoding="utf-8").index("\n---\n", 4)])["description"]) for s in all_skills)
+        self.assertLessEqual(total_chars, 5200, f"Catalog exceeded 5200c: {total_chars}")
+
+    def test_v088_open_code_review_integration(self):
+        """v0.8.9: Verify unified open-code-review skill, review_pr.py, V1/V2 plugin, /ocr-review command, and <=5200c cap."""
+        ocr = REPO_ROOT / ".opencode" / "skills" / "open-code-review"
+        raw = (ocr / "SKILL.md").read_text(encoding="utf-8")
+        import yaml
+        meta = yaml.safe_load(raw[4:raw.index("\n---\n", 4)])
+        self.assertEqual(meta["name"], "open-code-review")
+        self.assertLessEqual(len(meta["description"]), 150)
+        for marker in ("ocr review --audience agent", "ocr delegate preview", "review_pr.py", "Zero-Overlap", "ctx_search"):
+            self.assertIn(marker, raw)
+        self.assertTrue((ocr / "scripts" / "review_pr.py").exists())
+        self.assertTrue((ocr / "references" / "native-and-pr.md").exists())
+        self.assertTrue((ocr / "references" / "delegate-mode.md").exists())
+        self.assertTrue((ocr / "references" / "opencode-plugin" / "open-code-review.ts").exists())
+        self.assertTrue((REPO_ROOT / ".opencode" / "commands" / "ocr-review.md").exists())
+        self.assertIn("open-code-review", (REPO_ROOT / ".opencode" / "agents" / "reviewer.md").read_text(encoding="utf-8"))
+        all_skills = sorted((REPO_ROOT / ".opencode" / "skills").glob("*/SKILL.md"))
+        self.assertEqual(len(all_skills), 44)
+        total_chars = sum(len(yaml.safe_load(s.read_text(encoding="utf-8")[4:s.read_text(encoding="utf-8").index("\n---\n", 4)])["description"]) for s in all_skills)
+        self.assertLessEqual(total_chars, 5200, f"Catalog exceeded 5200c: {total_chars}")
 
 if __name__ == "__main__":
     unittest.main()

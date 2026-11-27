@@ -1,3 +1,106 @@
+## [0.8.9] - 2026-11-27
+
+### Fixed — README Badges, Anchor & Counts Sync + Final Verification
+- Synced `README.md` hero tagline, badges (`44 zero-bloat skills`, `18 workflows`), section anchor (`#the-44-skills`), and exact catalog char count (`5,084` chars).
+- Verified 0 Python/JS/JSON/YAML/bash errors, 0 duplicate reference playbooks, 0 unrewritten skill/dashboard paths across all 6 tri-harness install targets, 0 `__pycache__`/`.pyc` artifacts, and 45/45 passing unit tests.
+
+## [0.8.8] - 2026-11-27
+
+### Added — OpenCodeReview (`alibaba/open-code-review`) — Unified, Zero-Bloat, Zero-Overlap
+- **Unified `open-code-review` Skill (113c description vs. 868c across 2 upstream skills — 87% less catalog bloat; 44 skills = 5,084 chars <= 5,200c cap):**
+  - Combines **Native Cross-Model Review** (`ocr review --audience agent`, true reviewer ≠ author model, SARIF/JSON/viewer), **LLM-Free Delegation Mode** (`ocr delegate preview` + `ocr delegate rule` with 65+ language rule packs using Horus's active model), and **GitHub PR Review** (bundled `scripts/review_pr.py` with policy-stop safety).
+  - Bundled official dual **OpenCode V1/V2 plugin** (`references/opencode-plugin/open-code-review.ts`, opt-in so OpenCode never errors without `@opencode-ai/plugin`).
+  - Added `horus-context-mode` (`ctx_search`/`ctx_execute`) paging, `graphify query` caller verification before fixing, OpenCode `question` triage gate (`header: "OCR Review"`), and an explicit **Zero-Overlap Routing Table** separating `open-code-review` from `vibe-critique` / `/horus-review` and `security-audit`.
+  - Added `/ocr-review` command (18 commands total) and wired optional cross-model CLI review into `.opencode/agents/reviewer.md`.
+- **Tests:** Added `test_v088_open_code_review_integration` (45/45 unit tests passing).
+
+## [0.8.7] - 2026-11-27
+
+### Optimized — Catalog Bloat Trim & README Sync
+- **Catalog Headroom (+217 chars saved):** Tightened the 10 longest `SKILL.md` descriptions (max 132c, down from 146c) without dropping a single trigger keyword, reducing total catalog size across all 43 skills from **5,188 chars** to **4,971 chars** (229 chars below the 5,200c cap).
+- **Documentation Sync (`README.md`):** Fixed remaining `42 skills` badge/text references to `43 skills` and added `modern-web-guidance` to the skills table.
+
+## [0.8.6] - 2026-11-27
+
+### Added — Modern Web Guidance (Google Chrome / Edge / Firefox / MDN) — Zero Bloat, Zero Overlap
+- **New Skill (`modern-web-guidance`, 112-char description; 43 skills = 5,188 chars <= 5,200c cap):** Integrated `GoogleChrome/modern-web-guidance` (255+ modern web platform guides across 17 disciplines) upgraded for OpenCode, Google Antigravity, and DeepSeek Harness:
+  - Compressed upstream's 698-char description to **112 chars** and fixed the literal `SKILL_VERSION` CLI placeholder.
+  - Added `horus-context-mode` (`ctx_search`/`ctx_execute`) paging for >9.5 KB guides and `legacy-scan --json` outputs.
+  - Added explicit **Zero-Overlap Routing Table** cleanly separating `modern-web-guidance` from `vercel-react-best-practices`, `ui-ux-design-systems`, `design-engineering`, `speed-engineer`, and `security-audit`.
+  - Bundled 2 offline progressive-disclosure references (`references/platform-cheatsheet.md`, `references/legacy-modernization.md`) so Baseline APIs and `legacy-scan` rubrics work even offline.
+  - Added `/modernize` command (17 commands total) and wired `modern-web-guidance` into `web-engineer.md` and `ui-gui-engineer.md`.
+- **Tests:** Added `test_v086_modern_web_guidance_integration` (44/44 unit tests passing).
+
+## [0.8.5] - 2026-11-27
+
+### Fixed — Audit Polish, Dashboard Branding, CLI Error Handling & Zero Bytecode Bloat
+- **Dashboard UX & Branding (`.opencode/dashboard/index.html`, `server.mjs`):** Updated top header, hero copy, Add Project help text, and validation errors to accurately reflect Horus (`task_plan.md` + `.horus/plan_state.json` `[PROVEN]`/`[UNPROVEN]` + `.todo.md`) alongside TaskMasterProMax (`.taskmaster/tasks/tasks.json`).
+- **Foundry Loop CLI Safety (`scripts/horus_foundry.py`):** Added clean validation and exit-code-1 error reporting when `--prompt-file` points to a missing file (instead of an unhandled traceback).
+- **Documentation Accuracy (`README.md`):** Updated command count to 16 slash commands/workflows, added `/portfolio` to the commands table, and added `.opencode/dashboard/` to the repo structure tree.
+- **Zero Bytecode Bloat:** Verified zero `__pycache__`/`.pyc`/`.bak` artifacts, zero duplicate reference playbooks, and zero catalog bloat (42 skills / 5,076 chars, max 146c).
+
+## [0.8.4] - 2026-11-27
+
+### Added — TaskMasterProMax Capabilities (Upgraded for OpenCode/Antigravity/DSH, Zero Bloat, Zero Overlap)
+Analyzed TaskMasterProMax (`task-master-ai` v0.43.1 privacy-first fork) against Horus v0.8.3 and integrated its 4 highest-value unique capabilities with **+0 new top-level skills** (42 skills / 5,076-char catalog unchanged) and **zero overlap**:
+- **Upgraded Multi-Project Local Portfolio Dashboard (`.opencode/dashboard/`, `/portfolio` command):** Ported TaskMasterProMax's zero-dependency Node 22+, loopback-only, CSP-hardened dashboard (`127.0.0.1:8917`) and **upgraded `model.mjs`** to natively parse **Horus `task_plan.md` + `.horus/plan_state.json` (`[PROVEN]`/`[UNPROVEN]` SHA-256 badges)**, **TaskMasterProMax `.taskmaster/tasks/tasks.json`**, and **Horus `.todo.md`** across up to 30 local projects. Wired into `install.ps1`, `install.sh`, and `scripts/install_harness.py` for all 3 harnesses.
+- **Tri-Harness Local Autonomous Loop (`scripts/horus_foundry.py loop`):** Upgraded TaskMasterProMax's Claude-only loop into a **100% local, zero-Linear-key** `loop` subcommand supporting **OpenCode (`--variant high`), Antigravity (`agy`), and DeepSeek Harness (`dsh`)** with all 5 presets (`default`, `test-coverage`, `linting`, `duplication`, `entropy`), custom `--prompt-file`, `.horus/loop-progress.txt`, and `<loop-complete>` / `<loop-blocked>` early exit.
+- **Repository Planning Graph (RPG) Method (`vibe-spec-plan/references/rpg-method.md`):** Integrated Dual-Semantics (Functional WHAT vs. Structural HOW) and explicit Topological Dependency Graphs (Phase 0→3) directly into `vibe-spec-plan`.
+- **Complexity Scoring (1–10) & Optional TaskMasterProMax MCP Bridge (`planning-with-evidence/references/taskmaster-promax-bridge.md`):** Added 1–10 complexity scoring (mandatory subtask expansion for tasks >= 6), DAG cycle checks, tag/branch isolation, and a disabled-by-default `"taskmaster-promax"` local MCP snippet in `opencode.jsonc` (zero default MCP tool bloat).
+- **Tests:** Added `test_v084_taskmaster_promax_integration` (43/43 unit tests passing).
+
+## [0.8.3] - 2026-11-27
+
+### Upgraded — Batch 3: All 24 Remaining Upstream & Router Skills (42/42 Complete)
+Appended tailored, domain-specific **Horus Super-Upgrade** gates to all 24 remaining upstream & router skills while preserving 100% of upstream content, all descriptions <= 150c, and the exact 42-skill / 5,076-char zero-bloat catalog:
+- **Superpowers & Workflow (6):** `brainstorming`, `systematic-debugging`, `test-driven-development`, `using-git-worktrees`, `finishing-a-development-branch`, `writing-skills`.
+- **Architecture, Perf, Web, DB, MCP & Testing (7):** `senior-engineering-partner` (kept lean < 10 KB), `engineering-craft`, `speed-engineer`, `vercel-react-best-practices`, `supabase-postgres-best-practices`, `mcp-builder`, `webapp-testing`.
+- **Design, Graphify, Reach & Vibe Routers (7):** `design-engineering`, `frontend-design`, `graphify`, `agent-reach`, `vibe`, `vibe-spec-plan`, `vibe-scoped-build`.
+- **Document & Office Deliverables (4):** `docx`, `pdf`, `pptx`, `xlsx` (render-inspect visual QA & zero-formula-error LibreOffice recalc gates).
+- **Tests:** Added `test_v083_all_42_skills_upgraded_cleanly` (42/42 unit tests passing).
+
+## [0.8.2] - 2026-11-27
+
+### Upgraded — Batch 2: 10 Horus-Adapted Workflow & Infrastructure Skills
+Upgraded the remaining 10 Horus-adapted core workflow, security, design-system, memory, and Vibe skills (preserving 42 skills / 5,076-char zero-bloat catalog and all descriptions <= 150c):
+- **`security-audit`**: Added automated first-pass recon commands (`git grep`/secret scan, `npm`/`pip`/`cargo` audit, SAST routed via `ctx_execute`), `OBSERVED` vs. `THEORETICAL` verification column, `SIZE_MAX` allocation checks, and `senior-engineering-partner` audit-report pairing.
+- **`ui-ux-design-systems`**: Added logical CSS & first-class RTL (`dir="rtl"`, `margin-inline`/`padding-block`), two-layer OKLCH primitive→semantic token architecture with FOUC-free theme parity, fluid `clamp()` typography, WCAG 2.2 AA floor, and explicit routing boundaries to `design-engineering` & `native-gui-architecture`.
+- **`horus-todo`**: Added `.todo.md` vs. `plan.py` decision boundary table, tri-harness standalone global script path resolution (OpenCode / Antigravity / DSH), and tri-harness confirmation fallback.
+- **`horus-context-mode`**: Added tri-harness SQLite WAL concurrency safety note (`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000`), concrete ~200-line / ~16 KB routing threshold, and 4-layer memory boundary table.
+- **`horus-memory`**: Added session lifecycle & write-hygiene rules (what to persist vs. never persist), `plan.py handoff` + `memory_handoff_begin` pairing, and tri-harness setup + `parentID` subagent isolation clarity.
+- **`horus-next-steps`**: Added tri-harness presentation fallback (OpenCode `question` tool vs. Antigravity/DSH compact bullet block) and zero-generic-filler grounding rule.
+- **`vibe-grill`**: Expanded discovery from 8 to 10 core dimensions by adding System Design Boundaries (`Architecture`) and UI & Locale System (`UI/UX`) so grilling feeds directly into `vibe-spec-plan`.
+- **`vibe-critique`**: Added pre-critique `graphify` blast-radius check, Reasoning Amplifier adversarial self-refutation check, and escalation triggers to `security-audit` / `senior-engineering-partner`.
+- **`vibe-test-gate`**: Added Deterministic Proof Matrix (Unit/Unhappy-Path, C/C++ sanitizers + `libFuzzer`, Playwright E2E/A11y/RTL, `plan.py verify --rerun`) and explicit Zero-Waiver Security Floor (#1, #2, #3, #6, #14).
+- **`agent-architecture-reference`**: Added a Horus Subsystem Quick-Lookup Map linking Horus modules directly to the 17 architecture chapters.
+- **Tests**: Added `test_v082_batch2_skills_upgraded_cleanly` (41/41 unit tests passing).
+
+## [0.8.1] - 2026-11-27
+
+### Changed — Default OpenCode Reasoning Variant (`high`)
+- Updated OpenCode subagent and Foundry variant defaults from `variant: xhigh` to `variant: high` (`--variant high`, `HORUS_FOUNDRY_VARIANT=high`) across `subagent-driven-dev`, `horus-foundry`, `horus.md`, `AGENTS.md`, and `tests/test_horus.py` for broader model compatibility while preventing OpenCode's silent `medium` downgrade.
+
+## [0.8.0] - 2026-11-27
+
+### Upgraded — 8 Core Horus Skills (One-by-One Engineering Deepening)
+Left all verbatim upstream skills untouched to prevent drift and bloat, while upgrading all 8 Horus-original / custom-adapted core skills (keeping all descriptions <= 150c and total catalog at 42 skills / 5,076 chars):
+- **`anti-hallucination-harness`**: Added False-Negative Search Guard (`git grep`, quoted globs, positive control checks), Context Mode log discipline (`ctx_search`/`ctx_execute`), and 4-Line Pre-Edit Contract / 5-Point Self-Check integration.
+- **`native-gui-architecture`**: Added concrete Win32/Direct2D/DWrite + DWM dark mode (`DwmSetWindowAttribute` `DWMWA_USE_IMMERSIVE_DARK_MODE`), Per-Monitor V2 DPI (`SetProcessDpiAwarenessContext`, `WM_DPICHANGED`), `D2DERR_RECREATE_TARGET` device-loss recovery, immediate-mode `SDL_WaitEventTimeout` idle power-saving, and a 4-point Verification Gate (100/150/200% DPI, Light/Dark, keyboard-only, idle CPU <1%).
+- **`planning-with-evidence`**: Added SHA-256 tamper-detection `--file` documentation, atomic `os.replace` + `fcntl`/`msvcrt` lock notes, `horus-memory` `memory_handoff_begin` cross-session pairing, and tri-harness standalone global path notes.
+- **`modern-c-mastery`**: Added `graphify` caller check + `ctx_search` sanitizer-log routing, explicit `SIZE_MAX`-checked `realloc` snippet, MSVC `/fsanitize=address`, and a `libFuzzer` gate for hostile-input parsers.
+- **`reverse-engineer-anything`**: Added `horus-context-mode` paging + `graphify extract . --code-only` decompilation-tree pairing and a mandatory `OBSERVED` vs `INFERRED` Evidence Table schema.
+- **`cpp20-win32-re`**: Added a concrete x86→x64 Porting Hazard Matrix (`DWORD`/`LONG`→`uintptr_t`, `SetWindowLongPtr`, `#pragma pack`, 32-bit `time_t`, inline `__asm`→`<intrin.h>`/`<bit>`, RAII handles, SEH `/EHa` vs `/EHsc`), `graphify`+`ctx_search` workflow, and a golden-vector differential verification gate.
+- **`subagent-driven-dev`**: Added smart kickoff rule, OpenCode `variant: xhigh` preservation rule, `horus-memory` `parentID` subagent isolation note, `horus-context-mode` discipline, and Reasoning Amplifier `INVARIANTS` field in Dispatch Packets.
+- **`horus-foundry`**: Updated for tri-harness `--runner opencode|antigravity|dsh`, `--variant xhigh` (`HORUS_FOUNDRY_VARIANT`), and standalone global script path resolution.
+- **Tests**: Added `test_v080_core_skills_upgraded_cleanly` (40/40 unit tests passing).
+
+## [0.7.9] - 2026-11-27
+### Changed
+- **Wired Deep System Design & UI Design Systems directly into `/vibe` (`vibe-spec-plan` & `vibe-scoped-build`)** with zero catalog bloat (+0 skills, +0 chars):
+  - `vibe-spec-plan` now explicitly delegates Tier-2 distributed/multi-tenant architecture to `engineering-craft` (`domain-modeling`, `codebase-design`) and `senior-engineering-partner` (`scalability-and-system-design`, `resilience-engineering`, `caching`, `disaster-recovery`, `threat-modeling-and-api-design`), and locks UI tokens via `ui-ux-design-systems` + `design-engineering`.
+  - `vibe-scoped-build` now explicitly enforces locked `ui-ux-design-systems` tokens, `break-ui` / `webapp-testing` verification on UI slices, and `senior-engineering-partner` resilience rules on backend slices.
+- Added unit test `test_vibe_wired_with_system_design_and_ui_design_systems` (39/39 tests).
+
 ## [0.7.8] - 2026-11-26
 ### Added
 - **Model-Agnostic Reasoning Amplifier (`AGENTS.md`, `horus.md`, `c-engineer.md`, `web-engineer.md`, `ui-gui-engineer.md`)**: Engineered concrete externalized scaffolding so even smaller, faster, or local models achieve frontier-level accuracy: **4-Line Pre-Edit Contract** (`ROOT_CAUSE`, `BLAST_RADIUS`, `INVARIANTS`, `PROOF_CMD`), **Atomic Edit → Immediate Verify**, **Hard 2-Strike Diagnosis Reset** (2 competing hypotheses + read-only falsification), **Zero-Memory-Guessing**, and **5-Point Pre-Delivery Self-Check**.

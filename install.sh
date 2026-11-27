@@ -81,11 +81,12 @@ if [[ "$HARNESS" == "opencode" || "$HARNESS" == "all" ]]; then
     CFG="$TARGET_DIR"
   fi
 
-  mkdir -p "$BASE/agents" "$BASE/skills" "$BASE/commands" "$BASE/context-mode" "$CFG/scripts"
+  mkdir -p "$BASE/agents" "$BASE/skills" "$BASE/commands" "$BASE/context-mode" "$BASE/dashboard" "$CFG/scripts"
   cp -r "$SCRIPT_DIR/.opencode/agents/." "$BASE/agents/"
   cp -r "$SCRIPT_DIR/.opencode/skills/." "$BASE/skills/"
   cp -r "$SCRIPT_DIR/.opencode/commands/." "$BASE/commands/"
   cp -r "$SCRIPT_DIR/.opencode/context-mode/." "$BASE/context-mode/"
+  cp -r "$SCRIPT_DIR/.opencode/dashboard/." "$BASE/dashboard/"
 
   for f in AGENTS.md opencode.jsonc; do
     dest="$CFG/$f"
@@ -127,7 +128,7 @@ if [[ "$HARNESS" == "opencode" || "$HARNESS" == "all" ]]; then
   if [[ "$MODE" == "global" ]] && command -v python3 >/dev/null 2>&1; then
     python3 "$CFG/scripts/install_harness.py" --harness opencode-global --mode global --target-dir "$BASE"
   fi
-  echo "Installed Horus v0.7.8 ($MODE) to $BASE"
+  echo "Installed Horus v0.8.9 ($MODE) to $BASE"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$CFG/scripts/validate_horus.py" || true

@@ -69,3 +69,8 @@ Use active voice as default. A CTA says exactly what happens when it is used: "S
 Treat failure and emptiness as moments for direction, not mood. Explain what went wrong and how to fix it, in the interface's voice rather than a person's. Errors don't apologize, and they are never vague about what happened. An empty screen is an invitation to act.
 
 Keep the tone conversational: plain verbs, sentence case, no filler, with tone matched to the brand and the audience. Let each written element do exactly one job.
+---
+
+## Horus Super-Upgrade (Token, RTL & Live-Render Gate)
+- **Zero Raw Hex Soup:** Anchor every bold aesthetic direction in two-layer OKLCH CSS custom properties (`ui-ux-design-systems`) with Light/Dark parity, fluid `clamp()` typography, and logical CSS (`margin-inline`, `padding-block`) for clean `dir="rtl"` support.
+- **Complete States + Browser Proof:** Implement all 7 interactive states (`default`, `hover`, `active`, `focus-visible`, `disabled`, `loading`, `error`), eliminate AI-slop clichés, and verify the live rendered UI with `webapp-testing` before declaring done.

@@ -94,3 +94,9 @@ with sync_playwright() as p:
   - `element_discovery.py` - Discovering buttons, links, and inputs on a page
   - `static_html_automation.py` - Using file:// URLs for local HTML
   - `console_logging.py` - Capturing console logs during automation
+---
+
+## Horus Super-Upgrade (Visual, A11y, RTL & Zero-Error Matrix)
+- **Hard Browser Assertions:** Every Playwright verification run MUST fail on any uncaught `pageerror`, `console.error`, or unexpected `5xx` network response.
+- **Full Surface Coverage:** Verify interactive state transitions, Light + Dark themes, keyboard-only navigation (`Tab`/`Enter`/`Escape`), mobile + desktop viewports, and `dir="rtl"` mirroring on bilingual/Arabic UIs.
+- **Zero-Bloat Traces:** Route verbose Playwright logs/HTML reports through `ctx_search` and close the task via `python <plan.py> done <id> --run "<pw_cmd>"`.

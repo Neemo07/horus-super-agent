@@ -317,3 +317,10 @@ question about a UI topic isn't automatically a visual question.
 
 If they accept, read `visual-companion.md` in this directory before
 starting the server.
+---
+
+## Horus Super-Upgrade (Tri-Harness & `xhigh` Design Discipline)
+- **Pre-Research First:** Before asking the user a single question, batch `graphify query`, `memory_query`, and targeted file reads so every design option is grounded in real repo code rather than assumptions.
+- **Tri-Harness Decision Polls:** On OpenCode, use the native `question` tool (`header` ≤ 12 chars, `options[].label` ≤ 30 chars, recommended choice first with `(Recommended)`, rationale in `description`). On Antigravity / DeepSeek Harness, present 1–2 concise choices per turn with `(Recommended)` first.
+- **Competing-Architecture Matrix:** Always compare **≥ 2 genuinely distinct designs** across complexity, blast radius, failure modes, and reversibility — never rubber-stamp the first idea.
+- **Clean Handoff:** Lock approved contracts/invariants into `.horus/STATE.md` (or `PRD.md` via `vibe-grill`) and hand straight into `vibe-spec-plan` + `plan.py init`.

@@ -312,3 +312,8 @@ with open("encrypted.pdf", "wb") as output:
 - For JavaScript libraries (pdf-lib), see REFERENCE.md
 - If you need to fill out a PDF form, follow the instructions in FORMS.md
 - For troubleshooting guides, see REFERENCE.md
+---
+
+## Horus Super-Upgrade (Page-by-Page Visual QA Gate)
+- **Mandatory Raster Inspection:** After generating, filling, or merging any `.pdf`, render pages to PNG (`pdftoppm -png -r 150` or `pypdfium2`) and inspect for text overlap, clipped tables/charts, broken form-field alignment, or missing embedded fonts.
+- **Text & Mechanical Closure:** Verify selectable text (`pdftotext`) and exact page count, then close via `python <plan.py> done <id> --file <output.pdf>`.

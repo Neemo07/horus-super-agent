@@ -90,3 +90,8 @@ The script writes `comments.xml`, `commentsExtended.xml`, `commentsIds.xml`, `co
 ## Dependencies
 
 `docx` (npm, preinstalled — install only if `require('docx')` fails) · `pandoc` · LibreOffice (`soffice`) · `pdftoppm` (Poppler)
+---
+
+## Horus Super-Upgrade (Visual Render & XML Integrity Gate)
+- **Mandatory Render-Inspect Loop:** After generating or editing any `.docx`, convert via LibreOffice → PDF → PNG (`soffice --headless --convert-to pdf` + `pdftoppm -png -r 150`) and visually inspect pages for clipped tables, orphaned headings, broken margins, or Unicode/RTL Arabic shaping issues.
+- **Mechanical Closure:** Validate OOXML relationships (`validate.py` if present) and record the finished file via `python <plan.py> done <id> --file <output.docx>`.

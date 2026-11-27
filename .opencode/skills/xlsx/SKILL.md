@@ -102,3 +102,8 @@ lone edited cell mid-row is the commonest silent error · guard denominators tha
 ## Dependencies
 
 `openpyxl`, `pandas`, `markitdown` (pip, preinstalled — install only if an import fails or the command is missing) · LibreOffice (`soffice`, auto-configured for sandboxed environments via `scripts/office/soffice.py`)
+---
+
+## Horus Super-Upgrade (Zero-Formula-Error Recalc Gate)
+- **Mandatory LibreOffice Recalculation & Error Scan:** Recalculate every generated/edited `.xlsx` via LibreOffice and programmatically scan every cell in every sheet for `#REF!`, `#DIV/0!`, `#VALUE!`, `#NAME?`, `#N/A`, and `#NUM!` — zero formula errors tolerated.
+- **Dynamic Formulas & Presentation:** Never hardcode computed totals/ratios when Excel formulas (`SUM`, `AVERAGE`, `IFERROR`, `INDEX/MATCH`) apply; auto-fit column widths with clean number formatting and close via `python <plan.py> done <id> --file <output.xlsx>`.

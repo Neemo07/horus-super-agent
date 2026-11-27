@@ -397,3 +397,9 @@ How future agents find your skill:
 6. **Loads example** (only when implementing)
 
 **Optimize for this flow** - put searchable terms early and often.
+---
+
+## Horus Super-Upgrade (Zero-Bloat & Tri-Harness Skill Standards)
+- **Strict Catalog Caps:** Every top-level `SKILL.md` `description:` MUST be **≤ 150 chars**, and the combined catalog across all skills MUST remain **≤ 5,200 chars**. Push deep playbooks into `references/` via progressive disclosure.
+- **Zero Overlap & Zero Collision:** Never duplicate a playbook filename across `.opencode/skills/*/references/` or re-implement an existing Horus skill's responsibility.
+- **Tri-Harness Compatibility:** Declare `compatibility: opencode, antigravity, dsh` when portable, avoid hardcoded `.opencode/`-only paths without global fallback notes, and verify every new/edited skill with `python3 scripts/validate_horus.py` + `python3 -m unittest discover -s tests -q`.

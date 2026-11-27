@@ -4,16 +4,16 @@
 
 # Horus Super Agent
 
-**A frontier multi-harness DAG-wave orchestrator and 42-skill engineering suite for [OpenCode](https://opencode.ai), Google Antigravity, and DeepSeek Harness Desktop App (`dsh`).**
+**A frontier multi-harness DAG-wave orchestrator and 44-skill engineering suite for [OpenCode](https://opencode.ai), Google Antigravity, and DeepSeek Harness Desktop App (`dsh`).**
 
 Specs before code · File-locked parallel subagents · Mechanical proof-gated task closure · 4-layer zero-overlap memory · Zero catalog bloat.
 
 [![CI](https://github.com/Neemo07/horus-super-agent/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.7.8-00d4aa?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.8.9-00d4aa?style=flat-square)](CHANGELOG.md)
 [![Harnesses](https://img.shields.io/badge/Harnesses-OpenCode%20%7C%20Antigravity%20%7C%20DSH-6e56cf?style=flat-square)](#standalone-global-install-recommended--works-for-every-app)
-[![Skills](https://img.shields.io/badge/skills-42%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
+[![Skills](https://img.shields.io/badge/skills-44%20zero--bloat-3b82f6?style=flat-square)](SKILLS.md)
 [![Agents](https://img.shields.io/badge/agents-1%20orchestrator%20%2B%206%20specialists-8b5cf6?style=flat-square)](#the-7-agents)
-[![Commands](https://img.shields.io/badge/commands-15%20workflows-06b6d4?style=flat-square)](#slash-commands--workflows)
+[![Commands](https://img.shields.io/badge/commands-18%20workflows-06b6d4?style=flat-square)](#slash-commands--workflows)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)](#installation)
 [![License](https://img.shields.io/badge/license-MIT-22c55e?style=flat-square)](LICENSE)
 
@@ -26,7 +26,7 @@ Specs before code · File-locked parallel subagents · Mechanical proof-gated ta
   <a href="#4-layer-memory-context--knowledge-graph">4-Layer Memory</a> ·
   <a href="#the-7-agents">Agents</a> ·
   <a href="#slash-commands--workflows">Commands</a> ·
-  <a href="#the-42-skills">Skills</a> ·
+  <a href="#the-44-skills">Skills</a> ·
   <a href="#tooling--scripts">Tooling</a> ·
   <a href="#configuration--verification">Config & Verify</a>
 </p>
@@ -45,7 +45,7 @@ Horus makes those failure modes structurally hard — across **OpenCode (V1/V2)*
 | **Hand-ticked "done"** | `plan.py done <id> --run "<cmd>"` requires exit code `0` and writes SHA-256 / log proofs to `evidence/`; hand-edited `[x]` fails `plan.py verify` as `UNPROVEN` |
 | **Context window drift & bloat** | 4-layer stack: `graphify` AST queries + `horus-context-mode` SQLite FTS5 sandbox + `horus-memory` wiki + `HANDOFF.md` |
 | **Parallel edit collisions** | Every wave task declares `OWNED_FILES`; only strictly disjoint file sets execute concurrently |
-| **Skill catalog bloat & overlap** | Hard mechanical cap enforced by `validate_horus.py`: every skill description ≤ 150 chars (`5,078` chars total across 42 skills), **0** duplicate sub-playbooks |
+| **Skill catalog bloat & overlap** | Hard mechanical cap enforced by `validate_horus.py`: every skill description ≤ 150 chars (`5,084` chars total across 44 skills), **0** duplicate sub-playbooks |
 | **Sycophantic self-review** | Read-only `reviewer` runs deterministic linters/typecheckers/tests (`mypy`, `ruff`, `bandit`, `semgrep`, `pytest`, `tsc`, `playwright`) and returns `PASS`/`FAIL` with `file:line` evidence |
 | **Bureaucratic friction on simple tasks** | Smart autonomy executes clear, scoped existing-repo tasks directly and reserves interactive polls for greenfield kickoffs, architectural forks, and destructive actions |
 
@@ -230,6 +230,9 @@ Available as `/command` in OpenCode, `.agents/workflows/` in Antigravity, and `.
 | `/horus-review` | Adversarial read-only review + deterministic verifiers + anti-test-theater audit |
 | `/vibe` | Enter the 7-stage Vibe Engineering Playbook (EN & AR templates + handbooks) |
 | `/graphify` | Official Graphify v0.9.115 AST knowledge graph build, query, path, explain, update & wiki |
+| `/ocr-review` | Cross-model AI code review (`ocr` native, LLM-free delegate 65+ language rules, GitHub PR `review_pr.py`, SARIF) |
+| `/modernize` | Scan & modernize legacy HTML/CSS/JS patterns with Google Chrome Modern Web Guidance + Baseline fallbacks |
+| `/portfolio` | Launch the upgraded local multi-project Horus + TaskMasterProMax portfolio dashboard (`127.0.0.1:8917`) |
 | `/reach` | Read-only multi-platform web/content CLI & MCP (`agent-reach`: YouTube subtitles, Reddit, X, GitHub, Bilibili, V2EX) |
 | `/horus-context` | Horus Context Mode token-savings stats (`ctx_stats`), `ctx_doctor`, JIT FTS5 search, or dashboard |
 | `/horus-memory` | Cross-session/cross-project `ai-memory` wiki retrieval, durable pages, handoffs, inbox & lint |
@@ -242,9 +245,9 @@ Available as `/command` in OpenCode, `.agents/workflows/` in Antigravity, and `.
 
 ---
 
-## The 42 Skills
+## The 44 Skills
 
-All 42 top-level skills enforce a strict **≤ 150-character description budget** (`5,078` chars total, `0` overlapping sub-playbooks). Heavy suites use **progressive disclosure** so only the exact reference handbook needed is ever loaded into context. Full upstream provenance lives in [SKILLS.md](SKILLS.md).
+All 44 top-level skills enforce a strict **≤ 150-character description budget** (`5,084` chars total, `0` overlapping sub-playbooks). Heavy suites use **progressive disclosure** so only the exact reference handbook needed is ever loaded into context. Full upstream provenance lives in [SKILLS.md](SKILLS.md).
 
 <details>
 <summary><b>Orchestration, Memory, Reach, Security & Systems (17 skills)</b></summary>
@@ -293,6 +296,8 @@ Templates (`PRD`, `IMPLEMENTATION_PLAN`, `AGENTS` EN/AR) and bilingual handbooks
 | Skill | Use It For |
 | :--- | :--- |
 | `speed-engineer` | Size-tiered (S/M/L) indexes, N+1, pagination, caching, image optimization, skeleton states |
+| `open-code-review` | Alibaba OpenCodeReview (`ocr`): cross-model review, LLM-free 65-lang delegate, GitHub PRs, SARIF, V1/V2 plugin |
+| `modern-web-guidance` | Google Chrome/MDN native HTML/CSS/JS APIs, Baseline fallbacks, `legacy-scan` & offline cheatsheet |
 | `vercel-react-best-practices` | Full v1.0.0 React/Next.js waterfall & bundle optimization (70 rules) |
 | `supabase-postgres-best-practices` | Full v1.1.1 schema, RLS, indexing, locking & connection management (31 rules) |
 | `frontend-design` | Distinctive, non-generic visual direction & typography |
@@ -367,9 +372,10 @@ horus-super-agent/
 │  └─ horus-hero.jpg               # README hero banner
 ├─ .opencode/                      # Single canonical source of truth
 │  ├─ agents/                      # horus + 6 specialist subagents
-│  ├─ commands/                    # 15 slash commands / workflows
+│  ├─ commands/                    # 18 slash commands / workflows
+│  ├─ dashboard/                   # Multi-project local portfolio console (Node 22+, zero deps)
 │  ├─ context-mode/                # Horus Context Mode SQLite FTS5 MCP server + dashboard
-│  └─ skills/                      # 42 zero-bloat skills (progressive-disclosure hubs)
+│  └─ skills/                      # 44 zero-bloat skills (progressive-disclosure hubs)
 ├─ scripts/
 │  ├─ validate_horus.py            # Tri-harness auto-detecting integrity validator
 │  ├─ install_harness.py           # Antigravity & DeepSeek Harness adapter + global path resolver
@@ -389,7 +395,7 @@ python -m pip install pyyaml
 # Auto-detect and validate installed harness(es) (OpenCode, Antigravity, DSH, or all)
 python scripts/validate_horus.py
 
-# Run full 38-test integrity & multi-harness suite (zero __pycache__)
+# Run full 45-test integrity & multi-harness suite (zero __pycache__)
 PYTHONDONTWRITEBYTECODE=1 python -m unittest discover -s tests -v
 
 # Lint first-party scripts

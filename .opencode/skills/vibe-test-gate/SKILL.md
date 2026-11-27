@@ -6,7 +6,7 @@ compatibility: opencode, antigravity, dsh, claude-code, codex
 metadata:
   source: abduallahJamal/vibe-engineering-playbook (full merged v1.0.0 + Horus integration)
   category: testing-and-release-gate
-  version: "1.1.0-horus"
+  version: "1.2.0-horus"
 ---
 
 # `vibe-test-gate` — Test-Theater Audit & Production Launch Gate
@@ -29,19 +29,22 @@ Inspect every test file created or modified and produce a verification table ans
 
 ---
 
-## Part 2 — Unhappy-Path Test Matrix
+## Part 2 — Deterministic Proof Matrix & Unhappy-Path Coverage
 
-Ensure automated or documented test coverage exists for:
-- Empty, malformed, oversized, boundary, and Unicode/RTL inputs.
-- Unauthenticated, expired-session, and horizontal/vertical privilege escalation (`User A` accessing `User B`'s resource).
-- Upstream timeout, database pool exhaustion, and network interruption behavior.
-- Prompt injection & data-exfiltration payloads on any LLM/chat input surface.
+Route verbose test/build/scanner logs through `horus-context-mode` (`ctx_execute` / `ctx_search`) and run real commands for every applicable surface:
+- **Unit, Integration & Unhappy-Path Suite:** Empty, malformed, oversized, boundary, and Unicode/RTL inputs; unauthenticated, expired-session, and horizontal/vertical privilege escalation (`User A` → `User B`); upstream timeout, DB pool exhaustion, network interruption; prompt-injection payloads on any LLM surface.
+- **Native C/C++ Surfaces:** Sanitizer build (`-fsanitize=address,undefined` or MSVC `/fsanitize=address`) + `libFuzzer` smoke run on hostile-input parsers.
+- **Web / UI Surfaces:** Playwright E2E (`webapp-testing`) verifying interactive states, Light/Dark theme, RTL (`dir="rtl"`) when applicable, keyboard-only navigation, and zero console/network error storms.
+- **Evidence Ledger Closure:** Run `python <plan.py> verify --rerun` to mechanically confirm all `[x]` tasks still pass on the final commit.
 
 ---
 
 ## Part 3 — 16-Point Pre-Launch Production Gate
 
-Before approving a production release, verify every item (`PASS` / `FAIL` / `N/A` with evidence — under Horus, run `plan.py verify --rerun` alongside this gate):
+Before approving a production release, verify every item (`PASS` / `FAIL` / `N/A` with real observed command/file evidence):
+
+> **Zero-Waiver Security Floor:** On `MVP / Production` builds, items **#1, #2, #3, #6, and #14** can NEVER be deferred to post-v1.
+
 1. Static security scan (SAST) & dependency vulnerability audit clean.
 2. Auth lifecycle verified end-to-end (signup, login, password reset, session expiry, RBAC, rate limits).
 3. Server-side validation enforced on all write/query endpoints; zero secrets in source or git history.
@@ -59,4 +62,4 @@ Before approving a production release, verify every item (`PASS` / `FAIL` / `N/A
 15. Legal, privacy, accessibility, and UI originality checks completed.
 16. Repository documentation (`README`, setup, architecture decisions) ready for the next engineer to onboard within one hour.
 
-After presenting the gate table, if any item is `FAIL`, invoke the **`question` tool** (`header: "Launch Gate"`, options: `Fix Blockers Now (Recommended)`, `Defer to Post-v1`, `Re-run Full Audit`) so the user explicitly decides how to proceed.
+After presenting the gate table, if any item is `FAIL`, invoke OpenCode's **`question` tool** (`header: "Launch Gate"`, options: `Fix Blockers Now (Recommended)`, `Defer Non-Security to Post-v1`, `Re-run Full Audit`) — or request explicit text sign-off on Antigravity/DSH — so the user explicitly decides how to proceed.

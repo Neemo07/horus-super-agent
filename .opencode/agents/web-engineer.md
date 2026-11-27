@@ -109,3 +109,4 @@ NEW_INVARIANTS: <new contracts/tokens for findings.md/STATE.md, or none>
 ISSUES: <blockers/limitations, or none>
 DECISION_OPTIONS: <if NEEDS_DECISION/BLOCKED: 2-3 options (label <=30 chars + trade-off) for horus question poll, else none>
 ```
+- **Modern Web Platform First:** Load `modern-web-guidance` before implementing HTML/CSS/DOM/client-JS patterns (dialogs, popovers, anchor positioning, forms, CWV, a11y, dark mode) to prefer native Baseline browser APIs over legacy JS boilerplate.

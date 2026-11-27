@@ -814,3 +814,9 @@ It connects over MCP, so the user keeps working in this same agent.
 - Always show token cost in the report.
 - Never hide cohesion scores behind symbols - show the raw number.
 - Never run HTML viz on a graph with more than 5,000 nodes without warning the user.
+---
+
+## Horus Super-Upgrade (CLI-First & `ai-memory` Coexistence Rule)
+- **CLI-First Always:** In Horus repos, run `graphify extract . --code-only` (build/refresh), `graphify query/path/explain` (before raw `grep`), and `graphify update .` after structural wave merges.
+- **NEVER Run `graphify opencode install`:** Its `graphify.js` hook prepends `echo` to shell commands and pollutes `ai-memory` tool observations. Keep `ai-memory` as the always-on memory plugin/MCP and `graphify` strictly CLI-first.
+- **4-Layer Boundary:** Use `graphify` for code AST/callers/blast radius, `horus-context-mode` (`ctx_*`) for huge logs/files, `plan.py` for task proofs, and `horus-memory` for cross-session decisions.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Horus Super Agent v0.7.8 — DAG-Wave Orchestrator + Vibe Playbook + Graphify + Horus Context Mode + Native OpenCode Poll UI
+  // Horus Super Agent v0.8.9 — DAG-Wave Orchestrator + Vibe Playbook + Graphify + Horus Context Mode + Native OpenCode Poll UI
   "default_agent": "horus",
   "instructions": [
     "AGENTS.md"
@@ -29,6 +29,12 @@
     // "graphify": {
     //   "type": "local",
     //   "command": ["graphify-mcp", "graphify-out/graph.json"],
+    //   "enabled": true
+    // },
+    // Optional: Local TaskMasterProMax MCP (build dist/mcp-server.js locally first; disabled by default for zero tool bloat)
+    // "taskmaster-promax": {
+    //   "type": "local",
+    //   "command": ["node", "/abs/path/to/taskmaster-promax/dist/mcp-server.js"],
     //   "enabled": true
     // },
     // "rea": {

@@ -449,6 +449,98 @@ def process_ticket(
     return {"issue": key, "stage": stage, "status": "DONE", "next": next_state, "branch": branch, "log": str(log_path)}
 
 
+
+LOOP_PRESETS: dict[str, str] = {
+    "default": (
+        "Complete ONE ready task from task_plan.md (`plan.py next`) or .taskmaster/tasks/tasks.json. "
+        "Follow the 4-Line Pre-Edit Contract, run deterministic tests, record proof via `plan.py done <id> --run`, "
+        "append a 1-line summary to {progress_file}, and stop. Emit <loop-complete>ALL_DONE</loop-complete> if no pending tasks remain, "
+        "or <loop-blocked>REASON</loop-blocked> if blocked."
+    ),
+    "test-coverage": (
+        "Find ONE critical untested user-facing or unhappy-path behavior, write a non-tautological test (verify it fails if logic is stubbed), "
+        "run the suite, append coverage/test notes to {progress_file}, and emit <loop-complete>TARGET_MET</loop-complete> when done."
+    ),
+    "linting": (
+        "Run the project linter and typechecker, fix ONE high-priority type/security/lint error with minimal diff, re-verify green, "
+        "and log remaining error count to {progress_file}. Emit <loop-complete>ZERO_ERRORS</loop-complete> when clean."
+    ),
+    "duplication": (
+        "Identify ONE high-impact duplicated code block, extract a clean shared utility preserving all callers (`graphify query`), "
+        "re-run tests, and log the refactor to {progress_file}. Emit <loop-complete>CLEAN</loop-complete> when no major clones remain."
+    ),
+    "entropy": (
+        "Find ONE high-risk code smell (>60-line function, >3-level nesting, magic numbers, or god module), refactor minimally with passing tests, "
+        "and log the cleanup to {progress_file}. Emit <loop-complete>CLEAN</loop-complete> when done."
+    ),
+}
+
+
+def run_local_loop(
+    repo_root: Path,
+    preset: str,
+    prompt_file: str | None,
+    iterations: int,
+    sleep_seconds: int,
+    progress_file: str,
+    runner: str,
+    agent: str,
+    model: str | None,
+    variant: str | None,
+    timeout: int,
+    dry_run: bool,
+) -> int:
+    """Fresh-context autonomous loop (TaskMasterProMax Ralph pattern, upgraded for OpenCode/Antigravity/DSH)."""
+    prog_path = (repo_root / progress_file).resolve()
+    if prompt_file:
+        pf = Path(prompt_file)
+        if not pf.is_file():
+            print(f"ERROR: --prompt-file not found: {pf}", file=sys.stderr)
+            return 1
+        base_prompt = pf.read_text(encoding="utf-8")
+    else:
+        base_prompt = LOOP_PRESETS[preset].format(progress_file=progress_file)
+
+    if dry_run:
+        print(json.dumps({
+            "mode": "loop",
+            "preset": preset,
+            "iterations": iterations,
+            "runner": runner,
+            "agent": agent,
+            "variant": variant,
+            "progress_file": str(prog_path),
+            "dry_run": True,
+        }))
+        return 0
+
+    prog_path.parent.mkdir(parents=True, exist_ok=True)
+    if not prog_path.exists():
+        prog_path.write_text(f"# Horus Loop Progress\n# Preset: {preset} | Runner: {runner}\n\n", encoding="utf-8")
+
+    logs_dir = repo_root / ".horus" / "foundry" / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+
+    for i in range(1, iterations + 1):
+        prompt = (
+            f"Iteration {i}/{iterations} (fresh context). Progress log: {progress_file}.\n"
+            f"Read the tail of {progress_file} before acting so you never repeat completed work.\n\n"
+            f"{base_prompt}"
+        )
+        log_path = logs_dir / f"loop-{preset}-iter{i}.log"
+        code, out = run_worker(repo_root, prompt, agent, model, timeout, log_path, runner=runner, variant=variant)
+        print(json.dumps({"iteration": i, "exit_code": code, "log": str(log_path)}))
+        if "<loop-complete>" in out:
+            print(f"Loop completed early at iteration {i}.")
+            return 0
+        if "<loop-blocked>" in out:
+            print(f"Loop blocked at iteration {i}; see {log_path}.", file=sys.stderr)
+            return 2
+        if i < iterations and sleep_seconds > 0:
+            time.sleep(sleep_seconds)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Horus Foundry — Linear-orchestrated parallel OpenCode background agents.")
     ap.add_argument("--dir", default=".", help="Project repository directory (default: current)")
@@ -471,9 +563,39 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--once", action="store_true", help="Process one wave and exit")
     p_run.add_argument("--dry-run", action="store_true", help="Plan claims without mutating Linear or running OpenCode")
 
+
+    p_loop = sp.add_parser("loop", help="Run fresh-context autonomous loop locally (no Linear key required)")
+    p_loop.add_argument("--preset", choices=tuple(LOOP_PRESETS.keys()), default="default", help="Loop preset (default, test-coverage, linting, duplication, entropy)")
+    p_loop.add_argument("--prompt-file", default=None, help="Optional custom prompt file overriding --preset")
+    p_loop.add_argument("-n", "--iterations", type=int, default=5, help="Max fresh-context iterations (default: 5)")
+    p_loop.add_argument("--sleep", type=int, default=2, help="Seconds between iterations (default: 2)")
+    p_loop.add_argument("--progress-file", default=".horus/loop-progress.txt", help="Progress log path")
+    p_loop.add_argument("--runner", choices=("opencode", "antigravity", "dsh"), default=None, help="CLI harness runner (default: opencode)")
+    p_loop.add_argument("--agent", default=None, help="Agent name (default: horus)")
+    p_loop.add_argument("--model", default=None, help="Optional provider/model override")
+    p_loop.add_argument("--variant", default=None, help="Optional reasoning effort variant (e.g. high)")
+    p_loop.add_argument("--timeout", type=int, default=1800, help="Per-iteration timeout in seconds")
+    p_loop.add_argument("--dry-run", action="store_true", help="Print resolved loop configuration without executing")
+
     args = ap.parse_args(argv)
     repo_root = Path(args.dir).resolve()
     load_env_file(repo_root)
+
+    if args.cmd == "loop":
+        return run_local_loop(
+            repo_root=repo_root,
+            preset=args.preset,
+            prompt_file=args.prompt_file,
+            iterations=max(1, args.iterations),
+            sleep_seconds=max(0, args.sleep),
+            progress_file=args.progress_file,
+            runner=args.runner or os.environ.get("HORUS_FOUNDRY_RUNNER", "opencode"),
+            agent=args.agent or os.environ.get("HORUS_FOUNDRY_AGENT", "horus"),
+            model=args.model or os.environ.get("HORUS_FOUNDRY_MODEL") or None,
+            variant=args.variant or os.environ.get("HORUS_FOUNDRY_VARIANT") or None,
+            timeout=args.timeout,
+            dry_run=args.dry_run,
+        )
 
     api_key = os.environ.get("LINEAR_API_KEY", "").strip()
     if not api_key:

@@ -281,3 +281,10 @@ These techniques are part of systematic debugging and available in this director
 - **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
 - **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
 - **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+---
+
+## Horus Super-Upgrade (`xhigh` Falsification & 2-Strike Circuit Breaker)
+- **Competing-Hypothesis Falsification:** Before editing a single line, write **≥ 2 falsifiable root-cause hypotheses** and run the cheapest deterministic read/command that distinguishes them.
+- **Hard 2-Strike Diagnosis Reset:** If 2 consecutive edit attempts fail to resolve the bug, **STOP editing**. Re-read the full function/file, run `graphify query` on callers/callees, and re-verify your root-cause hypothesis from raw runtime evidence.
+- **False-Negative Search Guard & Tail-First Logs:** Use `git grep` + quoted globs so empty output never fools you, and inspect large crash/server logs via `ctx_search(queries: [...], path: "...", reverse: true)` instead of dumping logs to context.
+- **Mechanical Regression Closure:** Reproduce with a failing test first (`Red`), apply the minimal fix (`Green`), and close the task via `python <plan.py> done <id> --run "<verify_cmd>"` (zero unverified "fixed" claims).

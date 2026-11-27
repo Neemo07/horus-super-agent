@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Multi-harness standalone & project adapter installer for Horus Super Agent v0.7.8.
+Multi-harness standalone & project adapter installer for Horus Super Agent v0.8.9.
 
 Ensures every skill, command/workflow, agent brief, plugin/hook reference, and script
 (`plan.py`, `horus_todo.py`, `horus_foundry.py`, `validate_horus.py`, `context-mode`)
@@ -20,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.7.8"
+VERSION = "0.8.9"
 MARKER_BEGIN = "<!-- HORUS:BEGIN -->"
 MARKER_END = "<!-- HORUS:END -->"
 HELPER_SCRIPTS = [
@@ -54,6 +54,7 @@ def rewrite_paths_in_text(
     out = (
         text.replace(".opencode/skills/", f"{skills_root}/")
         .replace(".opencode/context-mode/", f"{ctx_root}/")
+        .replace(".opencode/dashboard/", f"{ctx_root.rsplit('/', 1)[0]}/dashboard/")
     )
     if scripts_root:
         for script_name in HELPER_SCRIPTS:
@@ -326,6 +327,8 @@ def install_antigravity(repo_root: Path, mode: str, target_dir: Path, force_conf
     copy_tree(src_opencode / "skills", base / "skills")
     copy_tree(src_opencode / "agents", base / "agents")
     copy_tree(src_opencode / "context-mode", base / "context-mode")
+    if (src_opencode / "dashboard").is_dir():
+        copy_tree(src_opencode / "dashboard", base / "dashboard")
     rewrite_installed_markdown_paths(base / "skills", skills_root=skills_rel, ctx_root=ctx_root, scripts_root=scripts_root)
     rewrite_installed_markdown_paths(base / "agents", skills_root=skills_rel, ctx_root=ctx_root, scripts_root=scripts_root)
 
@@ -431,6 +434,8 @@ def install_dsh(
     copy_tree(src_opencode / "agents", base / "agents")
     copy_tree(src_opencode / "commands", base / "commands")
     copy_tree(src_opencode / "context-mode", base / "context-mode")
+    if (src_opencode / "dashboard").is_dir():
+        copy_tree(src_opencode / "dashboard", base / "dashboard")
     rewrite_installed_markdown_paths(base / "agents", skills_root=skills_rel, ctx_root=ctx_root, scripts_root=scripts_root)
     rewrite_installed_markdown_paths(base / "commands", skills_root=skills_rel, ctx_root=ctx_root, scripts_root=scripts_root)
 

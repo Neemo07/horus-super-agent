@@ -1,6 +1,6 @@
 ---
 name: engineering-craft
-description: "18-playbook senior engineering suite: deep modules, domain modeling, wayfinder, tickets, PRs, triage, retros, bug diagnosis, pre-commit."
+description: "18-playbook senior engineering suite: deep modules, domain modeling, wayfinder, tickets, PRs, triage, retros, bugs."
 license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
@@ -48,3 +48,8 @@ metadata:
 - **Interactive Choices:** If invoked via `/craft` without a specific target (and running as primary `horus`), call OpenCode's native **`question` tool** (`header: "Craft"`, concise labels ≤ 30 chars, `custom: true`) to pick the playbook first.
 - **No Duplication:** Use Horus's own `vibe-grill` / `brainstorming` for discovery, `reviewer` + `vibe-critique` for code review, `test-driven-development` for TDD, and `plan.py` for executable proof-gated task tracking — `engineering-craft` complements them without replacing them.
 - **Graphify & Context Mode First:** Pair `improve-codebase-architecture`, `domain-modeling`, and `diagnosing-bugs` with `graphify query` (AST coupling/god nodes) and `ctx_search` (large logs/traces).
+---
+
+## Horus Super-Upgrade (DAG Contract & Reasoning Amplifier Bridge)
+- **Feed Frozen Contracts Directly:** When running `domain-modeling`, `design-an-interface`, or `codebase-design` under Horus, write the resulting types, bounded contexts, and invariants directly into `.horus/STATE.md` (`Frozen Contracts & Invariants`) so parallel workers never drift.
+- **Caller-First Refactoring:** Always run `graphify query` on every symbol you plan to refactor before touching code, and verify with the Reasoning Amplifier's **4-Line Pre-Edit Contract** + **Atomic Edit → Immediate Verify**.

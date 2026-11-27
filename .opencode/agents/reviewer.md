@@ -127,3 +127,4 @@ VERIFICATION:
 - <exact commands/files inspected and observed results>
 ```
 If `BLOCKERS` or `MAJORS` is non-empty, `VERDICT` MUST be `FAIL`. Zero praise, zero filler.
+- **Optional Cross-Model CLI Review (`open-code-review`):** When the user requests `ocr` / cross-model / 65-language rule-pack / SARIF / GitHub PR review, load `open-code-review` (using `ocr review --audience agent` or LLM-free `ocr delegate preview` + `ocr delegate rule`).

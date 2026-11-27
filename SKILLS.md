@@ -1,4 +1,4 @@
-# Skill Provenance (v0.7.8 — 42 zero-bloat skills)
+# Skill Provenance (v0.8.9 — 44 zero-bloat skills)
 
 "verbatim" = byte-identical to the source. "full merged + Horus polls" = full upstream skill + bundled templates/handbooks upgraded with OpenCode's native `question` tool poll workflow. "offline edition" = re-authored, condensed, works with no network; replace with exact upstream using `python scripts/sync_upstream.py` (needs git + network).
 
@@ -23,3 +23,5 @@
 | `security-audit` + `/security` | Horus defensive AppSec edition | **defensive security & hardening audit** — OWASP Web/API/Auth, C/C++20/Win32 memory safety & compiler mitigations, CI/CD & supply-chain hygiene, CWE-grounded remediation |
 | `agent-architecture-reference` | claude-reviews-claude (MIT) | **17-chapter bilingual (EN/ZH) progressive-disclosure reference** — 19 EN + 19 ZH files under `.opencode/skills/agent-architecture-reference/references/` (query via `ctx_search` to avoid context bloat) |
 | Horus originals (8) | this project | `subagent-driven-dev` upgraded with native OpenCode `question` polls & `DECISION_OPTIONS` escalation |
+| `modern-web-guidance` + `/modernize` | GoogleChrome/modern-web-guidance (Apache-2.0) | **Horus zero-bloat edition** — 112c description, CLI `search`/`retrieve`/`legacy-scan`, Context Mode paging, Baseline fallback policy, offline `platform-cheatsheet.md` & `legacy-modernization.md` |
+| `open-code-review` + `/ocr-review` | alibaba/open-code-review (Apache-2.0) | **Horus unified edition** — merges native + delegate (112c desc vs 868c upstream), bundled `scripts/review_pr.py`, dual OpenCode V1/V2 plugin (`references/opencode-plugin/open-code-review.ts`), `native-and-pr.md` & `delegate-mode.md` |

@@ -163,3 +163,9 @@ Ready to implement <feature-name>
 | "The worktree directory is surely ignored already" | Run `git check-ignore`. An unignored worktree directory commits the whole tree into the repo. |
 | "Any directory name works" | Explicit instructions beat an existing project-local directory, which beats the `.worktrees/` default. |
 | "The workspace is fresh — baseline tests can wait" | A dirty baseline makes every later failure ambiguous. Run the tests now; proceeding past failures is your human partner's call. |
+---
+
+## Horus Super-Upgrade (Tri-Harness & Parallel Pod Safety)
+- **Clean Branch & Path Naming:** Create sibling worktrees outside the repo root (never nested inside `.git` or tracked directories) using `horus/<task-slug>` branches so Windows/POSIX paths stay short and clean.
+- **State Isolation:** Never share mutable `.horus/STATE.md` locks across concurrent worktrees; when running parallel autonomous pods, delegate directly to `horus-foundry` (`scripts/horus_foundry.py`) which manages isolated worktrees and merge gates automatically.
+- **Hygiene & Cleanup:** Always verify the baseline test suite passes inside the new worktree before editing, and run `git worktree remove <path> && git worktree prune` after merging.

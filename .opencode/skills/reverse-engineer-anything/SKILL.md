@@ -5,13 +5,14 @@ license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
   source: https://github.com/morluto/rea
+  version: "0.8.0-horus"
 ---
 # Reverse Engineer Anything (REA) — Dedicated Tool Routing & Evidence Skill
 
 Use REA (`morluto/rea`) when a software analysis, compatibility, porting, or defensive audit claim depends on a shipped binary, package, or artifact rather than available source code. Skip REA for ordinary complete-source repositories.
 
-## 1. Connection, CLI Fallback & Recovery
-- **MCP first:** If REA MCP tools are already connected in OpenCode, call them directly—do not run `rea doctor` or `rea setup` on every task.
+## 1. Connection, CLI Fallback, Context Mode & Recovery
+- **MCP first:** If REA MCP tools are already connected (OpenCode, Antigravity, or DSH), call them directly — do not run `rea doctor` or `rea setup` on every task.
 - **Enable in `opencode.jsonc`:**
   ```jsonc
   "mcp": {
@@ -23,6 +24,7 @@ Use REA (`morluto/rea`) when a software analysis, compatibility, porting, or def
   }
   ```
 - **CLI fallback (when MCP is unavailable):** Prefer an existing `rea` CLI, or run `npx -y rea-agents@latest <command> /abs/path/to/target --json` from a trusted directory outside the target project.
+- **Zero-Bloat Paging (`horus-context-mode` + `graphify`):** For huge import tables, disassembly listings, string tables, or archive inventories, use `detail: "summary"` + `inspect_analysis_view` paging or pipe JSON output through `ctx_search`/`ctx_execute`. When working on a decompiled C/C++ tree, run `graphify extract . --code-only` to trace cross-function call graphs before deep manual reads.
 - **Honest recovery:** Never auto-install Node.js, Java, Ghidra, IDA, Hopper, or Kuna. If a connection fails or an engine is missing, run `rea doctor`, report the exact blocker, and continue with zero-engine built-in REA tools where possible.
 
 ## 2. Target-First REA Tool Routing
@@ -51,8 +53,14 @@ Use REA (`morluto/rea`) when a software analysis, compatibility, porting, or def
 - **Release Exposure Audit (Defensive):** `audit_release_exposure` / `rea audit-release-exposure` on local `.app`, install dir, ASAR, or executable. Preserve unknown/unassessed checks honestly.
 - **SQLite / Captures:** `inspect_sqlite_database` (schema first), `inspect_web_network_capture` (HAR/SAZ/mitmproxy/qlog), `inspect_pcap_capture` / `inspect_packet_capture` (recorded captures only).
 
-## 3. Strict Evidence & Anti-Hallucination Contract
-- **Preserve Evidence IDs & Digests:** Quote exact SHA-256 digests, VAs/RVAs, section ranges, and `parent_evidence_id` references. Use `detail: "summary"` + `inspect_analysis_view` paging for large outputs instead of dumping raw megabytes into context.
-- **Observed Absence != Proof:** A missing import table, security directory, or metadata section is observed absence of that table—never claim it proves the binary is unsigned or never loads APIs dynamically.
+## 3. Strict Evidence Table & Anti-Hallucination Contract
+Record recovered facts in a terse, auditable schema before handing off to `c-engineer`:
+```markdown
+| VA / RVA | Symbol / Struct / Table | Status | Evidence ID / SHA-256 |
+| :--- | :--- | :--- | :--- |
+| 0x004012A0 | PacketHeader (size=6, opcode@+2) | OBSERVED | sha256:... / rea:... |
+| 0x004013F0 | EncryptionKeySlot (candidate) | INFERRED | static xref only (unverified at runtime) |
+```
+- **Observed Absence != Proof:** A missing import table, security directory, or metadata section is observed absence of that table — never claim it proves the binary is unsigned or never loads APIs dynamically.
 - **Static != Runtime:** Never claim observed runtime behavior solely from static decompilation or header inspection.
 - **Scope Boundary:** Use REA strictly for authorized software comprehension, compatibility/porting, interoperability, and defensive security auditing. Do not generate exploit payloads or DRM-bypass workflows.

@@ -62,3 +62,8 @@ Each rule file contains:
 - https://wiki.postgresql.org/wiki/Performance_Optimization
 - https://supabase.com/docs/guides/database/overview
 - https://supabase.com/docs/guides/auth/row-level-security
+---
+
+## Horus Super-Upgrade (Migration, EXPLAIN & RLS Proof Gate)
+- **Measured Query Plans:** Capture `EXPLAIN (ANALYZE, BUFFERS)` before and after index/query changes; use `CREATE INDEX CONCURRENTLY` for zero-downtime production migrations and verify rollback SQL.
+- **Mandatory Negative RLS Proof:** Every RLS policy change MUST be verified with a real negative test proving an unauthenticated caller and a different tenant (`User B`) receive zero unauthorized rows or writes (pair with `security-audit`).

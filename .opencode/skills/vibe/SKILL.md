@@ -58,3 +58,8 @@ At the start of any session on an existing codebase:
 1. Read `AGENTS.md` / `CLAUDE.md`, `PRD.md`, `IMPLEMENTATION_PLAN.md`, and (if present) `HANDOFF.md` / `task_plan.md` / `.horus/STATE.md`.
 2. Summarize your understanding of the architecture, constraints, and active task in **5 concise bullets**.
 3. Call the **`question` tool** (`header: "Confirm"`, options: `Proceed (Recommended)`, `Adjust Scope`, `Review Specs First`) to confirm before modifying files.
+---
+
+## Horus Super-Upgrade (Tri-Harness & System-Design Pipeline)
+- **End-to-End Flow:** `vibe-grill` (10 dimensions incl. System Design & UI/Locale) → `vibe-spec-plan` (Deep System Design via `engineering-craft`/`senior-engineering-partner` + UI Design System via `ui-ux-design-systems`/`design-engineering`) → `vibe-scoped-build` (4-Line Pre-Edit Contract + Atomic Edit→Verify + `plan.py done --run`) → `vibe-critique` (adversarial review) → `vibe-test-gate` (16-point zero-waiver launch gate).
+- **Tri-Harness Ready:** Works seamlessly across OpenCode (native `question` polls), Google Antigravity, and DeepSeek Harness (`dsh`).

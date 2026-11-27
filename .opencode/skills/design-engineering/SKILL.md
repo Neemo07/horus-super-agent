@@ -1,6 +1,6 @@
 ---
 name: design-engineering
-description: "23-playbook UI craft, motion, Stageshow, Figma MCP & landing-page suite: animations, gestures, break-ui, conversion copy, tokens, Swift."
+description: "23-playbook UI craft, motion, Stageshow, Figma MCP & landing-page suite: springs, gestures, break-ui, tokens, Swift."
 license: MIT
 compatibility: opencode, antigravity, dsh
 metadata:
@@ -57,3 +57,8 @@ All 23 full Design Engineering playbooks (20 Emil Kowalski craft playbooks + Ben
 - **Interactive Choices:** If the user invokes `/design` without a clear goal (and you are primary `horus`), call OpenCode's native **`question` tool** (`header: "Design"`, concise labels ≤ 30 chars, `custom: true`) to pick the workflow instead of dumping a text menu.
 - **Pair with Horus Tools:** Use `graphify query` to find affected UI components first, `ui-ux-design-systems` for OKLCH tokens/accessibility, and `webapp-testing` (Playwright) to visually verify rendered animations and `break-ui` edge cases.
 - **Durable Taste (`DESIGN.md`):** When running `learn-taste`, ensure `AGENTS.md` references `DESIGN.md` so future Horus sessions inherit the user's design rules automatically.
+---
+
+## Horus Super-Upgrade (Design-System & Verification Bridge)
+- **Clear Skill Routing:** Pair `design-engineering` (springs, choreography, Figma MCP sync, landing-page craft) with `ui-ux-design-systems` (OKLCH two-layer tokens, WCAG 2.2 AA, `dir="rtl"` logical CSS) and `native-gui-architecture` (Win32/Direct2D/Qt/ImGui desktop).
+- **Motion & A11y Non-Negotiables:** Honor `@media (prefers-reduced-motion: reduce)` on every animation, avoid physical `left`/`right` layout assumptions when RTL applies, and verify rendered motion/layout in a real browser via `webapp-testing` before closing UI waves.
